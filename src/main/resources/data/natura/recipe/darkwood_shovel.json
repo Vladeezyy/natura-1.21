@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A",
+    "B",
+    "B"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:darkwood_planks"
+    },
+    "B": {
+      "item": "natura:darkwood_stick"
+    }
+  },
+  "result": {
+    "id": "natura:darkwood_shovel"
+  }
+}

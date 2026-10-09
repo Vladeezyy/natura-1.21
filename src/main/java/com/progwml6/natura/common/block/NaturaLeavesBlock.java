@@ -37,7 +37,7 @@ public class NaturaLeavesBlock extends LeavesBlock {
             ServerLevel level = params.getLevel();
             var enchantments = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
             boolean silk = tool != null && EnchantmentHelper.getItemEnchantmentLevel(enchantments.getOrThrow(Enchantments.SILK_TOUCH), tool) > 0;
-            boolean sheared = tool != null && tool.is(Items.SHEARS);
+            boolean sheared = tool != null && tool.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.SHEARS_DIG);
             if (!silk && !sheared) {
                 int fortune = tool == null ? 0 : EnchantmentHelper.getItemEnchantmentLevel(enchantments.getOrThrow(Enchantments.FORTUNE), tool);
                 Random rand = new Random();

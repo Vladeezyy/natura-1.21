@@ -70,6 +70,10 @@ public final class NaturaGameTests {
         TESTS.put("netherrack_furnace", NaturaGameTests::furnace);
         TESTS.put("blaze_rails_and_hopper", NaturaGameTests::railsAndHopper);
         TESTS.put("clouds", NaturaGameTests::clouds);
+        TESTS.put("tools", NaturaGameTests::tools);
+        TESTS.put("kama", NaturaGameTests::kama);
+        TESTS.put("flint_and_blaze", NaturaGameTests::flintAndBlaze);
+        TESTS.put("imp_armor", NaturaGameTests::impArmor);
     }
 
     private NaturaGameTests() {}
@@ -543,6 +547,66 @@ public final class NaturaGameTests {
                 new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(helper.absolutePos(sulfur)), net.minecraft.core.Direction.UP, helper.absolutePos(sulfur), false));
         helper.assertTrue(helper.getBlockState(sulfur).isAir(), "flint and steel sets off a sulfur cloud");
         player.discard();
+        helper.succeed();
+    }
+
+    private static ItemStack tool(String id) {
+        return new ItemStack(com.progwml6.natura.tools.NaturaTools.TOOLS.get(id).get());
+    }
+
+    /** Tiers: bloodwood mines like iron (not obsidian), the bows' 1.12 durability. */
+    private static void tools(GameTestHelper helper) {
+        ItemStack blood = tool("bloodwood_pickaxe");
+        helper.assertTrue(blood.isCorrectToolForDrops(Blocks.DIAMOND_ORE.defaultBlockState()) && !blood.isCorrectToolForDrops(Blocks.OBSIDIAN.defaultBlockState()),
+                "the bloodwood pickaxe mines diamond ore but not obsidian");
+        helper.assertTrue(blood.getMaxDamage() == 350 && tool("ghostwood_pickaxe").getMaxDamage() == 59 && tool("fusewood_pickaxe").getMaxDamage() == 250,
+                "tool durability: bloodwood 350, ghostwood wood, fusewood iron");
+        helper.assertTrue(tool("darkwood_pickaxe").isCorrectToolForDrops(Blocks.IRON_ORE.defaultBlockState())
+                && !tool("ghostwood_pickaxe").isCorrectToolForDrops(Blocks.IRON_ORE.defaultBlockState()), "darkwood is stone, ghostwood wood");
+        int[] bows = {384, 1501, 162, 28};
+        String[] woods = {"ghostwood", "bloodwood", "darkwood", "fusewood"};
+        for (int i = 0; i < 4; i++) {
+            helper.assertTrue(tool(woods[i] + "_bow").getMaxDamage() == bows[i], woods[i] + " bow durability " + tool(woods[i] + "_bow").getMaxDamage());
+        }
+        helper.succeed();
+    }
+
+    /** The kama shears: leaves drop themselves, sheep get sheared. */
+    private static void kama(GameTestHelper helper) {
+        List<ItemStack> leaves = drops(helper, block("maple_leaves").defaultBlockState(), tool("bloodwood_kama"));
+        helper.assertTrue(leaves.size() == 1 && leaves.get(0).is(block("maple_leaves").asItem()), "a kama gets the leaves: " + leaves);
+        helper.assertTrue(tool("ghostwood_kama").getDestroySpeed(Blocks.COBWEB.defaultBlockState()) == 15.0F, "cobweb breaks at 15");
+        ServerPlayer player = player(helper);
+        var sheep = helper.spawn(net.minecraft.world.entity.EntityType.SHEEP, new BlockPos(3, 1, 3));
+        ItemStack kama = tool("fusewood_kama");
+        kama.interactLivingEntity(player, sheep, net.minecraft.world.InteractionHand.MAIN_HAND);
+        helper.assertTrue(sheep.isSheared() && kama.getDamageValue() == 1, "the kama shears a sheep");
+        player.discard();
+        helper.succeed();
+    }
+
+    private static void flintAndBlaze(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        BlockPos floor = new BlockPos(3, 1, 3);
+        helper.setBlock(floor, Blocks.NETHERRACK);
+        ItemStack flint = tool("flint_and_blaze");
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, flint);
+        flint.useOn(new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND,
+                new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(helper.absolutePos(floor)), net.minecraft.core.Direction.UP, helper.absolutePos(floor), false)));
+        helper.assertTrue(helper.getBlockState(floor.above()).is(Blocks.FIRE) && flint.getDamageValue() == 1 && flint.getMaxDamage() == 64,
+                "flint and blaze lights a fire and wears 1 of 64");
+        player.discard();
+        helper.succeed();
+    }
+
+    private static void impArmor(GameTestHelper helper) {
+        int[] defense = {1, 2, 3, 1};
+        String[] pieces = {"imp_armor_helmet", "imp_armor_chestplate", "imp_armor_leggings", "imp_armor_boots"};
+        for (int i = 0; i < 4; i++) {
+            var armor = (net.minecraft.world.item.ArmorItem) com.progwml6.natura.tools.NaturaTools.TOOLS.get(pieces[i]).get();
+            helper.assertTrue(armor.getDefense() == defense[i] && armor.getEnchantmentValue() == 15, pieces[i] + " defense " + armor.getDefense());
+        }
+        helper.assertTrue(tool("imp_armor_chestplate").getMaxDamage() == 16 * 33, "imp armor durability factor 33");
         helper.succeed();
     }
 

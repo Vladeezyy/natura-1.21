@@ -29,6 +29,17 @@ public final class NaturaTabs {
 
     private static DeferredHolder<CreativeModeTab, CreativeModeTab> tab(String name, List<DeferredItem<? extends Item>> items, Supplier<ItemStack> icon) {
         return TABS.register(name, () -> CreativeModeTab.builder().title(Component.translatable("itemGroup.natura." + name)).icon(icon)
-                .displayItems((params, output) -> items.forEach(item -> output.accept(item.get()))).build());
+                .displayItems((params, output) -> items.forEach(item -> {
+                    // 1.12 imp armor came enchanted in the creative tab
+                    var enchantments = com.progwml6.natura.tools.NaturaTools.ENCHANTED.get(item);
+                    if (enchantments == null) {
+                        output.accept(item.get());
+                        return;
+                    }
+                    ItemStack stack = new ItemStack(item.get());
+                    var lookup = params.holders().lookupOrThrow(Registries.ENCHANTMENT);
+                    enchantments.forEach(key -> stack.enchant(lookup.getOrThrow(key), 1));
+                    output.accept(stack);
+                })).build());
     }
 }

@@ -98,7 +98,15 @@ public final class DevScene {
         at(650, mc -> shot(mc, "plants"));
         at(660, mc -> server(mc, DevScene::netherBlocks));
         at(700, mc -> shot(mc, "nether_blocks"));
-        at(710, Minecraft::stop);
+        at(705, mc -> server(mc, DevScene::armorStand));
+        at(740, mc -> shot(mc, "imp_armor"));
+        at(745, mc -> mc.options.hideGui = false);
+        at(750, mc -> mc.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true)));
+        at(754, mc -> selectTab(mc, NaturaTabs.GENERAL.get()));
+        at(758, mc -> mc.screen.mouseScrolled(mc.getWindow().getGuiScaledWidth() / 2.0, mc.getWindow().getGuiScaledHeight() / 2.0, 0, -10));
+        at(768, mc -> shot(mc, "tab_general_tools"));
+        at(770, mc -> mc.setScreen(null));
+        at(780, Minecraft::stop);
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -352,6 +360,24 @@ public final class DevScene {
             c++;
         }
         player.teleportTo(level, base.getX() + 12.5, base.getY() + 9, base.getZ() + 24, 180.0F, 25.0F);
+    }
+
+    /** An armor stand in imp armor holding a bloodwood kama, next to the nether gallery. */
+    private static void armorStand(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        BlockPos pos = origin.offset(52, 0, 18);
+        var stand = new net.minecraft.world.entity.decoration.ArmorStand(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+        stand.setYRot(0);
+        stand.setYBodyRot(0);
+        stand.setYHeadRot(0);
+        String[] pieces = {"imp_armor_boots", "imp_armor_leggings", "imp_armor_chestplate", "imp_armor_helmet"};
+        net.minecraft.world.entity.EquipmentSlot[] slots = {net.minecraft.world.entity.EquipmentSlot.FEET, net.minecraft.world.entity.EquipmentSlot.LEGS,
+                net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.HEAD};
+        for (int i = 0; i < 4; i++) {
+            stand.setItemSlot(slots[i], new net.minecraft.world.item.ItemStack(com.progwml6.natura.tools.NaturaTools.TOOLS.get(pieces[i]).get()));
+        }
+        level.addFreshEntity(stand);
+        player.teleportTo(level, pos.getX() + 0.5, pos.getY() + 0.4, pos.getZ() + 3.5, 180.0F, 5.0F);
     }
 
     private static String shroomColor(String id) {

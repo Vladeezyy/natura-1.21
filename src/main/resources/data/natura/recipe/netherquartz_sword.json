@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A",
+    "A",
+    "B"
+  ],
+  "key": {
+    "A": [
+      {
+        "item": "minecraft:quartz_block"
+      },
+      {
+        "item": "minecraft:chiseled_quartz_block"
+      },
+      {
+        "item": "minecraft:quartz_pillar"
+      }
+    ],
+    "B": {
+      "item": "natura:ghostwood_stick"
+    }
+  },
+  "result": {
+    "id": "natura:netherquartz_sword"
+  }
+}

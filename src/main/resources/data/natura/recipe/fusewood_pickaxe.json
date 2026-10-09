@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    " B ",
+    " B "
+  ],
+  "key": {
+    "A": {
+      "item": "natura:fusewood_planks"
+    },
+    "B": {
+      "item": "natura:fusewood_stick"
+    }
+  },
+  "result": {
+    "id": "natura:fusewood_pickaxe"
+  }
+}

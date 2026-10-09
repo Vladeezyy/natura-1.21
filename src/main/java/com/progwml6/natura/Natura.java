@@ -33,6 +33,8 @@ public class Natura {
         container.registerConfig(ModConfig.Type.COMMON, NaturaConfig.SPEC);
         NaturaBlocks.init();
         NaturaItems.init();
+        com.progwml6.natura.tools.NaturaTools.init();
+        com.progwml6.natura.tools.NaturaTools.ARMOR.register(modBus);
         NaturaBlocks.BLOCKS.register(modBus);
         NaturaBlocks.ITEMS.register(modBus);
         NaturaBlocks.BLOCK_ENTITIES.register(modBus);

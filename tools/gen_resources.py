@@ -319,8 +319,9 @@ def door_drop(name):
                                                          "conditions": [{"condition": "minecraft:survives_explosion"}]}]}
 
 
+SHEARS = {"condition": "neoforge:can_item_perform_ability", "ability": "shears_dig"}
 SILK_OR_SHEARS = {"condition": "minecraft:any_of", "terms": [
-    {"condition": "minecraft:match_tool", "predicate": {"items": "minecraft:shears"}},
+    SHEARS,
     {"condition": "minecraft:match_tool", "predicate": {"predicates": {"minecraft:enchantments": [
         {"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}}]}
 
@@ -665,7 +666,7 @@ def nether():
     item_model("thorn_vines", layer0=vine)
     old("nether_thorn_vines", 0, "thorn_vines", "nether_thorn_vines")
     LOOT["thorn_vines"] = {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0, "entries": [{"type": "minecraft:item", "name": nid("thorn_vines")}],
-                                                               "conditions": [{"condition": "minecraft:match_tool", "predicate": {"items": "minecraft:shears"}}]}]}
+                                                               "conditions": [SHEARS]}]}
     tag("block", "minecraft:climbable", nid("thorn_vines"))
     tag("block", "minecraft:mineable/axe", nid("thorn_vines"))
     # glowshrooms
@@ -768,6 +769,50 @@ def nether():
             tag(kind, "minecraft:rails", nid(name))
 
 
+def copy_item_model(name):
+    """A 1.12 item model as it was (handheld tools, the bows with their pulling overrides), with 1.21 paths."""
+    with open(os.path.join(SRC, "models", "item", name + ".json"), encoding="utf-8") as fh:
+        m = json.load(fh)
+    parent = m.get("parent", "")
+    if parent and ":" not in parent:
+        m["parent"] = "minecraft:" + parent
+    if "textures" in m:
+        m["textures"] = {k: tex_path(v) for k, v in m["textures"].items()}
+    w(os.path.join(ASSETS, "models", "item", name + ".json"), m)
+
+
+def tools():
+    """1.12 NaturaTools: the tools keep their 1.12 ids and item models; imp armor gets the 1.21 armor layer textures."""
+    names = ["imp_armor_helmet", "imp_armor_chestplate", "imp_armor_leggings", "imp_armor_boots", "flint_and_blaze"]
+    for wood in ("ghostwood", "bloodwood", "darkwood", "fusewood", "netherquartz"):
+        names += [f"{wood}_{kind}" for kind in ("sword", "pickaxe", "shovel", "axe", "kama")]
+        if wood != "netherquartz":
+            names.append(f"{wood}_bow")
+            for stage in range(3):
+                copy_item_model(f"{wood}_bow_pulling_{stage}")
+    for name in names:
+        copy_item_model(name)
+        old(name, 0, name, name, kind="item")
+    armor = os.path.join(ASSETS, "textures", "models", "armor")
+    os.makedirs(armor, exist_ok=True)
+    shutil.copyfile(os.path.join(SRC, "textures", "armor", "imp_armor.png"), os.path.join(armor, "imp_layer_1.png"))
+    shutil.copyfile(os.path.join(SRC, "textures", "armor", "imp_armor_legs.png"), os.path.join(armor, "imp_layer_2.png"))
+    for wood in ("ghostwood", "bloodwood", "darkwood", "fusewood", "netherquartz"):
+        tag("item", "minecraft:swords", nid(f"{wood}_sword"), nid(f"{wood}_kama"))
+        tag("item", "minecraft:pickaxes", nid(f"{wood}_pickaxe"))
+        tag("item", "minecraft:shovels", nid(f"{wood}_shovel"))
+        tag("item", "minecraft:axes", nid(f"{wood}_axe"))
+        tag("item", "c:tools/shear", nid(f"{wood}_kama"))
+        if wood != "netherquartz":
+            tag("item", "c:tools/bow", nid(f"{wood}_bow"))
+            tag("item", "minecraft:enchantable/bow", nid(f"{wood}_bow"))
+            tag("item", "minecraft:enchantable/durability", nid(f"{wood}_bow"))
+    for piece, slot in (("helmet", "head"), ("chestplate", "chest"), ("leggings", "leg"), ("boots", "foot")):
+        tag("item", f"minecraft:enchantable/{slot}_armor", nid(f"imp_armor_{piece}"))
+        tag("item", "minecraft:enchantable/armor", nid(f"imp_armor_{piece}"))
+        tag("item", "minecraft:enchantable/durability", nid(f"imp_armor_{piece}"))
+
+
 def crop_drops(name, max_age, crop, seed, p):
     """1.12 BlockOverworldCrops: the crop when ripe (else the seed), and when ripe 3 more tries at a seed
     (rand(2 * max) <= age), never with fortune (1.12 dropped crops with fortune 0)."""
@@ -863,6 +908,9 @@ def convert_ingredient(i):
     if i.get("type") == "forge:ore_dict":
         return {"tag": ORE[i["ore"]]} if i["ore"] in ORE else None
     item = i["item"]
+    if item.startswith("natura:") and i.get("data") == 32767:
+        # the 1.12 wildcard: every block the metadata variants became
+        return [{"item": nid(new)} for (old_id, _), new in OLD.items() if old_id == item[7:]] or None
     if item.startswith("natura:"):
         new = OLD.get((item[7:], i.get("data", 0)))
         if new is None:
@@ -1013,6 +1061,7 @@ def main():
     woods()
     plants()
     nether()
+    tools()
     items()
     recipes()
     smelting()

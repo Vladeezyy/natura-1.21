@@ -13,7 +13,7 @@ NeoForge 21.1. The 1.12 source is the specification: `git clone -b 1.12 https://
    materials, food, soups, seed bags, bone meal bag. ✅
 4. Nether blocks: heat sand, tainted soil, nether glass, thorn vines, glowshrooms, respawn obelisk, netherrack furnace,
    blaze hopper, blaze rails, nether lever / button / pressure plate; the clouds. ✅
-5. Tools: nether wood and quartz tools, kamas, bows, flint and blaze, imp armor.
+5. Tools: nether wood and quartz tools, kamas, bows, flint and blaze, imp armor. ✅
 6. Entities: imp, heatscar spider (+ baby), nitro creeper.
 7. World generation: trees, berry bushes, crops, clouds, glowshrooms, saguaro, vines, nether trees; clouds.
 8. JEI, config, game tests, release.
@@ -175,3 +175,25 @@ Differences:
 - One netherrack furnace block with a lit state instead of two blocks.
 - Breaking an obelisk clears the breaker's respawn point (1.12 reset the spawn dimension, leaving a stale position).
 - Tainted soil also carries nether wart and the 1.21 nether plants (1.12: every nether plant type).
+
+## Phase 5: tools and imp armor
+
+As in 1.12:
+- Ghostwood tools are wooden, darkwood and nether quartz stone, fusewood iron, each with the vanilla stats of that
+  material (1.12 used the vanilla materials). Bloodwood has its own: mines like iron (not obsidian: 1.12 set its harvest
+  level 2), 350 uses, speed 7, +3 damage, enchantability 24, no repair item. The 1.12 ids are kept (`ghostwood_sword`,
+  `netherquartz_kama`, ...).
+- Kamas are swords that work as shears: cobweb and leaves break at 15, wool at 5, they shear sheep (any shearable mob)
+  and get the sheared drops of leaves, grass and vines (the leaves loot tables use the NeoForge `shears_dig` ability, so
+  any shears do).
+- Bows: ghostwood 384, bloodwood 1501, darkwood 162, fusewood 28 uses, otherwise vanilla bows. Their "pull" model
+  property compared the drawn item with a field that was still null when the bow was made, so they only ever show the
+  first pulling frame; kept.
+- Flint and blaze: 64 uses, lights fire in the air next to the clicked face (portals too), every use wears it.
+- Imp armor ("Impskin"): durability factor 33, 1 / 2 / 3 / 1 (helmet, chestplate, leggings, boots), enchantability 15,
+  no repair item. The creative tab pieces come enchanted (Protection / Blast Protection / Projectile Protection /
+  Feather Falling, each with Fire Protection), the crafted ones do not.
+
+Differences:
+- 1.12 kamas also broke the block normally after shearing it (sheared drops plus the normal ones); here a kama breaking
+  leaves gives the sheared drops only, like shears.

@@ -54,6 +54,23 @@ public final class NaturaClient {
         NaturaBlocks.COLORED_GRASS.forEach((id, block) -> event.register((stack, tint) -> 0xFF000000 | GrassColorizer.colorStatic(grassType(id)), block.get()));
     }
 
+    /**
+     * 1.12 ItemNaturaBow: "pulling" like the vanilla bow; its "pull" compared the drawn item with a field that was still
+     * null when the bow was made, so it was always 0 and the bows only ever show their first pulling frame.
+     */
+    @SubscribeEvent
+    static void setup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            for (String wood : new String[] {"ghostwood", "bloodwood", "darkwood", "fusewood"}) {
+                var bow = com.progwml6.natura.tools.NaturaTools.TOOLS.get(wood + "_bow").get();
+                net.minecraft.client.renderer.item.ItemProperties.register(bow, net.minecraft.resources.ResourceLocation.withDefaultNamespace("pulling"),
+                        (stack, level, entity, seed) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+                net.minecraft.client.renderer.item.ItemProperties.register(bow, net.minecraft.resources.ResourceLocation.withDefaultNamespace("pull"),
+                        (stack, level, entity, seed) -> 0.0F);
+            }
+        });
+    }
+
     @SubscribeEvent
     static void reloadListeners(net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(new GrassColorizer());
