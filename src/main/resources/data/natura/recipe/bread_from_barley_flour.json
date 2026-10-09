@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "natura:barley_flour"
+  },
+  "result": {
+    "id": "minecraft:bread"
+  },
+  "experience": 0.5,
+  "cookingtime": 200
+}

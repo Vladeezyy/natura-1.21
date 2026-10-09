@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "AAA",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "tag": "c:crops/potato"
+    }
+  },
+  "result": {
+    "id": "natura:potatoes_seed_bag"
+  }
+}

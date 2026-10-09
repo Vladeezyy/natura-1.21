@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "natura:block/saguaro_baby"
+    },
+    "age=1": {
+      "model": "natura:block/saguaro_baby"
+    }
+  }
+}

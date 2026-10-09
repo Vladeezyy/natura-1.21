@@ -57,6 +57,13 @@ public final class NaturaGameTests {
         TESTS.put("fusewood_explodes", NaturaGameTests::fusewoodExplodes);
         TESTS.put("recipes", NaturaGameTests::recipes);
         TESTS.put("workbench_menu", NaturaGameTests::workbenchMenu);
+        TESTS.put("crops", NaturaGameTests::crops);
+        TESTS.put("berry_bushes", NaturaGameTests::berryBushes);
+        TESTS.put("saguaro", NaturaGameTests::saguaro);
+        TESTS.put("food", NaturaGameTests::food);
+        TESTS.put("seed_bag", NaturaGameTests::seedBag);
+        TESTS.put("plants_on_colored_grass", NaturaGameTests::coloredGrass);
+        TESTS.put("tempt", NaturaGameTests::tempt);
     }
 
     private NaturaGameTests() {}
@@ -305,6 +312,132 @@ public final class NaturaGameTests {
         }
         helper.assertTrue(leaves > 0, tree + ": no leaves");
         helper.assertTrue(decaying * 10 <= leaves, tree + ": " + decaying + " of " + leaves + " leaves would decay");
+        helper.succeed();
+    }
+
+    /** Barley: planted on farmland, bone meal adds 2-5 stages, picked when ripe (back to stage 1, one barley). */
+    private static void crops(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        BlockPos pos = new BlockPos(2, 2, 2);
+        helper.setBlock(pos.below(), Blocks.FARMLAND);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.progwml6.natura.common.NaturaItems.BARLEY_SEEDS.get(), 2));
+        var hit = new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(helper.absolutePos(pos.below())), net.minecraft.core.Direction.UP,
+                helper.absolutePos(pos.below()), false);
+        player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
+        var crop = (com.progwml6.natura.common.block.NaturaCropBlock) block("barley_crop");
+        helper.assertTrue(helper.getBlockState(pos).is(crop) && player.getMainHandItem().getCount() == 1, "barley seeds plant barley on farmland");
+        crop.performBonemeal(helper.getLevel(), helper.getLevel().random, helper.absolutePos(pos), helper.getBlockState(pos));
+        int age = helper.getBlockState(pos).getValue(crop.getAgeProperty());
+        helper.assertTrue(age >= 2, "bone meal grows at least two stages: " + age);
+        helper.setBlock(pos, crop.defaultBlockState().setValue(crop.getAgeProperty(), 3));
+        List<ItemStack> ripe = drops(helper, helper.getBlockState(pos), ItemStack.EMPTY);
+        helper.assertTrue(ripe.get(0).is(com.progwml6.natura.common.NaturaItems.BARLEY.get()), "a ripe crop drops barley: " + ripe);
+        helper.getBlockState(pos).useWithoutItem(helper.getLevel(), player, new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(helper.absolutePos(pos)),
+                net.minecraft.core.Direction.UP, helper.absolutePos(pos), false));
+        helper.assertTrue(helper.getBlockState(pos).getValue(crop.getAgeProperty()) == 1, "picked barley goes back to stage 1");
+        helper.assertTrue(player.getInventory().countItem(com.progwml6.natura.common.NaturaItems.BARLEY.get()) == 1, "the picked barley is in the inventory");
+        player.discard();
+        helper.succeed();
+    }
+
+    private static void berryBushes(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        BlockPos pos = new BlockPos(2, 1, 3);
+        var bush = (com.progwml6.natura.common.block.NaturaBerryBushBlock) block("raspberry_bush");
+        helper.setBlock(pos, bush.defaultBlockState().setValue(com.progwml6.natura.common.block.NaturaBerryBushBlock.AGE, 2));
+        for (int i = 0; i < 20; i++) {
+            bush.performBonemeal(helper.getLevel(), helper.getLevel().random, helper.absolutePos(pos), helper.getBlockState(pos));
+        }
+        helper.assertTrue(helper.getBlockState(pos).getValue(com.progwml6.natura.common.block.NaturaBerryBushBlock.AGE) == 2, "bone meal never ripens a bush");
+        helper.assertTrue(helper.getBlockState(pos.above()).is(bush), "bone meal on a grown bush starts one above");
+        helper.setBlock(pos, bush.defaultBlockState().setValue(com.progwml6.natura.common.block.NaturaBerryBushBlock.AGE, 3));
+        helper.getBlockState(pos).useWithoutItem(helper.getLevel(), player, new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(helper.absolutePos(pos)),
+                net.minecraft.core.Direction.UP, helper.absolutePos(pos), false));
+        helper.assertTrue(helper.getBlockState(pos).getValue(com.progwml6.natura.common.block.NaturaBerryBushBlock.AGE) == 2
+                && player.getInventory().countItem(com.progwml6.natura.common.NaturaItems.BERRIES.get("raspberry").get()) == 1, "picking a ripe bush gives a raspberry");
+        player.discard();
+        helper.succeed();
+    }
+
+    /** A baby saguaro on sand grows into a connected saguaro; it hurts what touches it. */
+    private static void saguaro(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(4, 2, 4);
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(7, 1, 7))) {
+            helper.setBlock(p, Blocks.SAND);
+        }
+        helper.setBlock(pos, block("saguaro_baby"));
+        var gen = new com.progwml6.natura.world.tree.SaguaroGenerator(block("saguaro").defaultBlockState(), true, true);
+        gen.generateSaguaro(new java.util.Random(1), new com.progwml6.natura.world.tree.TreeWorld(helper.getLevel()), helper.absolutePos(pos));
+        BlockState trunk = helper.getBlockState(pos);
+        helper.assertTrue(trunk.is(block("saguaro")), "the baby became a saguaro: " + trunk);
+        helper.assertTrue(trunk.getValue(net.minecraft.world.level.block.PipeBlock.UP) && trunk.getValue(net.minecraft.world.level.block.PipeBlock.DOWN),
+                "the trunk connects up and to the sand");
+        helper.setBlock(pos.offset(3, 2, 0), Blocks.AIR);
+        helper.setBlock(new BlockPos(1, 2, 1), block("saguaro_baby"));
+        helper.setBlock(new BlockPos(1, 1, 1), Blocks.GLASS);
+        helper.assertTrue(helper.getBlockState(new BlockPos(1, 2, 1)).isAir(), "a baby saguaro without sand breaks");
+        helper.succeed();
+    }
+
+    /** 1.12 food numbers; soups give their bowl back. */
+    private static void food(GameTestHelper helper) {
+        var items = com.progwml6.natura.common.NaturaItems.class;
+        Object[][] expected = {{"raspberry", 1, 16}, {"impmeat_cooked", 8, 32}, {"potash_apple", 4, 1}, {"cactus_juice", 1, 12}, {"berry_medley", 5, 32},
+                {"bloodwood_glowshroom_stew", 3, 32}, {"ghostwood_glowshroom_stew", 6, 32}};
+        for (Object[] e : expected) {
+            var item = BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Natura.MODID, (String) e[0]));
+            var food = new ItemStack(item).getFoodProperties(null);
+            helper.assertTrue(food != null && food.nutrition() == (int) e[1] && food.eatDurationTicks() == (int) e[2], e[0] + ": " + food);
+        }
+        ServerPlayer player = player(helper);
+        player.getFoodData().setFoodLevel(10);
+        ItemStack stew = new ItemStack(com.progwml6.natura.common.NaturaItems.SOUPS.get("ghostwood_mushroom_stew").get());
+        helper.assertTrue(stew.getMaxStackSize() == 1, "stews stack to one");
+        stew.finishUsingItem(helper.getLevel(), player);
+        helper.assertTrue(player.getInventory().countItem(com.progwml6.natura.common.NaturaItems.BOWLS.get("ghostwood").get()) == 1, "the ghostwood bowl comes back");
+        new ItemStack(com.progwml6.natura.common.NaturaItems.BERRIES.get("duskberry").get()).finishUsingItem(helper.getLevel(), player);
+        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION) && player.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS),
+                "a duskberry gives night vision and blindness");
+        player.discard();
+        helper.succeed();
+    }
+
+    private static void seedBag(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(1, 1, 1), new BlockPos(3, 1, 3))) {
+            helper.setBlock(p, Blocks.FARMLAND);
+        }
+        helper.setBlock(new BlockPos(3, 1, 3), Blocks.DIRT);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.progwml6.natura.common.NaturaItems.COTTON_SEED_BAG.get(), 2));
+        BlockPos centre = helper.absolutePos(new BlockPos(2, 1, 2));
+        player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND,
+                new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(centre), net.minecraft.core.Direction.UP, centre, false)));
+        int planted = 0;
+        for (BlockPos p : BlockPos.betweenClosed(new BlockPos(1, 2, 1), new BlockPos(3, 2, 3))) {
+            if (helper.getBlockState(p).is(block("cotton_crop"))) planted++;
+        }
+        helper.assertTrue(planted == 8 && player.getMainHandItem().getCount() == 1, "the bag plants the 8 farmland blocks and is used once: " + planted);
+        player.discard();
+        helper.succeed();
+    }
+
+    private static void coloredGrass(GameTestHelper helper) {
+        for (String grass : new String[] {"topiary_grass", "bluegrass", "autumnal_grass"}) {
+            helper.setBlock(new BlockPos(2, 1, 2), block(grass));
+            helper.assertTrue(block("bluebells").defaultBlockState().canSurvive(helper.getLevel(), helper.absolutePos(new BlockPos(2, 2, 2)))
+                    && block("maple_sapling").defaultBlockState().canSurvive(helper.getLevel(), helper.absolutePos(new BlockPos(2, 2, 2))),
+                    "plains plants grow on " + grass);
+        }
+        helper.succeed();
+    }
+
+    private static void tempt(GameTestHelper helper) {
+        var cow = helper.spawn(net.minecraft.world.entity.EntityType.COW, new BlockPos(2, 1, 2));
+        var chicken = helper.spawn(net.minecraft.world.entity.EntityType.CHICKEN, new BlockPos(4, 1, 4));
+        boolean cowTempted = cow.goalSelector.getAvailableGoals().stream().anyMatch(g -> g.getGoal() instanceof net.minecraft.world.entity.ai.goal.TemptGoal t
+                && t.toString() != null);
+        helper.assertTrue(cowTempted && chicken.goalSelector.getAvailableGoals().stream().filter(g -> g.getGoal() instanceof net.minecraft.world.entity.ai.goal.TemptGoal).count() >= 2,
+                "cows and chickens get the Natura tempt goals");
         helper.succeed();
     }
 

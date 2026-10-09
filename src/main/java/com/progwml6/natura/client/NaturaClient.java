@@ -35,14 +35,27 @@ public final class NaturaClient {
         };
     }
 
+    /** 0 topiary, 1 bluegrass, 2 autumnal, for the colored grass blocks, slabs and stairs. */
+    private static int grassType(String id) {
+        return id.startsWith("bluegrass") ? 1 : id.startsWith("autumnal") ? 2 : 0;
+    }
+
     @SubscribeEvent
     static void blockColors(RegisterColorHandlersEvent.Block event) {
         NaturaBlocks.LEAVES.forEach((id, block) -> event.register((BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) ->
                 leavesColor(id, level, pos), block.get()));
+        NaturaBlocks.COLORED_GRASS.forEach((id, block) -> event.register((BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) ->
+                level != null && pos != null ? GrassColorizer.colorForPos(level, pos, grassType(id)) : GrassColorizer.colorStatic(grassType(id)), block.get()));
     }
 
     @SubscribeEvent
     static void itemColors(RegisterColorHandlersEvent.Item event) {
         NaturaBlocks.LEAVES.forEach((id, block) -> event.register((stack, tint) -> 0xFF000000 | leavesColor(id, null, null), block.get()));
+        NaturaBlocks.COLORED_GRASS.forEach((id, block) -> event.register((stack, tint) -> 0xFF000000 | GrassColorizer.colorStatic(grassType(id)), block.get()));
+    }
+
+    @SubscribeEvent
+    static void reloadListeners(net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(new GrassColorizer());
     }
 }

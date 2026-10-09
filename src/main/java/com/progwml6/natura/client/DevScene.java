@@ -45,6 +45,7 @@ public final class DevScene {
     private static final List<Step> STEPS = new ArrayList<>();
     private static int tick;
     private static BlockPos origin;
+    private static BlockPos redwoodBase = BlockPos.ZERO;
 
     private record Step(int at, Consumer<Minecraft> action) {}
 
@@ -89,7 +90,13 @@ public final class DevScene {
         at(430, mc -> shot(mc, "trees_nether"));
         at(440, mc -> server(mc, DevScene::redwood));
         at(520, mc -> shot(mc, "tree_redwood"));
-        at(530, Minecraft::stop);
+        at(525, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), redwoodBase.getX() + 26.5, redwoodBase.getY() + 60, redwoodBase.getZ() + 26.5, 135.0F, 10.0F)));
+        at(560, mc -> shot(mc, "tree_redwood_crown"));
+        at(565, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), redwoodBase.getX() + 14.5, redwoodBase.getY() + 2, redwoodBase.getZ() + 14.5, 135.0F, -35.0F)));
+        at(600, mc -> shot(mc, "tree_redwood_base"));
+        at(610, mc -> server(mc, DevScene::plants));
+        at(650, mc -> shot(mc, "plants"));
+        at(660, Minecraft::stop);
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -226,6 +233,7 @@ public final class DevScene {
     private static void redwood(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         BlockPos base = origin.offset(0, 0, 160);
+        redwoodBase = base;
         box(level, base.offset(-30, 0, -30), base.offset(30, 150, 30), Blocks.AIR.defaultBlockState());
         box(level, base.offset(-30, -1, -30), base.offset(30, -1, 30), Blocks.GRASS_BLOCK.defaultBlockState());
         var sapling = NaturaBlocks.SAPLINGS.get("redwood_sapling").get();
@@ -237,6 +245,51 @@ public final class DevScene {
         }
         sapling.advanceTree(level, base, state, level.random);
         player.teleportTo(level, base.getX() + 0.5, base.getY() + 40, base.getZ() + 95, 180.0F, -14.0F);
+    }
+
+    /** Crops at every stage, berry bushes at every stage, saguaro, colored grass, bluebells. */
+    private static void plants(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        BlockPos base = origin.offset(0, 0, -40);
+        box(level, base.offset(-4, 0, -4), base.offset(24, 12, 16), Blocks.AIR.defaultBlockState());
+        box(level, base.offset(-4, -1, -4), base.offset(24, -1, 16), Blocks.GRASS_BLOCK.defaultBlockState());
+        int x = 0;
+        for (var crop : new com.progwml6.natura.common.block.NaturaCropBlock[] {NaturaBlocks.BARLEY_CROP.get(), NaturaBlocks.COTTON_CROP.get()}) {
+            for (int age = 0; age <= crop.getMaxAge(); age++) {
+                put(level, base.offset(x, -1, 0), Blocks.FARMLAND.defaultBlockState());
+                put(level, base.offset(x, 0, 0), crop.defaultBlockState().setValue(crop.getAgeProperty(), age));
+                x++;
+            }
+            x++;
+        }
+        int z = 3;
+        for (var bush : NaturaBlocks.BUSHES.values()) {
+            for (int age = 0; age < 4; age++) {
+                put(level, base.offset(age * 2, 0, z), bush.get().defaultBlockState().setValue(com.progwml6.natura.common.block.NaturaBerryBushBlock.AGE, age));
+            }
+            z += 2;
+            if (z > 9) {
+                z = 3;
+                base = base.offset(9, 0, 0);
+            }
+        }
+        base = origin.offset(0, 0, -40);
+        BlockPos sand = base.offset(18, 0, 2);
+        box(level, sand.offset(-3, -1, -3), sand.offset(3, -1, 3), Blocks.SAND.defaultBlockState());
+        var gen = new com.progwml6.natura.world.tree.SaguaroGenerator(NaturaBlocks.SAGUARO.get().defaultBlockState(), false, false);
+        gen.generateSaguaro(new java.util.Random(7), new com.progwml6.natura.world.tree.TreeWorld(level), sand);
+        put(level, sand.offset(2, 0, 2), NaturaBlocks.SAGUARO_BABY.get().defaultBlockState());
+        put(level, sand.offset(-2, 0, 2), NaturaBlocks.SAGUARO_FRUIT.get().defaultBlockState());
+        int gx = 0;
+        for (String grass : new String[] {"topiary_grass", "bluegrass", "autumnal_grass"}) {
+            put(level, base.offset(gx, 0, 12), NaturaBlocks.COLORED_GRASS.get(grass).get().defaultBlockState());
+            put(level, base.offset(gx + 1, 0, 12), NaturaBlocks.COLORED_GRASS.get(grass + "_slab").get().defaultBlockState());
+            put(level, base.offset(gx + 2, 0, 12), NaturaBlocks.COLORED_GRASS.get(grass + "_stairs").get().defaultBlockState()
+                    .setValue(StairBlock.FACING, Direction.NORTH));
+            put(level, base.offset(gx, 1, 12), NaturaBlocks.BLUEBELLS.get().defaultBlockState());
+            gx += 4;
+        }
+        player.teleportTo(level, base.getX() + 10.5, base.getY() + 7, base.getZ() + 22, 180.0F, 28.0F);
     }
 
     private static void put(ServerLevel level, BlockPos pos, BlockState state) {

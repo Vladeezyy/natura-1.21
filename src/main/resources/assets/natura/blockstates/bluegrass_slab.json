@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "natura:block/bluegrass_slab"
+    },
+    "type=double": {
+      "model": "natura:block/bluegrass"
+    },
+    "type=top": {
+      "model": "natura:block/bluegrass_slab_top"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "natura:block/saguaro/saguaro_bottom",
+    "up": "natura:block/saguaro/saguaro_top",
+    "north": "natura:block/saguaro/saguaro_side",
+    "south": "natura:block/saguaro/saguaro_side",
+    "west": "natura:block/saguaro/saguaro_side",
+    "east": "natura:block/saguaro/saguaro_side",
+    "particle": "natura:block/saguaro/saguaro_side"
+  }
+}

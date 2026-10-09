@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "natura:block/autumnal_grass_slab"
+    },
+    "type=double": {
+      "model": "natura:block/autumnal_grass"
+    },
+    "type=top": {
+      "model": "natura:block/autumnal_grass_slab_top"
+    }
+  }
+}

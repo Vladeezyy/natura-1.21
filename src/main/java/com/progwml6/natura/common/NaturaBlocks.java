@@ -10,6 +10,12 @@ import java.util.function.Supplier;
 
 import com.progwml6.natura.Natura;
 import com.progwml6.natura.common.block.BloodwoodLogBlock;
+import com.progwml6.natura.common.block.NaturaBerryBushBlock;
+import com.progwml6.natura.common.block.NaturaCropBlock;
+import com.progwml6.natura.common.block.NaturaPlantBlock;
+import com.progwml6.natura.common.block.SaguaroBabyBlock;
+import com.progwml6.natura.common.block.SaguaroBlock;
+import com.progwml6.natura.common.block.SaguaroFruitBlock;
 import com.progwml6.natura.common.block.FusewoodLogBlock;
 import com.progwml6.natura.common.block.NaturaLeavesBlock;
 import com.progwml6.natura.common.block.NaturaLogBlock;
@@ -81,6 +87,17 @@ public final class NaturaBlocks {
     /** Doors by their new id (no amaranth or willow door in 1.12, two for redwood). */
     public static final Map<String, DeferredBlock<DoorBlock>> DOORS = new LinkedHashMap<>();
 
+    // NaturaOverworld plants (phase 3)
+    public static DeferredBlock<Block> COLORED_GRASS_TOPIARY, COLORED_GRASS_BLUEGRASS, COLORED_GRASS_AUTUMNAL;
+    public static final Map<String, DeferredBlock<? extends Block>> COLORED_GRASS = new LinkedHashMap<>();
+    public static final Map<String, DeferredBlock<NaturaBerryBushBlock>> BUSHES = new LinkedHashMap<>();
+    public static DeferredBlock<NaturaPlantBlock> BLUEBELLS;
+    public static DeferredBlock<NaturaCropBlock> BARLEY_CROP, COTTON_CROP;
+    public static DeferredBlock<SaguaroBlock> SAGUARO;
+    public static DeferredBlock<SaguaroBabyBlock> SAGUARO_BABY;
+    public static DeferredBlock<SaguaroFruitBlock> SAGUARO_FRUIT;
+
+
     static {
         // NaturaOverworld: logs, leaves, saplings, planks, slabs, stairs, doors
         for (NaturaWood wood : new NaturaWood[] {NaturaWood.MAPLE, NaturaWood.SILVERBELL, NaturaWood.AMARANTH, NaturaWood.TIGER,
@@ -100,6 +117,8 @@ public final class NaturaBlocks {
             sapling(wood.getName(), null, false);
         }
 
+        overworldPlants();
+
         // NaturaNether: logs, leaves, saplings
         log("ghostwood_log", () -> new NaturaLogBlock(logProps(3.5F, 24.0F, SoundType.WOOD)), 0, 0);
         log("darkwood_log", () -> new NaturaLogBlock(logProps(3.5F, 24.0F, SoundType.WOOD)), 0, 0);
@@ -116,6 +135,9 @@ public final class NaturaBlocks {
         sapling("fusewood", NETHER_SAPLING_SOIL, false);
         sapling("darkwood", NETHER_SAPLING_SOIL, false);
         sapling("bloodwood", NETHER_SAPLING_SOIL, true);
+        for (String berry : new String[] {"blightberry", "duskberry", "skyberry", "stingberry"}) {
+            bush(berry, true);
+        }
 
         // planks + the decorative set of every wood
         for (NaturaWood wood : NaturaWood.values()) {
@@ -131,6 +153,64 @@ public final class NaturaBlocks {
     }
 
     private NaturaBlocks() {}
+
+    /** 1.12 NaturaOverworld registration order: colored grass, bluebells, berry bushes, crops, saguaro. */
+    private static void overworldPlants() {
+        for (String type : new String[] {"topiary", "bluegrass", "autumnal"}) {
+            String id = type.equals("bluegrass") ? "bluegrass" : type + "_grass";
+            DeferredBlock<Block> grass = block(id, () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.GRASS).strength(0.6F)
+                    .sound(SoundType.GRASS)), TAB_WORLD);
+            COLORED_GRASS.put(id, grass);
+            switch (type) {
+                case "topiary" -> COLORED_GRASS_TOPIARY = grass;
+                case "bluegrass" -> COLORED_GRASS_BLUEGRASS = grass;
+                default -> COLORED_GRASS_AUTUMNAL = grass;
+            }
+        }
+        for (var grass : new java.util.ArrayList<>(COLORED_GRASS.entrySet())) {
+            String id = grass.getKey();
+            COLORED_GRASS.put(id + "_slab", block(id + "_slab", () -> new SlabBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DIRT).strength(0.6F)
+                    .sound(SoundType.GRASS)), TAB_DECORATIVE));
+        }
+        for (var grass : new String[] {"topiary_grass", "bluegrass", "autumnal_grass"}) {
+            DeferredBlock<? extends Block> full = COLORED_GRASS.get(grass);
+            COLORED_GRASS.put(grass + "_stairs", block(grass + "_stairs", () -> new StairBlock(full.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of().mapColor(MapColor.GRASS).strength(0.6F).sound(SoundType.GRASS)), TAB_DECORATIVE));
+        }
+        BLUEBELLS = block("bluebells", () -> new NaturaPlantBlock(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).noCollission().instabreak()
+                .sound(SoundType.GRASS).pushReaction(PushReaction.DESTROY)), TAB_WORLD);
+        for (String berry : new String[] {"raspberry", "blueberry", "blackberry", "maloberry"}) {
+            bush(berry, false);
+        }
+        BARLEY_CROP = BLOCKS.register("barley_crop", () -> new NaturaCropBlock.Barley(() -> NaturaItems.BARLEY.get(), () -> NaturaItems.BARLEY_SEEDS.get(), cropProps()));
+        COTTON_CROP = BLOCKS.register("cotton_crop", () -> new NaturaCropBlock.Cotton(() -> NaturaItems.COTTON.get(), () -> NaturaItems.COTTON_SEEDS.get(), cropProps()));
+        SAGUARO = block("saguaro", () -> new SaguaroBlock(cactus()), TAB_WORLD);
+        SAGUARO_BABY = block("saguaro_baby", () -> new SaguaroBabyBlock(cactus()), TAB_WORLD);
+        SAGUARO_FRUIT = block("saguaro_fruit", () -> new SaguaroFruitBlock(cactus()), TAB_WORLD);
+    }
+
+    private static BlockBehaviour.Properties cropProps() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.CROP)
+                .pushReaction(PushReaction.DESTROY);
+    }
+
+    private static BlockBehaviour.Properties cactus() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).strength(0.3F).sound(SoundType.WOOL).noOcclusion().randomTicks()
+                .pushReaction(PushReaction.DESTROY);
+    }
+
+    /** 1.12 BlockOverworldBerryBush / BlockNetherBerryBush (leaves material, hardness 0.3); overworld ones burn (4 / 25). */
+    private static void bush(String berry, boolean nether) {
+        String id = berry + "_bush";
+        DeferredBlock<NaturaBerryBushBlock> holder = block(id, () -> new NaturaBerryBushBlock(nether, () -> NaturaItems.BERRIES.get(berry).get(),
+                BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).strength(0.3F).randomTicks().sound(SoundType.GRASS).noOcclusion()
+                        .isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
+                        .pushReaction(PushReaction.DESTROY)), TAB_WORLD);
+        BUSHES.put(id, holder);
+        if (!nether) {
+            FLAMMABLE.put(holder, new int[] {4, 25});
+        }
+    }
 
     private static BlockBehaviour.Properties wood(float hardness, float resistance) {
         return BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(hardness, resistance)

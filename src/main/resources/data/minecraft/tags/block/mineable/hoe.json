@@ -14,6 +14,14 @@
     "natura:fusewood_leaves",
     "natura:darkwood_leaves",
     "natura:darkwood_flowering_leaves",
-    "natura:darkwood_fruit_leaves"
+    "natura:darkwood_fruit_leaves",
+    "natura:raspberry_bush",
+    "natura:blueberry_bush",
+    "natura:blackberry_bush",
+    "natura:maloberry_bush",
+    "natura:blightberry_bush",
+    "natura:duskberry_bush",
+    "natura:skyberry_bush",
+    "natura:stingberry_bush"
   ]
 }

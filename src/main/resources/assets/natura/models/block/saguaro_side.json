@@ -1,0 +1,10 @@
+{
+  "parent": "natura:block/natura_saguaro_side",
+  "textures": {
+    "side": "natura:block/saguaro/saguaro_side",
+    "top": "natura:block/saguaro/saguaro_top",
+    "bottom": "natura:block/saguaro/saguaro_bottom",
+    "particle": "natura:block/saguaro/saguaro_side"
+  },
+  "render_type": "minecraft:cutout"
+}

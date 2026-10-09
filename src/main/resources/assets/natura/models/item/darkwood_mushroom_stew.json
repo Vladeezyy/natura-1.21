@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "natura:item/bowls/empty/darkwood_bowl",
+    "layer1": "natura:item/bowls/stew/stew_mushroom"
+  }
+}

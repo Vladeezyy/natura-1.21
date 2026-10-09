@@ -10,7 +10,7 @@ NeoForge 21.1. The 1.12 source is the specification: `git clone -b 1.12 https://
    buttons, pressure plates, bookshelves, workbenches, sticks. ✅
 2. Trees: the 1.12 tree generators for sapling growth. ✅
 3. Overworld plants and food: crops (barley, cotton), berry bushes, saguaro, bluebells, colored grass (+ slab, stairs),
-   materials, food, soups, seed bags, bone meal bag.
+   materials, food, soups, seed bags, bone meal bag. ✅
 4. Nether blocks: heat sand, tainted soil, nether glass, thorn vines, glowshrooms, respawn obelisk, netherrack furnace,
    blaze hopper, blaze rails, nether lever / button / pressure plate.
 5. Tools: nether wood and quartz tools, kamas, bows, flint and blaze, imp armor.
@@ -37,6 +37,11 @@ NeoForge 21.1. The 1.12 source is the specification: `git clone -b 1.12 https://
 | `overworld_bookshelves` / `nether_bookshelves` type=X | `X_bookshelf` |
 | `overworld_workbenches` / `nether_workbenches` type=X | `X_workbench` |
 | `sticks` meta | `X_stick` |
+| `colored_grass` / `_slab` / `colored_grass_stairs_X` | `topiary_grass`, `bluegrass`, `autumnal_grass` (+ `_slab`, `_stairs`) |
+| `overworld_berrybush_X` / `nether_berrybush_X` | `X_bush` |
+| `bluebells_flower` | `bluebells` |
+| `materials`, `edibles`, `empty_bowls`, `seed_bags`, `overworld_seeds`, `overworld_seed_bags` metas | the meta names (`barley`, `raspberry`, `ghostwood_bowl`, `barley_seeds`, ...); `potashapple` / `cactusjuice` → `potash_apple` / `cactus_juice` |
+| `soups` metas | `X_mushroom_stew`, `X_glowshroom_stew`, `glowshroom_stew` (1.12 `vanilla_glowshroomstew`), `berry_medley` |
 
 The translations come from the 1.12 language files with the keys renamed (`tile.natura.overworld_logs.maple.name` →
 `block.natura.maple_log`), the Mantle tooltips (`.tooltip`) too. Recipes are the 1.12 JSON recipes with the items
@@ -105,3 +110,37 @@ Differences:
 - The 1.12 "Retroactive Generation" option is gone (1.21 has no retrogen).
 - Config: `config/natura-common.toml`, the same options, sections and defaults as the 1.12 `natura.cfg` (the world
   generation ones are used from phase 7).
+
+## Phase 3: overworld plants and food
+
+As in 1.12:
+- Barley (4 stages) and cotton (5 stages) grow like vanilla crops on farmland (planted only on farmland, but they stay
+  on grass and dirt), bone meal adds 2-5 stages. A ripe crop is picked by clicking it (right or left): one crop at the
+  player's feet, back to stage 1 (barley) / 2 (cotton). Broken ripe: the crop and three tries at a seed (2/3 barley,
+  5/8 cotton), never with Fortune (1.12 dropped crops with fortune 0). Crops are in no creative tab.
+- Berry bushes grow from small to ripe and stack up to three high; overworld ones 1 in 20 random ticks with light 8,
+  nether ones 1 in 75 in any light. A ripe bush is picked by clicking (one berry, back to stage 2). Bone meal grows a
+  small bush 1-2 stages, and on a grown bush may start a new one above, but never ripens it. Bushes can be placed
+  anywhere; overworld ones burn (4 / 25).
+- Saguaro: connects to other saguaro and opaque blocks on all six sides, hurts (1) what touches it, grows fruit on a
+  free side (1 in 20) while it rains with air above it. Placed on sand or saguaro, it does not break when that goes.
+  A baby saguaro grows (1 in 200, twice) into a saguaro (1 in 20 a big candelabra one) and breaks without sand. The
+  fruit drops the saguaro fruit food (3, 0.3), which plants a baby on sand or terracotta. Saguaro smelts into green dye.
+- Colored grass: topiary (biome grass colour), bluegrass and autumnal (the Natura colour maps by temperature and
+  rainfall), plains plants grow on it; slabs and stairs.
+- Food: 1.12 nutrition, saturation, eating time and effects (always applied). Imp meat poisons even cooked; the
+  bloodwood / darkwood / fusewood glowshroom stews feed 3 instead of 6. Stews stack to 1 and give their bowl back (the
+  wooden ones for the nether bowls). The potash apple is eaten at once (1 tick, see phase 1).
+- Seed bags plant the 3x3 around the clicked farmland (soul sand for nether wart), the bone meal bag fertilizes the
+  3x3; 1.12 recipes for the bags, flour, bread from flour, cake, wool / string from cotton, gunpowder from sulfur, ...
+  The wheat flour recipe follows the "Enable wheat to flour recipe" option (`natura:config_option_enabled` condition).
+- Cows and sheep follow a player holding any 1.12 "materials" item, chickens barley or cotton seeds (speed 0.25). The
+  1.12 barley breeding never worked (it compared stacks by identity), so barley does not breed them.
+- The 1.12 ore dictionary names used by recipes are tags: `c:crops/barley`, `c:crops/<berry>`, `c:dusts/sulfur`,
+  `c:dyes/blue`, `natura:wooden_bowls` (vanilla and Natura bowls), `c:seeds/barley`, ...
+
+Differences:
+- The double berry medley recipe (two bowls, four berries) made one stack of two stews that cannot stack; 1.21 cannot
+  craft that, so only the single recipe is left (same berries per stew as the double one minus one).
+- The grass colour maps use the biome temperature without the 1.12 height cooling (1.21 keeps that private).
+- Saguaro connections are block state properties (1.12 computed them when drawing).

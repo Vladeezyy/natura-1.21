@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "natura:block/topiary_grass_slab"
+    },
+    "type=double": {
+      "model": "natura:block/topiary_grass"
+    },
+    "type=top": {
+      "model": "natura:block/topiary_grass_slab_top"
+    }
+  }
+}

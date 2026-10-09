@@ -1,0 +1,6 @@
+{
+  "parent": "natura:block/natura_grass",
+  "textures": {
+    "all": "natura:block/grass/grass"
+  }
+}

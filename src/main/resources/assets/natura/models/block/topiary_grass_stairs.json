@@ -1,0 +1,8 @@
+{
+  "parent": "natura:block/natura_stairs",
+  "textures": {
+    "bottom": "natura:block/grass/grass",
+    "side": "natura:block/grass/grass",
+    "top": "natura:block/grass/grass"
+  }
+}

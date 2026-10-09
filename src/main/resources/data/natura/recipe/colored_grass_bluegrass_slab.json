@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:bluegrass"
+    }
+  },
+  "result": {
+    "id": "natura:bluegrass_slab",
+    "count": 6
+  },
+  "group": "natura:overworld_slabs"
+}

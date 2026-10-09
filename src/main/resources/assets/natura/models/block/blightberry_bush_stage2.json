@@ -1,0 +1,8 @@
+{
+  "parent": "natura:block/natura_bush_large",
+  "textures": {
+    "all": "natura:block/berrybush/nether/blightberry",
+    "particle": "natura:block/berrybush/nether/blightberry"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}

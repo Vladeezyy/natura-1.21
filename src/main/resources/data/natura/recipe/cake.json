@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "BCB",
+    " D "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:milk_bucket"
+    },
+    "B": {
+      "item": "minecraft:sugar"
+    },
+    "C": {
+      "item": "minecraft:egg"
+    },
+    "D": [
+      {
+        "item": "natura:barley_flour"
+      },
+      {
+        "item": "natura:wheat_flour"
+      }
+    ]
+  },
+  "result": {
+    "id": "minecraft:cake"
+  }
+}

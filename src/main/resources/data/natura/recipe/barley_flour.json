@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:crops/barley"
+    }
+  ],
+  "result": {
+    "id": "natura:barley_flour"
+  }
+}

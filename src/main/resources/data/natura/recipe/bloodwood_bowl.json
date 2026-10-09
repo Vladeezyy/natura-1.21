@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A A",
+    " A "
+  ],
+  "key": {
+    "A": {
+      "item": "natura:bloodwood_planks"
+    }
+  },
+  "result": {
+    "id": "natura:bloodwood_bowl",
+    "count": 4
+  },
+  "group": "natura:nether_bowls"
+}

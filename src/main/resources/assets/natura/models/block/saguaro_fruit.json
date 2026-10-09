@@ -1,0 +1,8 @@
+{
+  "parent": "natura:block/natura_saguaro_fruit",
+  "textures": {
+    "all": "natura:block/saguaro/saguaro_fruit",
+    "particle": "natura:block/saguaro/saguaro_fruit"
+  },
+  "render_type": "minecraft:cutout"
+}

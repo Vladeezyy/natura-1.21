@@ -1,0 +1,39 @@
+package com.progwml6.natura.world;
+
+import com.progwml6.natura.Natura;
+import com.progwml6.natura.common.NaturaItems;
+
+import net.minecraft.world.entity.ai.goal.TemptGoal;
+import net.minecraft.world.entity.animal.Chicken;
+import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+
+/**
+ * 1.12 WorldEvents: cows and sheep follow a player holding any 1.12 "materials" item (barley, flour, cotton, sulfur,
+ * ...), chickens one holding barley or cotton seeds, slowly (speed 0.25). The 1.12 barley breeding never worked (it
+ * compared the held stack with a fixed stack by identity), so barley does not breed them here either.
+ */
+@EventBusSubscriber(modid = Natura.MODID)
+public final class WorldEvents {
+    private WorldEvents() {}
+
+    @SubscribeEvent
+    static void onJoin(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide) {
+            return;
+        }
+        if (event.getEntity() instanceof Cow || event.getEntity() instanceof Sheep) {
+            var animal = (net.minecraft.world.entity.animal.Animal) event.getEntity();
+            animal.goalSelector.addGoal(3, new TemptGoal(animal, 0.25D, Ingredient.of(NaturaItems.BARLEY.get(), NaturaItems.BARLEY_FLOUR.get(),
+                    NaturaItems.WHEAT_FLOUR.get(), NaturaItems.COTTON.get(), NaturaItems.SULFUR_POWDER.get(), NaturaItems.GHOSTWOOD_FLETCHING.get(),
+                    NaturaItems.IMP_LEATHER.get(), NaturaItems.FLAME_STRING.get(), NaturaItems.BLUE_DYE.get()), false));
+        }
+        if (event.getEntity() instanceof Chicken chicken) {
+            chicken.goalSelector.addGoal(3, new TemptGoal(chicken, 0.25D, Ingredient.of(NaturaItems.BARLEY_SEEDS.get(), NaturaItems.COTTON_SEEDS.get()), false));
+        }
+    }
+}

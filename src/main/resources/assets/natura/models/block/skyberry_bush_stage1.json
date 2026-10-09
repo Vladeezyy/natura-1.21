@@ -1,0 +1,8 @@
+{
+  "parent": "natura:block/natura_bush_medium",
+  "textures": {
+    "all": "natura:block/berrybush/nether/skyberry",
+    "particle": "natura:block/berrybush/nether/skyberry"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}
