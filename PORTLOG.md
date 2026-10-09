@@ -15,7 +15,7 @@ NeoForge 21.1. The 1.12 source is the specification: `git clone -b 1.12 https://
    blaze hopper, blaze rails, nether lever / button / pressure plate; the clouds. ✅
 5. Tools: nether wood and quartz tools, kamas, bows, flint and blaze, imp armor. ✅
 6. Entities: imp, heatscar spider (+ baby), nitro creeper. ✅
-7. World generation: trees, berry bushes, crops, clouds, glowshrooms, saguaro, vines, nether trees; clouds.
+7. World generation: trees, berry bushes, crops, clouds, glowshrooms, saguaro, vines, nether trees, soil veins. ✅
 8. JEI, config, game tests, release.
 
 ## Names
@@ -220,3 +220,53 @@ As in 1.12 (ids `imp`, `heatscarspider`, `babyheatscarspider`, `nitrocreeper`, t
 Differences:
 - Entities are always registered (1.12 skipped the heatscar spiders when disabled); disabled, they just never spawn.
 - Spawn eggs are in the vanilla spawn egg tab; their names come from the entity names (1.12 had no egg names).
+
+## Phase 7: world generation
+
+The nine 1.12 IWorldGenerators are configured features of one feature (`natura:world`, config `kind`), placed once per
+chunk with no placement modifiers and added to every biome (`neoforge:any`); each runs the 1.12 per-chunk rolls in the
+1.12 order:
+- `overworld_trees`: forest sakura (1 in rarity x 5, three tries) and eucalyptus; plains redwood (off by default, as in
+  1.12) and eucalyptus (rarity x 1.5); mountains and hills hopseed and eucalyptus (1.12 `nextInt(rarity) < 10`, so
+  nearly every hill chunk); rivers sakura and willow; jungles amaranth (rarity 1: every jungle chunk); forests maple,
+  silverbell, tiger; swamps three willow tries; sandy biomes saguaro. Spawn heights as in 1.12 (sea level + 16 / + 48 /
+  + range); the generators look for the ground themselves.
+- `nether_trees`: bloodwood at y 72 (it hangs from the ceiling), darkwood and fusewood at 32-95, three ghostwood tries
+  at 16-95.
+- `overworld_berry_bushes` (by the biome's base temperature and downfall, as 1.12 temperature and rainfall: raspberry
+  0.6-2.0 / 0.2-0.93, blueberry 0.3-0.81 / 0.3-0.8, blackberry 0.5-5 / 0.6-3 plus swamps at rarity / 3, maloberry
+  0-0.3 / 0-5) and `nether_berry_bushes` (ultrawarm dimensions, 1.12 doesWaterVaporize): a single bush, a small node, a
+  shrub or a large node, ripe 1 in 5.
+- `crops`: barley (1 in 5), cotton (1 in 12) in temperature and downfall 0.11-1 / 0.11-2, grown, 2 x 64 tries; bluebells
+  (1 in 12) 40 tries, anywhere.
+- `clouds`: white clouds where downfall > 0.15 outside the End, ash and sulfur clouds in ultrawarm dimensions, dark
+  clouds in the End; only with "Enable Clouds" (off by default, as 1.12 made no cloud generators without it).
+- `glowshrooms`: large glowshrooms (1 in 35, five tries, purple 1 in 3) and baby glowshrooms in the nether.
+- `thorn_vines`: 1 in 40 nether chunks, 20 vines hanging from y 108.
+- `nether_minables`: 4 veins of 33 tainted soil in netherrack and 4 of heat sand in soul sand at y 27-36 (1.12
+  `getSeaLevel() / 2 + 1 - 5` with the 63 sea level the nether had).
+
+As in 1.12 (quirks kept):
+- Biome types are the c: biome tags (`c:is_forest`, `c:is_plains`, `c:is_mountain`, `c:is_hill`, `c:is_river`,
+  `c:is_jungle`, `c:is_swamp`, `c:is_sandy` without the beaches, `c:is_nether`, `c:is_end`), checked once per chunk
+  at its middle.
+- The overworld generators are not limited to the overworld (biome and climate decide, as in 1.12).
+- The nether berry bushes searched the ground from the x coordinate as the height (1.12 bug), so mostly they only grow
+  where the rolled spot is already on the ground.
+- The saguaro generator checked for sand under the rolled spot (sea level to + 15), not under the ground it found, so
+  saguaros only generate where a desert's sand is right at that height: rare, and none in high deserts.
+- The ash clouds use the small size where the medium one belonged; the four dark cloud sizes are all 10 blocks.
+- The sakura and ghostwood generators share their height limit across all the trees they grow (1.12 kept one
+  generator for the game: the limit is rolled once and only lowered where a tree did not fit), so these trees are all
+  about the same size in one game session.
+- Heights: the overworld ones come from the "Sea level" setting (64) as in 1.12; the nether ones are counted from the
+  world bottom (y 0 in both versions).
+
+Differences:
+- Positions are rolled inside the chunk instead of 1.12's chunk + 8 (1.21 features may only write one chunk around
+  their own, and 1.12's offset caused the known cascading generation); the tree generators cannot write further than
+  that, so the outer branches of a giant redwood next to a chunk border can be cut.
+- No dimension blacklists (1.12 "Overworld/Nether World Gen Blacklist", by dimension id): biome modifiers or datapacks
+  do that now. No retrogen.
+- The crops' light check (light 8 or sky) is the sky above them (the heightmap): no light is known while generating.
+- Blocks are placed without neighbour updates, like 1.12's flag 2.

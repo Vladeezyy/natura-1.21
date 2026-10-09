@@ -56,6 +56,7 @@ def tex_path(t):
 
 VANILLA_TEXTURES = {
     "block/netherrack": "block/netherrack",
+    "item/bow_standby": "item/bow",
 }
 
 
@@ -784,6 +785,7 @@ def copy_item_model(name):
 def tools():
     """1.12 NaturaTools: the tools keep their 1.12 ids and item models; imp armor gets the 1.21 armor layer textures."""
     names = ["imp_armor_helmet", "imp_armor_chestplate", "imp_armor_leggings", "imp_armor_boots", "flint_and_blaze"]
+    copy_item_model("bow")  # the parent of the pulling models (the bow display transforms)
     for wood in ("ghostwood", "bloodwood", "darkwood", "fusewood", "netherquartz"):
         names += [f"{wood}_{kind}" for kind in ("sword", "pickaxe", "shovel", "axe", "kama")]
         if wood != "netherquartz":
@@ -1098,6 +1100,20 @@ def gametest_area():
 
 # ---------------------------------------------------------------- output
 
+def worldgen():
+    """1.12 IWorldGenerators: one configured feature each (natura:world with its kind), placed once per chunk with no
+    placement modifiers (the feature does the 1.12 per-chunk rolls and biome checks), added to every biome."""
+    kinds = [("overworld_trees", "vegetal_decoration"), ("nether_trees", "vegetal_decoration"),
+             ("overworld_berry_bushes", "vegetal_decoration"), ("nether_berry_bushes", "vegetal_decoration"),
+             ("crops", "vegetal_decoration"), ("clouds", "top_layer_modification"), ("glowshrooms", "vegetal_decoration"),
+             ("thorn_vines", "vegetal_decoration"), ("nether_minables", "underground_ores")]
+    for kind, step in kinds:
+        w(os.path.join(DATA, NS, "worldgen", "configured_feature", kind + ".json"), {"type": nid("world"), "config": {"kind": kind}})
+        w(os.path.join(DATA, NS, "worldgen", "placed_feature", kind + ".json"), {"feature": nid(kind), "placement": []})
+        w(os.path.join(DATA, NS, "neoforge", "biome_modifier", kind + ".json"),
+          {"type": "neoforge:add_features", "biomes": {"type": "neoforge:any"}, "features": nid(kind), "step": step})
+
+
 def main():
     copy_textures()
     copy_models()
@@ -1113,6 +1129,7 @@ def main():
     gametest_area()
     for name, table in LOOT.items():
         w(os.path.join(DATA, NS, "loot_table", "blocks", name + ".json"), table)
+    worldgen()
     for kind, table in (("block", BLOCK_TAGS), ("item", ITEM_TAGS)):
         for name, values in table.items():
             ns, _, path = name.partition(":")

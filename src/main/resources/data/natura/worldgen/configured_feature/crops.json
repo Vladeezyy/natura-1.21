@@ -1,0 +1,6 @@
+{
+  "type": "natura:world",
+  "config": {
+    "kind": "crops"
+  }
+}

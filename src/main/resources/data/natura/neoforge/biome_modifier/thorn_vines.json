@@ -1,0 +1,8 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": {
+    "type": "neoforge:any"
+  },
+  "features": "natura:thorn_vines",
+  "step": "vegetal_decoration"
+}

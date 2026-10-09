@@ -68,6 +68,11 @@ neoForge {
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
+        // Screenshots of generated terrain (com.progwml6.natura.client.WorldgenScene): opens or creates run/saves/natura_gen.
+        worldgenScene {
+            client()
+            systemProperty 'natura.worldgenScene', 'true'
+        }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.
         // By default, the server will crash when no gametests are provided.

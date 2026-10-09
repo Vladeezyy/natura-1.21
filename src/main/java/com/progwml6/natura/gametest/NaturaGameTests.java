@@ -79,6 +79,9 @@ public final class NaturaGameTests {
         TESTS.put("nitro_creeper", NaturaGameTests::nitroCreeper);
         TESTS.put("imp_breeding", NaturaGameTests::impBreeding);
         TESTS.put("mob_spawns", NaturaGameTests::mobSpawns);
+        TESTS.put("worldgen_features", NaturaGameTests::worldgenFeatures);
+        TESTS.put("worldgen_veins", NaturaGameTests::worldgenVeins);
+        TESTS.put("worldgen_berry_bushes", NaturaGameTests::worldgenBushes);
     }
 
     private NaturaGameTests() {}
@@ -704,6 +707,68 @@ public final class NaturaGameTests {
                 "the workbench opens a crafting grid that stays open");
         player.closeContainer();
         player.discard();
+        helper.succeed();
+    }
+
+    /** The nine 1.12 world generators are features added to every biome. */
+    private static void worldgenFeatures(GameTestHelper helper) {
+        var access = helper.getLevel().registryAccess();
+        var modifiers = access.registryOrThrow(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS);
+        var biomes = access.registryOrThrow(Registries.BIOME);
+        for (var kind : com.progwml6.natura.world.gen.NaturaWorldFeature.Kind.values()) {
+            var id = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Natura.MODID, kind.getSerializedName());
+            helper.assertTrue(modifiers.containsKey(id), "biome modifier " + id);
+            for (var biome : List.of(net.minecraft.world.level.biome.Biomes.FOREST, net.minecraft.world.level.biome.Biomes.NETHER_WASTES,
+                    net.minecraft.world.level.biome.Biomes.THE_END)) {
+                boolean has = biomes.getHolderOrThrow(biome).value().getGenerationSettings().features().stream()
+                        .anyMatch(set -> set.stream().anyMatch(f -> f.unwrapKey().map(k -> k.location().equals(id)).orElse(false)));
+                helper.assertTrue(has, id + " in " + biome.location());
+            }
+        }
+        helper.succeed();
+    }
+
+    /** 1.12 NetherMinableGenerator veins: tainted soil only replaces netherrack. */
+    private static void worldgenVeins(GameTestHelper helper) {
+        for (int x = 1; x <= 6; x++) {
+            for (int y = 1; y <= 6; y++) {
+                for (int z = 1; z <= 6; z++) {
+                    helper.setBlock(new BlockPos(x, y, z), x == 1 ? Blocks.STONE : Blocks.NETHERRACK);
+                }
+            }
+        }
+        var world = new com.progwml6.natura.world.tree.TreeWorld(helper.getLevel());
+        BlockState soil = NaturaBlocks.NETHER.get("tainted_soil").get().defaultBlockState();
+        new com.progwml6.natura.world.gen.MinableGenerator(soil, 12, s -> s.is(Blocks.NETHERRACK))
+                .generate(world, new java.util.Random(5), helper.absolutePos(new BlockPos(3, 3, 3)).offset(-8, 0, -8));
+        int count = 0;
+        for (int x = 1; x <= 6; x++) {
+            for (int y = 1; y <= 6; y++) {
+                for (int z = 1; z <= 6; z++) {
+                    BlockState state = helper.getBlockState(new BlockPos(x, y, z));
+                    count += state.is(soil.getBlock()) ? 1 : 0;
+                    helper.assertTrue(x != 1 || state.is(Blocks.STONE), "only netherrack is replaced");
+                }
+            }
+        }
+        helper.assertTrue(count > 0, "a tainted soil vein in the netherrack");
+        helper.succeed();
+    }
+
+    /** 1.12 berry bush generators: a bush, node or shrub on grass, and on netherrack for the nether ones. */
+    private static void worldgenBushes(GameTestHelper helper) {
+        for (int x = 0; x < 8; x++) {
+            for (int z = 0; z < 8; z++) {
+                helper.setBlock(new BlockPos(x, 1, z), x < 4 ? Blocks.GRASS_BLOCK : Blocks.NETHERRACK);
+            }
+        }
+        var world = new com.progwml6.natura.world.tree.TreeWorld(helper.getLevel());
+        new com.progwml6.natura.world.gen.BerryBushGenerator(128, NaturaBlocks.BUSHES.get("raspberry_bush").get().defaultBlockState(), false)
+                .generateBush(new java.util.Random(1), world, helper.absolutePos(new BlockPos(1, 2, 3)));
+        new com.progwml6.natura.world.gen.BerryBushGenerator(0, NaturaBlocks.BUSHES.get("stingberry_bush").get().defaultBlockState(), true)
+                .generateBush(new java.util.Random(1), world, helper.absolutePos(new BlockPos(6, 2, 3)));
+        helper.assertBlockPresent(NaturaBlocks.BUSHES.get("raspberry_bush").get(), new BlockPos(1, 2, 3));
+        helper.assertBlockPresent(NaturaBlocks.BUSHES.get("stingberry_bush").get(), new BlockPos(6, 2, 3));
         helper.succeed();
     }
 }

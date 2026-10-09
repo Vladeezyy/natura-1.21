@@ -39,6 +39,7 @@ public class Natura {
         NaturaBlocks.BLOCKS.register(modBus);
         NaturaBlocks.ITEMS.register(modBus);
         NaturaBlocks.BLOCK_ENTITIES.register(modBus);
+        com.progwml6.natura.world.gen.NaturaFeatures.FEATURES.register(modBus);
         modBus.addListener(net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent.class,
                 event -> event.modify(net.minecraft.world.level.block.entity.BlockEntityType.HOPPER, NaturaBlocks.BLAZE_HOPPER.get()));
         NaturaTabs.TABS.register(modBus);

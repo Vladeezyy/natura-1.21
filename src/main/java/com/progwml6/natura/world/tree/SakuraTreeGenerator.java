@@ -18,6 +18,7 @@ public class SakuraTreeGenerator extends NaturaTreeGenerator {
     protected TreeWorld world;
     protected BlockPos basePos = BlockPos.ZERO;
     int heightLimit;
+    private java.util.concurrent.atomic.AtomicInteger sharedHeightLimit;
     int height;
     double heightAttenuation = 0.618D;
     double branchSlope = 0.381D;
@@ -257,16 +258,32 @@ public class SakuraTreeGenerator extends NaturaTreeGenerator {
         this.world = worldIn;
         this.basePos = this.startPos(worldIn, position);
         this.rand = new Random(random.nextLong());
+        if (this.sharedHeightLimit != null) {
+            this.heightLimit = this.sharedHeightLimit.get();
+        }
         if (this.heightLimit == 0) {
             this.heightLimit = 5 + this.rand.nextInt(this.heightLimitLimit);
         }
-        if (this.validTreeLocation()) {
+        boolean valid = this.validTreeLocation();
+        if (this.sharedHeightLimit != null) {
+            this.sharedHeightLimit.set(this.heightLimit);
+        }
+        if (valid) {
             this.generateLeafNodeList();
             this.generateLeaves();
             this.generateTrunk();
             this.generateLeafNodeBases();
         }
         this.world = null;
+    }
+
+    /**
+     * The world generators: 1.12 kept one generator for the whole game, so its height limit (rolled once, then only
+     * lowered where a tree did not fit) was shared by every tree it grew.
+     */
+    public SakuraTreeGenerator shareHeightLimit(java.util.concurrent.atomic.AtomicInteger heightLimit) {
+        this.sharedHeightLimit = heightLimit;
+        return this;
     }
 
     record FoliageCoordinates(BlockPos pos, int branchBase) {}

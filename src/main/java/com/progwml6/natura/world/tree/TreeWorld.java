@@ -38,12 +38,39 @@ public final class TreeWorld {
         return this.level;
     }
 
+    /**
+     * During world generation only the chunks around the decorated one can be read (and only the 3x3 written): 1.12
+     * generators reached further (the redwood crowns), so outside that this reads air and does not write.
+     */
+    private boolean readable(BlockPos pos) {
+        if (pos.getY() < this.level.getMinBuildHeight() || pos.getY() >= this.level.getMaxBuildHeight()) {
+            return false;
+        }
+        return !(this.level instanceof net.minecraft.server.level.WorldGenRegion region)
+                || region.hasChunk(net.minecraft.core.SectionPos.blockToSectionCoord(pos.getX()), net.minecraft.core.SectionPos.blockToSectionCoord(pos.getZ()));
+    }
+
+    private boolean writable(BlockPos pos) {
+        if (!this.readable(pos)) {
+            return false;
+        }
+        if (this.level instanceof net.minecraft.server.level.WorldGenRegion region) {
+            var center = region.getCenter();
+            return Math.abs(center.x - net.minecraft.core.SectionPos.blockToSectionCoord(pos.getX())) <= 1
+                    && Math.abs(center.z - net.minecraft.core.SectionPos.blockToSectionCoord(pos.getZ())) <= 1;
+        }
+        return true;
+    }
+
     public BlockState getBlockState(BlockPos pos) {
-        return this.level.getBlockState(pos);
+        return this.readable(pos) ? this.level.getBlockState(pos) : Blocks.AIR.defaultBlockState();
     }
 
     /** 1.12 setBlockState(pos, state, 2 / 0): sent to clients, no neighbour updates. */
     public void setBlockState(BlockPos pos, BlockState state) {
+        if (!this.writable(pos)) {
+            return;
+        }
         pos = pos.immutable();
         this.level.setBlock(pos, state, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
         if (state.getBlock() instanceof LeavesBlock) {
@@ -54,7 +81,7 @@ public final class TreeWorld {
     }
 
     public boolean isAirBlock(BlockPos pos) {
-        return this.level.getBlockState(pos).isAir();
+        return this.getBlockState(pos).isAir();
     }
 
     public static boolean isAir(BlockState state) {
@@ -108,7 +135,7 @@ public final class TreeWorld {
     /** 1.12 Block.onPlantGrow: grass and farmland under a growing tree become dirt. */
     public void onPlantGrow(BlockPos pos) {
         BlockState state = this.getBlockState(pos);
-        if (state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.FARMLAND)) {
+        if ((state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.FARMLAND)) && this.writable(pos)) {
             this.level.setBlock(pos, Blocks.DIRT.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
     }
@@ -142,7 +169,7 @@ public final class TreeWorld {
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
         for (BlockPos pos : this.leaves.keySet()) {
             for (Direction dir : Direction.values()) {
-                if (this.level.getBlockState(pos.relative(dir)).is(BlockTags.LOGS)) {
+                if (this.getBlockState(pos.relative(dir)).is(BlockTags.LOGS)) {
                     distance.put(pos, 1);
                     queue.add(pos);
                     break;
@@ -163,7 +190,7 @@ public final class TreeWorld {
         }
         Set<BlockPos> done = new HashSet<>();
         for (var entry : this.leaves.entrySet()) {
-            BlockState current = this.level.getBlockState(entry.getKey());
+            BlockState current = this.getBlockState(entry.getKey());
             if (current.getBlock() instanceof LeavesBlock && current.hasProperty(LeavesBlock.DISTANCE) && done.add(entry.getKey())) {
                 int d = Math.min(6, distance.getOrDefault(entry.getKey(), 7));
                 this.level.setBlock(entry.getKey(), current.setValue(LeavesBlock.DISTANCE, d), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
