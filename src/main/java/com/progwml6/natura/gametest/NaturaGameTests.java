@@ -66,6 +66,12 @@ public final class NaturaGameTests {
         List<TestFunction> functions = new ArrayList<>();
         TESTS.forEach((name, body) -> functions.add(new TestFunction(Natura.MODID, Natura.MODID + "." + name, STRUCTURE, Rotation.NONE, 100, 0,
                 true, false, 1, 1, false, body)));
+        // every tree in a batch of its own: the bigger ones reach into the neighbouring test areas
+        for (String tree : new String[] {"maple", "silverbell", "amaranth", "tiger", "willow", "eucalyptus", "hopseed", "sakura", "redwood",
+                "ghostwood", "fusewood", "darkwood", "bloodwood"}) {
+            functions.add(new TestFunction(Natura.MODID + "_tree_" + tree, Natura.MODID + ".tree_" + tree, STRUCTURE, Rotation.NONE, 100, 0,
+                    true, false, 1, 1, true, helper -> saplingGrows(helper, tree)));
+        }
         return functions;
     }
 
@@ -245,6 +251,60 @@ public final class NaturaGameTests {
         // vanilla recipes take the Natura wood through the tags
         out = craft(helper, 1, 2, planks, planks);
         helper.assertTrue(out.is(Items.STICK), "two planks -> vanilla sticks: " + out);
+        helper.succeed();
+    }
+
+    /**
+     * The sapling grows its 1.12 tree: the log where the sapling stood (bloodwood: hanging from the netherrack above),
+     * leaves with a vanilla distance below 7 so they stay. The redwood needs 40 redwood saplings in the 7x7 square.
+     */
+    private static void saplingGrows(GameTestHelper helper, String tree) {
+        BlockPos pos = new BlockPos(4, 2, 4);
+        boolean nether = tree.equals("ghostwood") || tree.equals("fusewood") || tree.equals("darkwood") || tree.equals("bloodwood");
+        BlockState soil = nether ? Blocks.NETHERRACK.defaultBlockState() : Blocks.GRASS_BLOCK.defaultBlockState();
+        var sapling = (com.progwml6.natura.common.block.NaturaSaplingBlock) block(tree + "_sapling");
+        BlockState grown = sapling.defaultBlockState().setValue(net.minecraft.world.level.block.SaplingBlock.STAGE, 1);
+        if (tree.equals("bloodwood")) {
+            helper.setBlock(pos.above(), soil);
+        } else if (tree.equals("redwood")) {
+            for (int x = -3; x <= 3; x++) {
+                for (int z = -3; z <= 3; z++) {
+                    helper.setBlock(pos.offset(x, -1, z), soil);
+                    helper.setBlock(pos.offset(x, 0, z), grown);
+                }
+            }
+            // 39 saplings are not enough
+            helper.setBlock(pos.offset(3, 0, 3), Blocks.AIR);
+            for (int i = 0; i < 9; i++) helper.setBlock(pos.offset(-3 + i % 7, 0, i < 7 ? -3 : -2), Blocks.AIR);
+            sapling.advanceTree(helper.getLevel(), helper.absolutePos(pos), grown, helper.getLevel().random);
+            helper.assertTrue(helper.getBlockState(pos).is(sapling) && helper.getBlockState(pos.offset(3, 0, 2)).is(sapling), "39 redwood saplings stay saplings");
+            for (int x = -3; x <= 3; x++) {
+                for (int z = -3; z <= 3; z++) {
+                    helper.setBlock(pos.offset(x, 0, z), grown);
+                }
+            }
+        } else {
+            helper.setBlock(pos.below(), soil);
+        }
+        helper.setBlock(pos, grown);
+        BlockState here = helper.getBlockState(pos);
+        sapling.advanceTree(helper.getLevel(), helper.absolutePos(pos), here, helper.getLevel().random);
+        String log = switch (tree) {
+            case "redwood" -> "redwood_heart";
+            case "bloodwood" -> "bloodwood_log";
+            default -> tree + "_log";
+        };
+        helper.assertTrue(helper.getBlockState(pos).is(block(log)), tree + ": " + log + " where the sapling was, found " + helper.getBlockState(pos));
+        int leaves = 0, decaying = 0;
+        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-16, -20, -16), pos.offset(16, 40, 16))) {
+            BlockState state = helper.getBlockState(p);
+            if (state.getBlock() instanceof net.minecraft.world.level.block.LeavesBlock && !state.getValue(BlockStateProperties.PERSISTENT)) {
+                leaves++;
+                if (state.getValue(net.minecraft.world.level.block.LeavesBlock.DISTANCE) >= 7 && !tree.equals("redwood")) decaying++;
+            }
+        }
+        helper.assertTrue(leaves > 0, tree + ": no leaves");
+        helper.assertTrue(decaying * 10 <= leaves, tree + ": " + decaying + " of " + leaves + " leaves would decay");
         helper.succeed();
     }
 

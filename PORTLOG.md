@@ -8,7 +8,7 @@ NeoForge 21.1. The 1.12 source is the specification: `git clone -b 1.12 https://
 
 1. Woods: logs, leaves, saplings (no trees yet), planks, slabs, stairs, fences, fence gates, doors, trapdoors,
    buttons, pressure plates, bookshelves, workbenches, sticks. ✅
-2. Trees: the 1.12 tree generators for sapling growth.
+2. Trees: the 1.12 tree generators for sapling growth. ✅
 3. Overworld plants and food: crops (barley, cotton), berry bushes, saguaro, bluebells, colored grass (+ slab, stairs),
    materials, food, soups, seed bags, bone meal bag.
 4. Nether blocks: heat sand, tainted soil, nether glass, thorn vines, glowshrooms, respawn obelisk, netherrack furnace,
@@ -77,5 +77,31 @@ Differences:
   effective in 1.21 (both still drop by hand, as in 1.12).
 - Leaves decay: vanilla 1.21 (distance 7 through leaves) instead of the 1.12 4-block check, except redwood. The
   redwood flag is cleared once a log is found (1.12 kept checking every random tick).
-- Saplings exist but do not grow until phase 2.
 - Fences and fence gates connect to all wooden fences (1.12: any wood material fence).
+
+## Phase 2: trees
+
+The 1.12 generators are ported line by line (`world/tree`), with the 1.12 random call order: OverworldTreeGenerator
+(maple, silverbell, amaranth, tiger), Willow, Eucalyptus, Hopseed, Sakura (the 1.12 big oak), Redwood, Ghostwood (big
+oak on nether soil), Fusewood, Darkwood and Bloodwood. The redwood trunk rings and roots (about 1200 block placements
+in 1.12) are data in `RedwoodShapes`, generated from the 1.12 source.
+
+As in 1.12:
+- Sapling growth: vanilla ticking, the sapling is removed, the tree grown, and the sapling put back if nothing grew
+  where it stood. The sapling sizes are the 1.12 ones (maple / silverbell 4-5, amaranth 9-16, tiger 6-9, willow 4-8,
+  eucalyptus 6-8, hopseed 2-4, darkwood / fusewood 4-5, bloodwood 8-15 down from the ceiling, redwood 80-139).
+- The overworld tree check for space never fails (1.12 bug), so those trees grow through anything; eucalyptus,
+  hopseed, willow, fusewood and darkwood check their space, bloodwood places over anything.
+- Saplings look for the ground down to the "Sea level" config option (64): in a normal world a sapling on dirt below
+  y 65 does not grow, as in 1.12. Flat worlds use "Flat Sea level" (1), counted from the world bottom.
+- Willows only below y 128, eucalyptus finds its ground between y 96 and 32 when not planted on dirt, bloodwood looks
+  for its ceiling up to y 120 (absolute heights, as in 1.12).
+- Redwood: only with 40 redwood saplings in the 7x7 square; they all turn into the tree, the roots grow through dirt.
+
+Differences:
+- Leaves get the vanilla 1.21 distance when the tree is done (otherwise they would decay at once).
+- Blocks are sent to the clients (1.12 placed the hopseed trunk with flag 0, invisible until the chunk reloaded).
+- 1.12 world limits (y 0, 256) are the 1.21 world bottom and top.
+- The 1.12 "Retroactive Generation" option is gone (1.21 has no retrogen).
+- Config: `config/natura-common.toml`, the same options, sections and defaults as the 1.12 `natura.cfg` (the world
+  generation ones are used from phase 7).

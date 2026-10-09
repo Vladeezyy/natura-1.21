@@ -9,7 +9,11 @@ import com.progwml6.natura.common.NaturaTabs;
 
 import com.progwml6.natura.gametest.NaturaGameTests;
 
+import com.progwml6.natura.common.NaturaConfig;
+
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
@@ -19,7 +23,8 @@ public class Natura {
     public static final String MODID = "natura";
     public static final Logger LOG = LogUtils.getLogger();
 
-    public Natura(IEventBus modBus) {
+    public Natura(IEventBus modBus, ModContainer container) {
+        container.registerConfig(ModConfig.Type.COMMON, NaturaConfig.SPEC);
         NaturaBlocks.init();
         NaturaItems.init();
         NaturaBlocks.BLOCKS.register(modBus);

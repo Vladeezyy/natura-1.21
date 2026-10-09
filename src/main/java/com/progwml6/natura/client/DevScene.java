@@ -82,7 +82,14 @@ public final class DevScene {
         }));
         at(280, mc -> shot(mc, "workbench_gui"));
         at(285, mc -> mc.player.closeContainer());
-        at(300, Minecraft::stop);
+        at(290, mc -> mc.options.hideGui = true);
+        at(300, mc -> server(mc, p -> trees(p, new String[] {"maple", "silverbell", "amaranth", "tiger", "willow", "eucalyptus", "hopseed", "sakura"}, false)));
+        at(360, mc -> shot(mc, "trees_overworld"));
+        at(370, mc -> server(mc, p -> trees(p, new String[] {"ghostwood", "fusewood", "darkwood", "bloodwood"}, true)));
+        at(430, mc -> shot(mc, "trees_nether"));
+        at(440, mc -> server(mc, DevScene::redwood));
+        at(520, mc -> shot(mc, "tree_redwood"));
+        at(530, Minecraft::stop);
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -186,6 +193,50 @@ public final class DevScene {
             x += 2;
         }
         look(player, 16);
+    }
+
+    private static void box(ServerLevel level, BlockPos from, BlockPos to, BlockState state) {
+        for (BlockPos p : BlockPos.betweenClosed(from, to)) {
+            level.setBlock(p, state, FLAGS);
+        }
+    }
+
+    /** One grown tree per sapling in a row, 12 blocks apart (nether ones on netherrack, bloodwood under a ceiling). */
+    private static void trees(ServerPlayer player, String[] names, boolean nether) {
+        ServerLevel level = player.serverLevel();
+        BlockPos base = origin.offset(0, 0, 60);
+        box(level, base.offset(-8, 0, -10), base.offset(names.length * 12 + 4, 40, 10), Blocks.AIR.defaultBlockState());
+        box(level, base.offset(-8, -1, -10), base.offset(names.length * 12 + 4, -1, 10),
+                (nether ? Blocks.NETHERRACK : Blocks.GRASS_BLOCK).defaultBlockState());
+        for (int i = 0; i < names.length; i++) {
+            BlockPos pos = base.offset(i * 12, 0, 0);
+            var sapling = NaturaBlocks.SAPLINGS.get(names[i] + "_sapling").get();
+            if (names[i].equals("bloodwood")) {
+                box(level, pos.offset(-5, 20, -5), pos.offset(6, 20, 6), Blocks.NETHERRACK.defaultBlockState());
+                pos = pos.above(19);
+            }
+            BlockState state = sapling.defaultBlockState().setValue(net.minecraft.world.level.block.SaplingBlock.STAGE, 1);
+            level.setBlock(pos, state, 3);
+            sapling.advanceTree(level, pos, state, level.random);
+        }
+        double cx = base.getX() + (names.length - 1) * 6 + 0.5;
+        player.teleportTo(level, cx, base.getY() + 8, base.getZ() + 14 + names.length * 2, 180.0F, 12.0F);
+    }
+
+    private static void redwood(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        BlockPos base = origin.offset(0, 0, 160);
+        box(level, base.offset(-30, 0, -30), base.offset(30, 150, 30), Blocks.AIR.defaultBlockState());
+        box(level, base.offset(-30, -1, -30), base.offset(30, -1, 30), Blocks.GRASS_BLOCK.defaultBlockState());
+        var sapling = NaturaBlocks.SAPLINGS.get("redwood_sapling").get();
+        BlockState state = sapling.defaultBlockState().setValue(net.minecraft.world.level.block.SaplingBlock.STAGE, 1);
+        for (int x = -3; x <= 3; x++) {
+            for (int z = -3; z <= 3; z++) {
+                level.setBlock(base.offset(x, 0, z), state, 3);
+            }
+        }
+        sapling.advanceTree(level, base, state, level.random);
+        player.teleportTo(level, base.getX() + 0.5, base.getY() + 40, base.getZ() + 95, 180.0F, -14.0F);
     }
 
     private static void put(ServerLevel level, BlockPos pos, BlockState state) {
