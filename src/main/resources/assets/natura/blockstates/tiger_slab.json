@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "natura:block/tiger_slab"
+    },
+    "type=double": {
+      "model": "natura:block/tiger_planks"
+    },
+    "type=top": {
+      "model": "natura:block/tiger_slab_top"
+    }
+  }
+}

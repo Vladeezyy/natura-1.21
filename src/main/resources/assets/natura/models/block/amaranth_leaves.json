@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "natura:block/leaves/overworld/amaranth_leaves"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}

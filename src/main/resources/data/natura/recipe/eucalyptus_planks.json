@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:eucalyptus_log"
+    }
+  },
+  "result": {
+    "id": "natura:eucalyptus_planks",
+    "count": 4
+  },
+  "group": "natura:overworld_planks"
+}

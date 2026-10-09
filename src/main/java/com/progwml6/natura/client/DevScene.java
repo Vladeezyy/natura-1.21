@@ -1,0 +1,238 @@
+package com.progwml6.natura.client;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import com.progwml6.natura.Natura;
+import com.progwml6.natura.common.NaturaBlocks;
+import com.progwml6.natura.common.NaturaTabs;
+import com.progwml6.natura.library.NaturaWood;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Screenshot;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+
+/**
+ * A scripted scene for development: {@code ./gradlew runScene} joins the {@code natura_scene} world, builds a gallery of
+ * the Natura blocks, saves screenshots to {@code run/screenshots/scene_*.png} and quits. Inert unless the
+ * {@code natura.scene} system property is set; {@code -Dnatura.sceneFrom=N} skips the steps before tick N.
+ */
+@EventBusSubscriber(modid = Natura.MODID, value = Dist.CLIENT)
+public final class DevScene {
+    private static final boolean ENABLED = System.getProperty("natura.scene") != null;
+    private static final List<Step> STEPS = new ArrayList<>();
+    private static int tick;
+    private static BlockPos origin;
+
+    private record Step(int at, Consumer<Minecraft> action) {}
+
+    static {
+        at(40, mc -> server(mc, p -> {
+            p.setGameMode(GameType.CREATIVE);
+            p.getInventory().clearContent();
+            ServerLevel level = p.serverLevel();
+            origin = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, p.blockPosition());
+        }));
+        NaturaWood[] overworld = {NaturaWood.MAPLE, NaturaWood.SILVERBELL, NaturaWood.AMARANTH, NaturaWood.TIGER, NaturaWood.WILLOW,
+                NaturaWood.EUCALYPTUS, NaturaWood.HOPSEED, NaturaWood.SAKURA, NaturaWood.REDWOOD};
+        NaturaWood[] nether = {NaturaWood.GHOSTWOOD, NaturaWood.BLOODWOOD, NaturaWood.FUSEWOOD, NaturaWood.DARKWOOD};
+        at(50, mc -> server(mc, p -> gallery(p, overworld)));
+        at(52, mc -> mc.options.hideGui = true);
+        at(90, mc -> shot(mc, "woods_overworld"));
+        at(95, mc -> server(mc, p -> gallery(p, nether)));
+        at(135, mc -> shot(mc, "woods_nether"));
+        at(140, mc -> server(mc, DevScene::logsAndLeaves));
+        at(180, mc -> shot(mc, "logs_leaves"));
+        at(185, mc -> mc.options.hideGui = false);
+        String[] tabNames = {"general", "world", "decorative"};
+        for (int i = 0; i < 3; i++) {
+            int t = 190 + i * 20, index = i;
+            at(t, mc -> mc.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true)));
+            at(t + 4, mc -> selectTab(mc, index == 0 ? NaturaTabs.GENERAL.get() : index == 1 ? NaturaTabs.WORLD.get() : NaturaTabs.DECORATIVE.get()));
+            at(t + 14, mc -> shot(mc, "tab_" + tabNames[index]));
+            at(t + 16, mc -> mc.setScreen(null));
+        }
+        at(260, mc -> server(mc, p -> {
+            BlockPos bench = origin.offset(0, 0, 8);
+            p.serverLevel().setBlock(bench, NaturaBlocks.WOODS.get(NaturaWood.SAKURA).workbench().get().defaultBlockState(), 3);
+            p.teleportTo(p.serverLevel(), bench.getX() + 0.5, bench.getY(), bench.getZ() + 2.5, 180.0F, 30.0F);
+            p.openMenu(p.serverLevel().getBlockState(bench).getMenuProvider(p.serverLevel(), bench));
+        }));
+        at(280, mc -> shot(mc, "workbench_gui"));
+        at(285, mc -> mc.player.closeContainer());
+        at(300, Minecraft::stop);
+    }
+
+    private static void at(int t, Consumer<Minecraft> action) {
+        STEPS.add(new Step(t, action));
+    }
+
+    @SubscribeEvent
+    static void onTick(ClientTickEvent.Post event) {
+        if (!ENABLED) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.getSingleplayerServer() == null) return;
+        // The window is usually unfocused while this runs: never pause, or the integrated server stops.
+        mc.options.pauseOnLostFocus = false;
+        if (mc.screen instanceof net.minecraft.client.gui.screens.PauseScreen) {
+            mc.setScreen(null);
+        }
+        tick++;
+        for (Step step : STEPS) {
+            if (step.at() == tick) {
+                Natura.LOG.info("[scene] tick {}", tick);
+                step.action().accept(mc);
+            }
+        }
+    }
+
+    private static void server(Minecraft mc, Consumer<ServerPlayer> action) {
+        MinecraftServer server = mc.getSingleplayerServer();
+        server.execute(() -> action.accept(server.getPlayerList().getPlayer(mc.player.getUUID())));
+    }
+
+    private static final int FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+
+    private static void clear(ServerLevel level) {
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-4, 0, -6), origin.offset(34, 8, 14))) {
+            level.setBlock(p, Blocks.AIR.defaultBlockState(), FLAGS);
+        }
+        // the flat world's animals wander into the pictures
+        for (var entity : level.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(origin).inflate(64),
+                e -> !(e instanceof ServerPlayer))) {
+            entity.discard();
+        }
+    }
+
+    /** Every block of the given woods: one column per wood, a tower of full blocks behind rows of the shapes. */
+    private static void gallery(ServerPlayer player, NaturaWood[] woods) {
+        ServerLevel level = player.serverLevel();
+        clear(level);
+        for (int i = 0; i < woods.length; i++) {
+            NaturaWood wood = woods[i];
+            NaturaBlocks.WoodSet set = NaturaBlocks.WOODS.get(wood);
+            BlockPos base = origin.offset(i * 2, 0, 0);
+            String name = wood.getName();
+            put(level, base, log(name));
+            put(level, base.above(), set.planks().get().defaultBlockState());
+            put(level, base.above(2), set.bookshelf().get().defaultBlockState());
+            put(level, base.above(3), set.workbench().get().defaultBlockState()
+                    .rotate(net.minecraft.world.level.block.Rotation.CLOCKWISE_180));
+            put(level, base.above(4), leavesState(leaves(name)));
+            put(level, base.above().south(), set.button().get().defaultBlockState().setValue(ButtonBlock.FACE, AttachFace.WALL)
+                    .setValue(ButtonBlock.FACING, Direction.SOUTH));
+            put(level, base.south(2), set.stairs().get().defaultBlockState().setValue(StairBlock.FACING, Direction.NORTH));
+            put(level, base.south(3), set.slab().get().defaultBlockState());
+            put(level, base.south(4), set.fence().get().defaultBlockState());
+            put(level, base.south(5), set.fenceGate().get().defaultBlockState());
+            var door = NaturaBlocks.DOORS.get(name + "_door");
+            if (door != null) {
+                put(level, base.south(6), door.get().defaultBlockState().setValue(DoorBlock.FACING, Direction.NORTH).setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
+                put(level, base.south(6).above(), door.get().defaultBlockState().setValue(DoorBlock.FACING, Direction.NORTH).setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER));
+            }
+            put(level, base.south(7), set.trapdoor().get().defaultBlockState());
+            put(level, base.south(8), set.pressurePlate().get().defaultBlockState());
+            put(level, base.south(9), NaturaBlocks.SAPLINGS.get(name + "_sapling").get().defaultBlockState());
+        }
+        look(player, woods.length);
+    }
+
+    /** The log pieces (axes, redwood, bloodwood quarters and bark) and every leaves block. */
+    private static void logsAndLeaves(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        clear(level);
+        int x = 0;
+        for (var entry : NaturaBlocks.LOGS.entrySet()) {
+            BlockState state = entry.getValue().get().defaultBlockState();
+            put(level, origin.offset(x, 0, 0), state);
+            if (state.hasProperty(net.minecraft.world.level.block.RotatedPillarBlock.AXIS)) {
+                put(level, origin.offset(x, 1, 0), state.setValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS, Direction.Axis.X));
+                put(level, origin.offset(x, 2, 0), state.setValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS, Direction.Axis.Z));
+            }
+            x += 2;
+        }
+        // a 2x2 bloodwood trunk from the four upright quarters, and one lying each way
+        BlockState blood = NaturaBlocks.LOGS.get("bloodwood_log").get().defaultBlockState();
+        for (int piece = 0; piece < 12; piece++) {
+            int set = piece / 4, quarter = piece % 4;
+            put(level, origin.offset(x + set * 3 + (quarter & 1), 0, -(quarter >> 1)), blood.setValue(
+                    com.progwml6.natura.common.block.BloodwoodLogBlock.PIECE, piece));
+        }
+        x = 0;
+        for (var entry : NaturaBlocks.LEAVES.values()) {
+            put(level, origin.offset(x, 0, 4), entry.get().defaultBlockState().setValue(BlockStateProperties.PERSISTENT, true));
+            x += 2;
+        }
+        look(player, 16);
+    }
+
+    private static void put(ServerLevel level, BlockPos pos, BlockState state) {
+        level.setBlock(pos, state, FLAGS);
+    }
+
+    private static BlockState leavesState(String id) {
+        return NaturaBlocks.LEAVES.get(id).get().defaultBlockState().setValue(BlockStateProperties.PERSISTENT, true);
+    }
+
+    private static BlockState log(String wood) {
+        return switch (wood) {
+            case "redwood" -> NaturaBlocks.LOGS.get("redwood_bark").get().defaultBlockState();
+            default -> NaturaBlocks.LOGS.get(wood + "_log").get().defaultBlockState();
+        };
+    }
+
+    private static String leaves(String wood) {
+        return wood.equals("darkwood") ? "darkwood_leaves" : wood + "_leaves";
+    }
+
+    /** Fly south of the gallery and above it, looking north at its middle (east is on the right). */
+    private static void look(ServerPlayer player, int columns) {
+        double cx = origin.getX() + columns - 0.5;
+        double eyeY = origin.getY() + 7.5;
+        double ez = origin.getZ() + 17.0;
+        double ty = origin.getY() + 1.5, tz = origin.getZ() + 3.0;
+        float pitch = (float) Math.toDegrees(Math.atan2(eyeY - ty, ez - tz));
+        player.getAbilities().flying = true;
+        player.onUpdateAbilities();
+        player.teleportTo(player.serverLevel(), cx, eyeY - player.getEyeHeight(), ez, 180.0F, pitch);
+    }
+
+    private static void selectTab(Minecraft mc, CreativeModeTab tab) {
+        if (!(mc.screen instanceof CreativeModeInventoryScreen screen)) return;
+        try {
+            var method = CreativeModeInventoryScreen.class.getDeclaredMethod("selectTab", CreativeModeTab.class);
+            method.setAccessible(true);
+            method.invoke(screen, tab);
+        } catch (ReflectiveOperationException e) {
+            Natura.LOG.warn("[scene] could not select the creative tab", e);
+        }
+    }
+
+    private static void shot(Minecraft mc, String name) {
+        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), msg -> Natura.LOG.info("[scene] {}", msg.getString()));
+    }
+
+    private DevScene() {}
+}

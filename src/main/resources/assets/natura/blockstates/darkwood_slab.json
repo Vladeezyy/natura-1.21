@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "natura:block/darkwood_slab"
+    },
+    "type=double": {
+      "model": "natura:block/darkwood_planks"
+    },
+    "type=top": {
+      "model": "natura:block/darkwood_slab_top"
+    }
+  }
+}

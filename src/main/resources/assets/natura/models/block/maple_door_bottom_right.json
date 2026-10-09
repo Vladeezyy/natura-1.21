@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/door_bottom_right",
+  "textures": {
+    "bottom": "natura:block/doors/maple/maple_door_bottom",
+    "top": "natura:block/doors/maple/maple_door_top"
+  },
+  "render_type": "minecraft:cutout"
+}

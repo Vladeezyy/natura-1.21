@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA",
+    "AA",
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:silverbell_planks"
+    }
+  },
+  "result": {
+    "id": "natura:silverbell_door",
+    "count": 3
+  },
+  "group": "natura:overworld_doors"
+}

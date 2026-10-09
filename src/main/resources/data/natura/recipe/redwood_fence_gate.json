@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ABA",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:redwood_stick"
+    },
+    "B": {
+      "item": "natura:redwood_planks"
+    }
+  },
+  "result": {
+    "id": "natura:redwood_fence_gate"
+  },
+  "group": "natura:overworld_fence_gates"
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "natura:block/planks/overworld/redwood_planks",
+    "side": "natura:block/bookshelves/overworld/redwood_bookshelf"
+  }
+}

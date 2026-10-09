@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:fusewood_planks"
+    }
+  },
+  "result": {
+    "id": "natura:fusewood_button"
+  },
+  "group": "natura:nether_buttons"
+}

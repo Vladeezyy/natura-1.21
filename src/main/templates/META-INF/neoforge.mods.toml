@@ -1,0 +1,30 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="${mod_license}"
+issueTrackerURL="https://github.com/Vladeezyy/natura-1.21/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+displayURL="https://github.com/progwml6/Natura"
+credits="Original credits: mDiyo, Slime Knights; Samtrion, tterrag"
+authors="mDiyo, progwml6 and the Slime Knights (original); port contributors"
+description='''
+Heyo, Redwood trees! Chop them all day long!
+Unofficial port of Natura (progwml6 / Slime Knights; code CC0, textures CC-BY 3.0) to Minecraft ${minecraft_version} / NeoForge.
+'''
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neo_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"

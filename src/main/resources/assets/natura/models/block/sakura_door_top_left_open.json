@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/door_top_left_open",
+  "textures": {
+    "bottom": "natura:block/doors/sakura/sakura_door_bottom",
+    "top": "natura:block/doors/sakura/sakura_door_top"
+  },
+  "render_type": "minecraft:cutout"
+}

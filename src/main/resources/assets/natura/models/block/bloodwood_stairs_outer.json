@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "natura:block/planks/nether/bloodwood_planks",
+    "side": "natura:block/planks/nether/bloodwood_planks",
+    "top": "natura:block/planks/nether/bloodwood_planks"
+  }
+}

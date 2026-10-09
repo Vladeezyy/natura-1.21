@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "natura:block/planks/overworld/hopseed_planks",
+    "side": "natura:block/bookshelves/overworld/hopseed_bookshelf"
+  }
+}

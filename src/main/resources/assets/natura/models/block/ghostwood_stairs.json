@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "natura:block/planks/nether/ghostwood_planks",
+    "side": "natura:block/planks/nether/ghostwood_planks",
+    "top": "natura:block/planks/nether/ghostwood_planks"
+  }
+}

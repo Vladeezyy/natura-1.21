@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:willow_log"
+    }
+  },
+  "result": {
+    "id": "natura:willow_planks",
+    "count": 4
+  },
+  "group": "natura:overworld_planks"
+}

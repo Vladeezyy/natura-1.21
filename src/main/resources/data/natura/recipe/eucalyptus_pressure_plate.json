@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:eucalyptus_planks"
+    }
+  },
+  "result": {
+    "id": "natura:eucalyptus_pressure_plate"
+  },
+  "group": "natura:overworld_pressure_plates"
+}

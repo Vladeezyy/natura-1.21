@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:silverbell_planks"
+    }
+  },
+  "result": {
+    "id": "natura:silverbell_slab",
+    "count": 6
+  },
+  "group": "natura:overworld_slabs"
+}

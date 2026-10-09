@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:bloodwood_planks"
+    }
+  },
+  "result": {
+    "id": "natura:bloodwood_pressure_plate"
+  },
+  "group": "natura:nether_pressure_plates"
+}

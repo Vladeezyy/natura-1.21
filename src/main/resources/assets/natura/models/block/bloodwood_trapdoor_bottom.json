@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_trapdoor_bottom",
+  "textures": {
+    "texture": "natura:block/trap_door/nether/bloodwood_trap_door"
+  },
+  "render_type": "minecraft:cutout"
+}

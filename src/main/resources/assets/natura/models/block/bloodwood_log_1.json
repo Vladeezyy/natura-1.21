@@ -1,0 +1,20 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "natura:block/logs/nether/bloodwood_bark",
+    "bark": "natura:block/logs/nether/bloodwood_bark",
+    "heart_small": "natura:block/logs/nether/bloodwood_heart_small",
+    "upper_left": "natura:block/logs/nether/bloodwood_upper_left",
+    "upper_right": "natura:block/logs/nether/bloodwood_upper_right",
+    "side_left": "natura:block/logs/nether/bloodwood_side_left",
+    "side_right": "natura:block/logs/nether/bloodwood_side_right",
+    "lower_left": "natura:block/logs/nether/bloodwood_lower_left",
+    "lower_right": "natura:block/logs/nether/bloodwood_lower_right",
+    "down": "natura:block/logs/nether/bloodwood_upper_right",
+    "up": "natura:block/logs/nether/bloodwood_upper_right",
+    "north": "natura:block/logs/nether/bloodwood_bark",
+    "south": "natura:block/logs/nether/bloodwood_side_right",
+    "west": "natura:block/logs/nether/bloodwood_side_left",
+    "east": "natura:block/logs/nether/bloodwood_bark"
+  }
+}

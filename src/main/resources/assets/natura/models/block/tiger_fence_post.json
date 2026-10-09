@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/fence_post",
+  "textures": {
+    "texture": "natura:block/planks/overworld/tiger_planks"
+  }
+}

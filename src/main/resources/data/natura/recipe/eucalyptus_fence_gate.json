@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ABA",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:eucalyptus_stick"
+    },
+    "B": {
+      "item": "natura:eucalyptus_planks"
+    }
+  },
+  "result": {
+    "id": "natura:eucalyptus_fence_gate"
+  },
+  "group": "natura:overworld_fence_gates"
+}

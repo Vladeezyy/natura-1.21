@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "stage=0": {
+      "model": "natura:block/amaranth_sapling"
+    },
+    "stage=1": {
+      "model": "natura:block/amaranth_sapling"
+    }
+  }
+}

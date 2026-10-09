@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_trapdoor_open",
+  "textures": {
+    "texture": "natura:block/trap_door/overworld/tiger_trap_door"
+  },
+  "render_type": "minecraft:cutout"
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "natura:block/planks/nether/bloodwood_planks",
+    "side": "natura:block/bookshelves/nether/bloodwood_bookshelf"
+  }
+}

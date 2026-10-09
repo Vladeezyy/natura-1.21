@@ -1,0 +1,40 @@
+{
+  "variants": {
+    "piece=0": {
+      "model": "natura:block/bloodwood_log_0"
+    },
+    "piece=1": {
+      "model": "natura:block/bloodwood_log_1"
+    },
+    "piece=2": {
+      "model": "natura:block/bloodwood_log_2"
+    },
+    "piece=3": {
+      "model": "natura:block/bloodwood_log_3"
+    },
+    "piece=4": {
+      "model": "natura:block/bloodwood_log_4"
+    },
+    "piece=5": {
+      "model": "natura:block/bloodwood_log_5"
+    },
+    "piece=6": {
+      "model": "natura:block/bloodwood_log_6"
+    },
+    "piece=7": {
+      "model": "natura:block/bloodwood_log_7"
+    },
+    "piece=8": {
+      "model": "natura:block/bloodwood_log_8"
+    },
+    "piece=9": {
+      "model": "natura:block/bloodwood_log_9"
+    },
+    "piece=10": {
+      "model": "natura:block/bloodwood_log_10"
+    },
+    "piece=11": {
+      "model": "natura:block/bloodwood_log_11"
+    }
+  }
+}

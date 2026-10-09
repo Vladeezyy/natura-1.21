@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "natura:block/silverbell_slab"
+    },
+    "type=double": {
+      "model": "natura:block/silverbell_planks"
+    },
+    "type=top": {
+      "model": "natura:block/silverbell_slab_top"
+    }
+  }
+}

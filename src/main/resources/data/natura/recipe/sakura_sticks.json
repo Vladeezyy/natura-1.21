@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A ",
+    " A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:sakura_planks"
+    }
+  },
+  "result": {
+    "id": "natura:sakura_stick",
+    "count": 4
+  },
+  "group": "natura:overworld_sticks"
+}

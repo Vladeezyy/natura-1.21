@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ABA",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:hopseed_stick"
+    },
+    "B": {
+      "item": "natura:hopseed_planks"
+    }
+  },
+  "result": {
+    "id": "natura:hopseed_fence_gate"
+  },
+  "group": "natura:overworld_fence_gates"
+}

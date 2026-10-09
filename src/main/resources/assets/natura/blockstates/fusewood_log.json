@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "natura:block/fusewood_log"
+    },
+    "axis=z": {
+      "model": "natura:block/fusewood_log",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "natura:block/fusewood_log",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:ghostwood_planks"
+    }
+  },
+  "result": {
+    "id": "natura:ghostwood_slab",
+    "count": 6
+  },
+  "group": "natura:nether_slabs"
+}

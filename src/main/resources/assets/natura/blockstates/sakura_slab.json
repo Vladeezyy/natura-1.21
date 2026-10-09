@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "natura:block/sakura_slab"
+    },
+    "type=double": {
+      "model": "natura:block/sakura_planks"
+    },
+    "type=top": {
+      "model": "natura:block/sakura_slab_top"
+    }
+  }
+}
