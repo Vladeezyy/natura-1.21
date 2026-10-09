@@ -64,6 +64,12 @@ public final class NaturaGameTests {
         TESTS.put("seed_bag", NaturaGameTests::seedBag);
         TESTS.put("plants_on_colored_grass", NaturaGameTests::coloredGrass);
         TESTS.put("tempt", NaturaGameTests::tempt);
+        TESTS.put("heat_sand_and_glass", NaturaGameTests::heatSandAndGlass);
+        TESTS.put("glowshrooms", NaturaGameTests::glowshrooms);
+        TESTS.put("respawn_obelisk", NaturaGameTests::obelisk);
+        TESTS.put("netherrack_furnace", NaturaGameTests::furnace);
+        TESTS.put("blaze_rails_and_hopper", NaturaGameTests::railsAndHopper);
+        TESTS.put("clouds", NaturaGameTests::clouds);
     }
 
     private NaturaGameTests() {}
@@ -438,6 +444,105 @@ public final class NaturaGameTests {
                 && t.toString() != null);
         helper.assertTrue(cowTempted && chicken.goalSelector.getAvailableGoals().stream().filter(g -> g.getGoal() instanceof net.minecraft.world.entity.ai.goal.TemptGoal).count() >= 2,
                 "cows and chickens get the Natura tempt goals");
+        helper.succeed();
+    }
+
+    private static void heatSandAndGlass(GameTestHelper helper) {
+        helper.setBlock(new BlockPos(2, 1, 2), block("heat_sand"));
+        var pig = helper.spawn(net.minecraft.world.entity.EntityType.PIG, new BlockPos(2, 2, 2));
+        float health = pig.getHealth();
+        helper.getBlockState(new BlockPos(2, 1, 2)).entityInside(helper.getLevel(), helper.absolutePos(new BlockPos(2, 1, 2)), pig);
+        helper.assertTrue(pig.getHealth() < health, "heat sand burns a pig");
+        BlockState soul = block("soul_glass").defaultBlockState();
+        helper.assertTrue(soul.getCollisionShape(helper.getLevel(), BlockPos.ZERO).isEmpty(), "soul glass has no collision");
+        soul.entityInside(helper.getLevel(), helper.absolutePos(new BlockPos(4, 1, 4)), pig);
+        helper.assertTrue(pig.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN), "soul glass slows");
+        helper.assertTrue(drops(helper, soul, ItemStack.EMPTY).isEmpty()
+                && drops(helper, soul, enchanted(helper, new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.SILK_TOUCH, 1)).size() == 1, "glass only with silk touch");
+        helper.assertTrue(block("heat_glass").getExplosionResistance() == 1800.0F, "nether glass resists 1800");
+        helper.succeed();
+    }
+
+    private static void glowshrooms(GameTestHelper helper) {
+        BlockState large = block("green_large_glowshroom").defaultBlockState();
+        int[] counts = new int[3];
+        for (int i = 0; i < 3000; i++) {
+            List<ItemStack> d = drops(helper, large, ItemStack.EMPTY);
+            int n = d.isEmpty() ? 0 : d.get(0).getCount();
+            helper.assertTrue(n <= 2 && (d.isEmpty() || d.get(0).is(block("green_glowshroom").asItem())), "a huge glowshroom drops 0-2 small ones");
+            counts[n]++;
+        }
+        helper.assertTrue(counts[1] > 200 && counts[1] < 400 && counts[2] > 200 && counts[2] < 400, "1 in 10 one, 1 in 10 two: " + java.util.Arrays.toString(counts));
+        helper.assertTrue(large.getLightEmission() == 9 && large.getDestroySpeed(helper.getLevel(), BlockPos.ZERO) == 0.0F, "glows 9, breaks at once");
+        BlockPos pos = new BlockPos(4, 2, 4);
+        helper.setBlock(pos.below(), Blocks.NETHERRACK);
+        var small = (com.progwml6.natura.common.block.NaturaGlowshroomBlock) block("blue_glowshroom");
+        helper.setBlock(pos, small);
+        small.performBonemeal(helper.getLevel(), helper.getLevel().random, helper.absolutePos(pos), helper.getBlockState(pos));
+        helper.assertTrue(helper.getBlockState(pos).is(block("blue_large_glowshroom"))
+                && helper.getBlockState(pos).getValue(com.progwml6.natura.common.block.LargeGlowshroomBlock.VARIANT) == com.progwml6.natura.common.block.LargeGlowshroomBlock.Variant.STEM,
+                "bone meal grows a huge blue glowshroom: " + helper.getBlockState(pos));
+        helper.succeed();
+    }
+
+    private static void obelisk(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        BlockPos pos = new BlockPos(2, 1, 3);
+        helper.setBlock(pos, block("respawn_obelisk"));
+        helper.getBlockState(pos).useWithoutItem(helper.getLevel(), player, new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(helper.absolutePos(pos)),
+                net.minecraft.core.Direction.UP, helper.absolutePos(pos), false));
+        BlockState active = helper.getBlockState(pos);
+        helper.assertTrue(active.getValue(com.progwml6.natura.common.block.RespawnObeliskBlock.ACTIVE) && active.getLightEmission() == 7, "the obelisk lights up");
+        helper.assertTrue(helper.absolutePos(pos).equals(player.getRespawnPosition()), "the respawn point is the obelisk");
+        var spawn = active.getRespawnPosition(net.minecraft.world.entity.EntityType.PLAYER, helper.getLevel(), helper.absolutePos(pos), 0);
+        helper.assertTrue(spawn.isPresent() && spawn.get().position().y > helper.absolutePos(pos).getY() + 1, "the player respawns on top");
+        player.discard();
+        helper.succeed();
+    }
+
+    private static void furnace(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, block("netherrack_furnace"));
+        var be = (com.progwml6.natura.common.block.NetherrackFurnaceBlockEntity) helper.getBlockEntity(pos);
+        be.setItem(0, new ItemStack(Items.RAW_IRON, 2));
+        be.setItem(1, new ItemStack(Items.COAL));
+        BlockState state = helper.getBlockState(pos);
+        net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity.serverTick(helper.getLevel(), helper.absolutePos(pos), state, be);
+        var data = new net.minecraft.nbt.CompoundTag();
+        var saved = be.saveWithoutMetadata(helper.getLevel().registryAccess());
+        helper.assertTrue(saved.getShort("BurnTime") >= 3199, "coal burns 3200 ticks (twice the vanilla 1600): " + saved.getShort("BurnTime"));
+        helper.succeed();
+    }
+
+    private static void railsAndHopper(GameTestHelper helper) {
+        var rail = (net.minecraft.world.level.block.BaseRailBlock) block("blaze_rail");
+        helper.assertTrue(rail.getRailMaxSpeed(rail.defaultBlockState(), helper.getLevel(), BlockPos.ZERO, null) == 0.65F, "blaze rails allow 0.65");
+        BlockPos pos = new BlockPos(2, 1, 2);
+        helper.setBlock(pos, block("blaze_hopper"));
+        helper.assertTrue(helper.getBlockEntity(pos) instanceof net.minecraft.world.level.block.entity.HopperBlockEntity, "the blaze hopper is a hopper");
+        helper.succeed();
+    }
+
+    private static void clouds(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 3, 2);
+        helper.setBlock(pos, block("white_cloud"));
+        helper.assertTrue(helper.getBlockState(pos).getCollisionShape(helper.getLevel(), helper.absolutePos(pos)).max(net.minecraft.core.Direction.Axis.Y) <= 1 / 16.0 + 1e-6,
+                "a cloud is solid only at the bottom");
+        helper.setBlock(pos.above(), block("white_cloud"));
+        helper.assertTrue(helper.getBlockState(pos.above()).getCollisionShape(helper.getLevel(), helper.absolutePos(pos.above())).isEmpty(), "a cloud on a cloud has no collision");
+        var pig = helper.spawn(net.minecraft.world.entity.EntityType.PIG, pos);
+        pig.fallDistance = 10;
+        pig.setDeltaMovement(0, -1, 0);
+        helper.getBlockState(pos).entityInside(helper.getLevel(), helper.absolutePos(pos), pig);
+        helper.assertTrue(pig.fallDistance == 0 && pig.getDeltaMovement().y > -0.01, "clouds stop the fall");
+        BlockPos sulfur = new BlockPos(5, 3, 5);
+        helper.setBlock(sulfur, block("sulfur_cloud"));
+        ServerPlayer player = player(helper);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.FLINT_AND_STEEL));
+        helper.getBlockState(sulfur).useItemOn(player.getMainHandItem(), helper.getLevel(), player, net.minecraft.world.InteractionHand.MAIN_HAND,
+                new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(helper.absolutePos(sulfur)), net.minecraft.core.Direction.UP, helper.absolutePos(sulfur), false));
+        helper.assertTrue(helper.getBlockState(sulfur).isAir(), "flint and steel sets off a sulfur cloud");
+        player.discard();
         helper.succeed();
     }
 

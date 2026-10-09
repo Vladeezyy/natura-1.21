@@ -1,0 +1,43 @@
+{
+  "variants": {
+    "variant=north_west": {
+      "model": "natura:block/green_large_glowshroom_north_west"
+    },
+    "variant=north": {
+      "model": "natura:block/green_large_glowshroom_north"
+    },
+    "variant=north_east": {
+      "model": "natura:block/green_large_glowshroom_north_east"
+    },
+    "variant=west": {
+      "model": "natura:block/green_large_glowshroom_west"
+    },
+    "variant=center": {
+      "model": "natura:block/green_large_glowshroom_center"
+    },
+    "variant=east": {
+      "model": "natura:block/green_large_glowshroom_east"
+    },
+    "variant=south_west": {
+      "model": "natura:block/green_large_glowshroom_south_west"
+    },
+    "variant=south": {
+      "model": "natura:block/green_large_glowshroom_south"
+    },
+    "variant=south_east": {
+      "model": "natura:block/green_large_glowshroom_south_east"
+    },
+    "variant=stem": {
+      "model": "natura:block/green_large_glowshroom_stem"
+    },
+    "variant=all_inside": {
+      "model": "natura:block/green_large_glowshroom_all_inside"
+    },
+    "variant=all_outside": {
+      "model": "natura:block/green_large_glowshroom_all_outside"
+    },
+    "variant=all_stem": {
+      "model": "natura:block/green_large_glowshroom_all_stem"
+    }
+  }
+}

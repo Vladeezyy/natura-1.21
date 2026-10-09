@@ -1,0 +1,8 @@
+{
+  "parent": "natura:block/natura_vine_up",
+  "textures": {
+    "vine": "natura:block/vine/thornvine",
+    "particle": "natura:block/vine/thornvine"
+  },
+  "render_type": "minecraft:cutout"
+}

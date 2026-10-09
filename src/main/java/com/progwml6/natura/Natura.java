@@ -35,6 +35,9 @@ public class Natura {
         NaturaItems.init();
         NaturaBlocks.BLOCKS.register(modBus);
         NaturaBlocks.ITEMS.register(modBus);
+        NaturaBlocks.BLOCK_ENTITIES.register(modBus);
+        modBus.addListener(net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent.class,
+                event -> event.modify(net.minecraft.world.level.block.entity.BlockEntityType.HOPPER, NaturaBlocks.BLAZE_HOPPER.get()));
         NaturaTabs.TABS.register(modBus);
         CONDITIONS.register("config_option_enabled", () -> ConfigOptionEnabledCondition.CODEC);
         CONDITIONS.register(modBus);

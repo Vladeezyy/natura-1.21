@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_rail_raised_ne",
+  "textures": {
+    "rail": "natura:block/rail/blaze_rail_golden_powered"
+  },
+  "render_type": "minecraft:cutout"
+}

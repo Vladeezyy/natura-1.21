@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "natura:block/glowshroom/green/green_glowshroom_inside"
+  },
+  "render_type": "minecraft:translucent"
+}

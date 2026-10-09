@@ -96,7 +96,9 @@ public final class DevScene {
         at(600, mc -> shot(mc, "tree_redwood_base"));
         at(610, mc -> server(mc, DevScene::plants));
         at(650, mc -> shot(mc, "plants"));
-        at(660, Minecraft::stop);
+        at(660, mc -> server(mc, DevScene::netherBlocks));
+        at(700, mc -> shot(mc, "nether_blocks"));
+        at(710, Minecraft::stop);
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -290,6 +292,70 @@ public final class DevScene {
             gx += 4;
         }
         player.teleportTo(level, base.getX() + 10.5, base.getY() + 7, base.getZ() + 22, 180.0F, 28.0F);
+    }
+
+    /** Heat sand, tainted soil, glass, thorn vines, glowshrooms, obelisk, furnace, hopper, redstone parts, rails, clouds. */
+    private static void netherBlocks(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        BlockPos base = origin.offset(40, 0, 0);
+        box(level, base.offset(-6, 0, -8), base.offset(28, 14, 14), Blocks.AIR.defaultBlockState());
+        box(level, base.offset(-6, -1, -8), base.offset(28, -1, 14), Blocks.NETHERRACK.defaultBlockState());
+        String[] row = {"heat_sand", "tainted_soil", "tainted_farmland_dry", "tainted_farmland_heated", "soul_glass", "heat_glass"};
+        for (int i = 0; i < row.length; i++) {
+            put(level, base.offset(i * 2, 0, 8), NaturaBlocks.NETHER.get(row[i]).get().defaultBlockState());
+        }
+        // thorn vines on a netherrack wall
+        box(level, base.offset(13, 0, 7), base.offset(15, 2, 7), Blocks.NETHERRACK.defaultBlockState());
+        for (int x = 13; x <= 15; x++) {
+            for (int y = 0; y <= 2; y++) {
+                put(level, base.offset(x, y, 8), NaturaBlocks.NETHER.get("thorn_vines").get().defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.VineBlock.NORTH, true));
+            }
+        }
+        int x = 0;
+        for (var shroom : NaturaBlocks.GLOWSHROOMS.values()) {
+            put(level, base.offset(x, 0, 11), shroom.get().defaultBlockState());
+            BlockPos huge = base.offset(x * 4 - 2, 0, -2);
+            for (int attempt = 0; attempt < 20 && !level.getBlockState(huge).is(NaturaBlocks.LARGE_GLOWSHROOMS.get(shroomColor(shroom.getId().getPath())).get()); attempt++) {
+                level.setBlock(huge, shroom.get().defaultBlockState(), 3);
+                shroom.get().performBonemeal(level, level.random, huge, shroom.get().defaultBlockState());
+            }
+            x += 2;
+        }
+        x = 0;
+        put(level, base.offset(7, 0, 4), NaturaBlocks.NETHER.get("respawn_obelisk").get().defaultBlockState());
+        put(level, base.offset(8, 0, 4), NaturaBlocks.NETHER.get("respawn_obelisk").get().defaultBlockState()
+                .setValue(com.progwml6.natura.common.block.RespawnObeliskBlock.ACTIVE, true));
+        put(level, base.offset(10, 0, 4), NaturaBlocks.NETHERRACK_FURNACE.get().defaultBlockState().setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.FACING, Direction.SOUTH));
+        put(level, base.offset(11, 0, 4), NaturaBlocks.NETHERRACK_FURNACE.get().defaultBlockState().setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.FACING, Direction.SOUTH)
+                .setValue(com.progwml6.natura.common.block.NetherrackFurnaceBlock.LIT, true));
+        put(level, base.offset(13, 0, 4), NaturaBlocks.BLAZE_HOPPER.get().defaultBlockState());
+        put(level, base.offset(15, 0, 4), NaturaBlocks.NETHER.get("nether_lever").get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.LeverBlock.FACE, AttachFace.FLOOR));
+        put(level, base.offset(16, 0, 4), NaturaBlocks.NETHER.get("nether_pressure_plate").get().defaultBlockState());
+        put(level, base.offset(17, 0, 4), NaturaBlocks.NETHER.get("nether_button").get().defaultBlockState()
+                .setValue(ButtonBlock.FACE, AttachFace.FLOOR));
+        String[] rails = {"blaze_rail", "blaze_powered_rail", "blaze_activator_rail", "blaze_detector_rail"};
+        for (int i = 0; i < rails.length; i++) {
+            for (int z = 0; z < 3; z++) {
+                BlockState rail = NaturaBlocks.NETHER.get(rails[i]).get().defaultBlockState();
+                if (z == 2 && rail.hasProperty(net.minecraft.world.level.block.PoweredRailBlock.POWERED)) {
+                    rail = rail.setValue(net.minecraft.world.level.block.PoweredRailBlock.POWERED, true);
+                }
+                put(level, base.offset(19 + i * 2, 0, z), rail);
+            }
+        }
+        int c = 0;
+        for (var cloud : NaturaBlocks.CLOUDS.values()) {
+            put(level, base.offset(19 + c * 2, 2, 9), cloud.get().defaultBlockState());
+            put(level, base.offset(19 + c * 2, 3, 9), cloud.get().defaultBlockState());
+            c++;
+        }
+        player.teleportTo(level, base.getX() + 12.5, base.getY() + 9, base.getZ() + 24, 180.0F, 25.0F);
+    }
+
+    private static String shroomColor(String id) {
+        return id.substring(0, id.indexOf('_'));
     }
 
     private static void put(ServerLevel level, BlockPos pos, BlockState state) {

@@ -157,6 +157,11 @@
     "natura:redwood_bark",
     "natura:redwood_heart",
     "natura:redwood_root",
-    "natura:bloodwood_bark"
+    "natura:bloodwood_bark",
+    "natura:thorn_vines",
+    "natura:green_large_glowshroom",
+    "natura:blue_large_glowshroom",
+    "natura:purple_large_glowshroom",
+    "natura:respawn_obelisk"
   ]
 }

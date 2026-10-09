@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "natura:block/glowshroom/purple/purple_glowshroom_inside",
+    "down": "natura:block/glowshroom/purple/purple_glowshroom_inside",
+    "up": "natura:block/glowshroom/purple/purple_glowshroom_skin",
+    "north": "natura:block/glowshroom/purple/purple_glowshroom_skin",
+    "east": "natura:block/glowshroom/purple/purple_glowshroom_inside",
+    "south": "natura:block/glowshroom/purple/purple_glowshroom_inside",
+    "west": "natura:block/glowshroom/purple/purple_glowshroom_skin"
+  },
+  "render_type": "minecraft:translucent"
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/rail_flat",
+  "textures": {
+    "rail": "natura:block/rail/blaze_rail_activator_powered"
+  },
+  "render_type": "minecraft:cutout"
+}

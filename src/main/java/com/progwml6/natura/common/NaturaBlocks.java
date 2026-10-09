@@ -9,6 +9,20 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.progwml6.natura.Natura;
+import com.progwml6.natura.common.block.BlazeRailBlocks;
+import com.progwml6.natura.common.block.CloudBlock;
+import com.progwml6.natura.common.block.HeatSandBlock;
+import com.progwml6.natura.common.block.LargeGlowshroomBlock;
+import com.progwml6.natura.common.block.NaturaGlowshroomBlock;
+import com.progwml6.natura.common.block.NetherGlassBlock;
+import com.progwml6.natura.common.block.NetherrackFurnaceBlock;
+import com.progwml6.natura.common.block.NetherrackFurnaceBlockEntity;
+import com.progwml6.natura.common.block.RespawnObeliskBlock;
+import com.progwml6.natura.common.block.TaintedSoilBlock;
+import com.progwml6.natura.common.block.ThornVinesBlock;
+import net.minecraft.world.level.block.HopperBlock;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import com.progwml6.natura.common.block.BloodwoodLogBlock;
 import com.progwml6.natura.common.block.NaturaBerryBushBlock;
 import com.progwml6.natura.common.block.NaturaCropBlock;
@@ -87,6 +101,24 @@ public final class NaturaBlocks {
     /** Doors by their new id (no amaranth or willow door in 1.12, two for redwood). */
     public static final Map<String, DeferredBlock<DoorBlock>> DOORS = new LinkedHashMap<>();
 
+    // NaturaNether blocks and NaturaCommons clouds (phase 4)
+    public static final Map<String, DeferredBlock<? extends Block>> NETHER = new LinkedHashMap<>();
+    public static final Map<String, DeferredBlock<NaturaGlowshroomBlock>> GLOWSHROOMS = new LinkedHashMap<>();
+    public static final Map<String, DeferredBlock<LargeGlowshroomBlock>> LARGE_GLOWSHROOMS = new LinkedHashMap<>();
+    public static final Map<String, DeferredBlock<CloudBlock>> CLOUDS = new LinkedHashMap<>();
+    public static DeferredBlock<NetherrackFurnaceBlock> NETHERRACK_FURNACE;
+    public static DeferredBlock<HopperBlock> BLAZE_HOPPER;
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Natura.MODID);
+    public static final Supplier<BlockEntityType<NetherrackFurnaceBlockEntity>> NETHERRACK_FURNACE_BE = BLOCK_ENTITIES.register("netherrack_furnace",
+            () -> BlockEntityType.Builder.of(NetherrackFurnaceBlockEntity::new, NETHERRACK_FURNACE.get()).build(null));
+    /** 1.12 netherrack button: a stone button (20 ticks, no arrows) with the wooden click sounds. */
+    private static final BlockSetType NETHERRACK = new BlockSetType("natura_netherrack", true, true, false, BlockSetType.PressurePlateSensitivity.MOBS,
+            SoundType.WOOD, net.minecraft.sounds.SoundEvents.IRON_DOOR_CLOSE, net.minecraft.sounds.SoundEvents.IRON_DOOR_OPEN,
+            net.minecraft.sounds.SoundEvents.IRON_TRAPDOOR_CLOSE, net.minecraft.sounds.SoundEvents.IRON_TRAPDOOR_OPEN,
+            net.minecraft.sounds.SoundEvents.STONE_PRESSURE_PLATE_CLICK_OFF, net.minecraft.sounds.SoundEvents.STONE_PRESSURE_PLATE_CLICK_ON,
+            net.minecraft.sounds.SoundEvents.WOODEN_BUTTON_CLICK_OFF, net.minecraft.sounds.SoundEvents.WOODEN_BUTTON_CLICK_ON);
+
+
     // NaturaOverworld plants (phase 3)
     public static DeferredBlock<Block> COLORED_GRASS_TOPIARY, COLORED_GRASS_BLUEGRASS, COLORED_GRASS_AUTUMNAL;
     public static final Map<String, DeferredBlock<? extends Block>> COLORED_GRASS = new LinkedHashMap<>();
@@ -99,6 +131,13 @@ public final class NaturaBlocks {
 
 
     static {
+        // NaturaCommons: clouds
+        for (String cloud : new String[] {"white", "dark", "ash", "sulfur"}) {
+            CLOUDS.put(cloud, block(cloud + "_cloud", () -> new CloudBlock(cloud.equals("sulfur"), BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.SNOW).strength(0.3F).sound(SoundType.WOOL).noOcclusion().dynamicShape().isSuffocating((s, l, p) -> false)
+                    .isViewBlocking((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false).pushReaction(PushReaction.BLOCK)), TAB_WORLD));
+        }
+
         // NaturaOverworld: logs, leaves, saplings, planks, slabs, stairs, doors
         for (NaturaWood wood : new NaturaWood[] {NaturaWood.MAPLE, NaturaWood.SILVERBELL, NaturaWood.AMARANTH, NaturaWood.TIGER,
                 NaturaWood.WILLOW, NaturaWood.EUCALYPTUS, NaturaWood.HOPSEED, NaturaWood.SAKURA}) {
@@ -135,9 +174,11 @@ public final class NaturaBlocks {
         sapling("fusewood", NETHER_SAPLING_SOIL, false);
         sapling("darkwood", NETHER_SAPLING_SOIL, false);
         sapling("bloodwood", NETHER_SAPLING_SOIL, true);
+        netherBlocks();
         for (String berry : new String[] {"blightberry", "duskberry", "skyberry", "stingberry"}) {
             bush(berry, true);
         }
+        netherDevices();
 
         // planks + the decorative set of every wood
         for (NaturaWood wood : NaturaWood.values()) {
@@ -153,6 +194,61 @@ public final class NaturaBlocks {
     }
 
     private NaturaBlocks() {}
+
+    /** 1.12 NaturaNether: heat sand, tainted soil, thorn vines, nether glass. */
+    private static void netherBlocks() {
+        NETHER.put("heat_sand", block("heat_sand", () -> new HeatSandBlock(BlockBehaviour.Properties.of().mapColor(MapColor.NETHER).strength(3.0F)
+                .sound(SoundType.SAND)), TAB_WORLD));
+        for (String soil : new String[] {"tainted_soil", "tainted_farmland_dry", "tainted_farmland_heated"}) {
+            NETHER.put(soil, block(soil, () -> new TaintedSoilBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DIRT).strength(2.2F, 15.0F)
+                    .sound(SoundType.GRAVEL)), TAB_WORLD));
+        }
+        NETHER.put("thorn_vines", block("thorn_vines", () -> new ThornVinesBlock(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).replaceable()
+                .noCollission().randomTicks().strength(1.0F).sound(SoundType.VINE).ignitedByLava().pushReaction(PushReaction.DESTROY)), TAB_WORLD));
+        for (String glass : new String[] {"soul", "heat"}) {
+            NETHER.put(glass + "_glass", block(glass + "_glass", () -> new NetherGlassBlock(glass.equals("soul"), BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.NONE).strength(1.0F, 1800.0F).sound(SoundType.GLASS).noOcclusion().isValidSpawn((s, l, p, type) -> false)
+                    .isRedstoneConductor((s, l, p) -> false).isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p) -> false)), TAB_WORLD));
+        }
+    }
+
+    /** 1.12 NaturaNether after the berry bushes: obelisk, glowshrooms, hopper, redstone parts, rails, furnace. */
+    private static void netherDevices() {
+        NETHER.put("respawn_obelisk", block("respawn_obelisk", () -> new RespawnObeliskBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD)
+                .strength(2.0F, 600000.0F).sound(SoundType.WOOD).ignitedByLava()
+                .lightLevel(s -> s.getValue(RespawnObeliskBlock.ACTIVE) ? 7 : 0)), TAB_WORLD));
+        for (String color : new String[] {"green", "blue", "purple"}) {
+            GLOWSHROOMS.put(color, block(color + "_glowshroom", () -> new NaturaGlowshroomBlock(color, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.GRASS).lightLevel(s -> 9)
+                    .pushReaction(PushReaction.DESTROY)), TAB_WORLD));
+        }
+        for (String color : new String[] {"green", "blue", "purple"}) {
+            DeferredBlock<LargeGlowshroomBlock> large = BLOCKS.register(color + "_large_glowshroom", () -> new LargeGlowshroomBlock(
+                    () -> GLOWSHROOMS.get(color).get(), BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instabreak().sound(SoundType.WOOD)
+                    .lightLevel(s -> 9).noOcclusion().dynamicShape().ignitedByLava()));
+            ITEMS.register(color + "_large_glowshroom", () -> new NaturaBlockItem(large.get(), new Item.Properties()));
+            LARGE_GLOWSHROOMS.put(color, large);
+        }
+        BLAZE_HOPPER = block("blaze_hopper", () -> new HopperBlock(BlockBehaviour.Properties.of().mapColor(MapColor.NETHER).requiresCorrectToolForDrops()
+                .strength(3.0F, 8.0F).sound(SoundType.METAL).noOcclusion()), TAB_WORLD);
+        NETHER.put("nether_lever", block("nether_lever", () -> new LeverBlock(BlockBehaviour.Properties.of().noCollission().strength(0.5F)
+                .sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY)), TAB_WORLD));
+        NETHER.put("nether_button", block("nether_button", () -> new ButtonBlock(NETHERRACK, 20, BlockBehaviour.Properties.of().noCollission()
+                .strength(0.5F).pushReaction(PushReaction.DESTROY)), TAB_WORLD));
+        NETHER.put("nether_pressure_plate", block("nether_pressure_plate", () -> new PressurePlateBlock(BlockSetType.STONE, BlockBehaviour.Properties.of()
+                .mapColor(MapColor.NETHER).forceSolidOn().requiresCorrectToolForDrops().noCollission().strength(0.5F).pushReaction(PushReaction.DESTROY)),
+                TAB_WORLD));
+        NETHER.put("blaze_rail", block("blaze_rail", () -> new BlazeRailBlocks.Normal(rail()), TAB_WORLD));
+        NETHER.put("blaze_powered_rail", block("blaze_powered_rail", () -> new BlazeRailBlocks.Powered(rail(), false), TAB_WORLD));
+        NETHER.put("blaze_activator_rail", block("blaze_activator_rail", () -> new BlazeRailBlocks.Powered(rail(), true), TAB_WORLD));
+        NETHER.put("blaze_detector_rail", block("blaze_detector_rail", () -> new BlazeRailBlocks.Detector(rail()), TAB_WORLD));
+        NETHERRACK_FURNACE = block("netherrack_furnace", () -> new NetherrackFurnaceBlock(BlockBehaviour.Properties.of().mapColor(MapColor.NETHER)
+                .requiresCorrectToolForDrops().strength(3.5F, 3.5F).sound(SoundType.STONE).lightLevel(s -> s.getValue(NetherrackFurnaceBlock.LIT) ? 13 : 0)), TAB_WORLD);
+    }
+
+    private static BlockBehaviour.Properties rail() {
+        return BlockBehaviour.Properties.of().noCollission().strength(0.7F).sound(SoundType.METAL);
+    }
 
     /** 1.12 NaturaOverworld registration order: colored grass, bluebells, berry bushes, crops, saguaro. */
     private static void overworldPlants() {

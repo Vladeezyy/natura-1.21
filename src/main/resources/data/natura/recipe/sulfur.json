@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA",
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:sulfur_cloud"
+    }
+  },
+  "result": {
+    "id": "natura:sulfur_powder"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "natura:block/glass/glass_heat"
+  },
+  "render_type": "minecraft:translucent"
+}

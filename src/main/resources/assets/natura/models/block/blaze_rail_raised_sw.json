@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_rail_raised_sw",
+  "textures": {
+    "rail": "natura:block/rail/blaze_rail_normal"
+  },
+  "render_type": "minecraft:cutout"
+}

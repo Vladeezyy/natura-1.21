@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "natura:block/respawn_obelisk"
+    },
+    "active=true": {
+      "model": "natura:block/respawn_obelisk_active"
+    }
+  }
+}

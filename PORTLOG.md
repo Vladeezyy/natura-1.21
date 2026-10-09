@@ -12,7 +12,7 @@ NeoForge 21.1. The 1.12 source is the specification: `git clone -b 1.12 https://
 3. Overworld plants and food: crops (barley, cotton), berry bushes, saguaro, bluebells, colored grass (+ slab, stairs),
    materials, food, soups, seed bags, bone meal bag. ✅
 4. Nether blocks: heat sand, tainted soil, nether glass, thorn vines, glowshrooms, respawn obelisk, netherrack furnace,
-   blaze hopper, blaze rails, nether lever / button / pressure plate.
+   blaze hopper, blaze rails, nether lever / button / pressure plate; the clouds. ✅
 5. Tools: nether wood and quartz tools, kamas, bows, flint and blaze, imp armor.
 6. Entities: imp, heatscar spider (+ baby), nitro creeper.
 7. World generation: trees, berry bushes, crops, clouds, glowshrooms, saguaro, vines, nether trees; clouds.
@@ -41,6 +41,11 @@ NeoForge 21.1. The 1.12 source is the specification: `git clone -b 1.12 https://
 | `overworld_berrybush_X` / `nether_berrybush_X` | `X_bush` |
 | `bluebells_flower` | `bluebells` |
 | `materials`, `edibles`, `empty_bowls`, `seed_bags`, `overworld_seeds`, `overworld_seed_bags` metas | the meta names (`barley`, `raspberry`, `ghostwood_bowl`, `barley_seeds`, ...); `potashapple` / `cactusjuice` → `potash_apple` / `cactus_juice` |
+| `clouds` white / dark / ash / sulfur | `white_cloud`, `dark_cloud`, `ash_cloud`, `sulfur_cloud` |
+| `nether_heat_sand`, `nether_tainted_soil` metas, `nether_glass` soul / heat, `nether_thorn_vines` | `heat_sand`, `tainted_soil`, `tainted_farmland_dry`, `tainted_farmland_heated`, `soul_glass`, `heat_glass`, `thorn_vines` |
+| `nether_glowshroom` metas, `nether_X_large_glowshroom` | `X_glowshroom`, `X_large_glowshroom` |
+| `netherrack_furnace` + `lit_netherrack_furnace` | `netherrack_furnace` (with a lit state) |
+| `blaze_rail_golden` | `blaze_powered_rail` (also `blaze_activator_rail`, `blaze_detector_rail`) |
 | `soups` metas | `X_mushroom_stew`, `X_glowshroom_stew`, `glowshroom_stew` (1.12 `vanilla_glowshroomstew`), `berry_medley` |
 
 The translations come from the 1.12 language files with the keys renamed (`tile.natura.overworld_logs.maple.name` →
@@ -141,6 +146,32 @@ As in 1.12:
 
 Differences:
 - The double berry medley recipe (two bowls, four berries) made one stack of two stews that cannot stack; 1.21 cannot
-  craft that, so only the single recipe is left (same berries per stew as the double one minus one).
+  craft that, so only the single recipe is left (it needs three berries per stew, the double one two).
 - The grass colour maps use the biome temperature without the 1.12 height cooling (1.21 keeps that private).
 - Saguaro connections are block state properties (1.12 computed them when drawing).
+
+## Phase 4: nether blocks and clouds
+
+As in 1.12:
+- Heat sand: falling, collision 14/16, burns (1) players without boots and mobs that are not fire immune.
+- Tainted soil (and its dry / heated farmland look-alikes): nether plants grow on it, it burns forever (fire source).
+- Soul glass has no collision and slows (II, 1 s) whoever is in it; heat glass burns like heat sand. Both resist 1800
+  and drop only with Silk Touch. They are smelted from soul sand / heat sand.
+- Thorn vines: vines with hardness 1 that prick (1, cactus or lava) what moves through them, 1 in 30 rolled with a
+  Random made from a fixed seed every time, so the roll always comes out the same (as in 1.12).
+- Glowshrooms glow 9, spread like mushrooms, stay on mycelium, netherrack, soul sand or tainted soil in any light; bone
+  meal (40%) grows the 1.12 huge green / blue / purple glowshroom. Huge glowshroom pieces break at once (no hardness in
+  1.12), only their top 1/16 is solid, slow falling things, give mobs (not players) nausea, and drop 0-2 small ones.
+- Respawn obelisk: right click (not sneaking) sets the respawn point, lights it (7), says "<name>: Spawn point set!";
+  the player respawns on top of it in any dimension.
+- Netherrack furnace: a furnace whose fuel burns twice as long. Blaze hopper: a vanilla hopper. Blaze rails: top speed
+  0.65; the powered one also pushes off a solid block (on the axis across the rail, as in 1.12) and speeds up / brakes.
+- Netherrack lever, button (stone timing, wooden clicks) and pressure plate (mobs only, like stone).
+- Clouds: you sink into them (only the bottom 1/16 is solid, nothing on a cloud), falling slows to a crawl and does no
+  damage; a sulfur cloud explodes (1) with flint and steel or a burning arrow; clouds never drop from explosions.
+  "Enable Clouds" (off by default) only controls their world generation, as in 1.12.
+
+Differences:
+- One netherrack furnace block with a lit state instead of two blocks.
+- Breaking an obelisk clears the breaker's respawn point (1.12 reset the spawn dimension, leaving a stale position).
+- Tainted soil also carries nether wart and the 1.21 nether plants (1.12: every nether plant type).

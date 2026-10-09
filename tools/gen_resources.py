@@ -97,6 +97,17 @@ def resolve(name, **props):
     return out
 
 
+def parent_of(r, default="minecraft:block/cube"):
+    """The 1.21 parent of a resolved 1.12 variant's model ("cube_column" -> minecraft:block/cube_column)."""
+    m = r.get("model")
+    if not m:
+        return default
+    if ":" in m:
+        ns, _, path = m.partition(":")
+        return f"{ns}:block/{path}"
+    return "minecraft:block/" + m
+
+
 def tex(name, key, **props):
     return resolve(name, **props)["textures"][key]
 
@@ -156,11 +167,24 @@ def from_vanilla(name, vanilla, textures, render_type=None, extra=None, item=Tru
         if extra and m in extra:
             return extra[m]
         if m not in made:
-            src = vanilla_json(f"models/block/{m.split('/')[-1]}.json")
-            suffix = m.split("/")[-1][len(vanilla):]
-            tex_map = {k: (textures if isinstance(textures, str) else textures[k]) for k in src.get("textures", {})}
-            parent = (parents or {}).get(src["parent"], src["parent"])
-            made[m] = model(name + suffix, parent, tex_map, render_type)
+            vname = m.split("/")[-1]
+            src = vanilla_json(f"models/block/{vname}.json")
+            suffix = vname[len(vanilla):] if vname.startswith(vanilla) else "_" + vname
+            def pick(k):
+                if callable(textures):
+                    return textures(k, vname)
+                return textures if isinstance(textures, str) else textures[k]
+            tex_map = {k: pick(k) for k in src.get("textures", {})}
+            if "parent" in src:
+                parent = (parents or {}).get(src["parent"], src["parent"])
+                made[m] = model(name + suffix, parent, tex_map, render_type)
+            else:
+                copy = dict(src)
+                copy["textures"] = tex_map
+                if render_type:
+                    copy["render_type"] = render_type
+                w(os.path.join(ASSETS, "models", "block", name + suffix + ".json"), copy)
+                made[m] = f"{NS}:block/{name}{suffix}"
         return made[m]
 
     def walk(o):
@@ -175,6 +199,7 @@ def from_vanilla(name, vanilla, textures, render_type=None, extra=None, item=Tru
         src = vanilla_json(f"models/item/{vanilla}.json")
         parent = src["parent"]
         item_model(name, swap(parent) if parent.startswith("minecraft:block/") else parent)
+    return made
 
 
 def slab(name, full_model, all_tex):
@@ -601,6 +626,148 @@ def plants():
     old("saguaro_fruit_item", 0, "saguaro_fruit_item", "saguaro_fruit_item", kind="item")
 
 
+def nether():
+    """1.12 NaturaNether blocks and the NaturaCommons clouds."""
+    for meta, cloud in enumerate(["white", "dark", "ash", "sulfur"]):
+        simple_block(f"{cloud}_cloud", "minecraft:block/cube_all", {"all": tex("clouds", "all", type=cloud)}, "minecraft:translucent")
+        old("clouds", meta, f"{cloud}_cloud", f"clouds.{cloud}")
+        self_drop(f"{cloud}_cloud")
+    simple_block("heat_sand", "minecraft:block/cube_all", {"all": tex("nether_heat_sand", "all")})
+    old("nether_heat_sand", 0, "heat_sand", "nether_heat_sand")
+    self_drop("heat_sand")
+    for meta, soil in enumerate(["tainted_soil", "tainted_farmland_dry", "tainted_farmland_heated"]):
+        simple_block(soil, "minecraft:block/cube_all", {"all": tex("nether_tainted_soil", "all", type=soil)})
+        old("nether_tainted_soil", meta, soil, f"nether_tainted_soil.{soil}")
+        self_drop(soil)
+        tag("block", "minecraft:mineable/shovel", nid(soil))
+        tag("block", "natura:nether_sapling_soil", nid(soil))
+    tag("block", "minecraft:mineable/shovel", nid("heat_sand"))
+    for meta, glass in enumerate(["soul", "heat"]):
+        simple_block(f"{glass}_glass", "minecraft:block/cube_all", {"all": tex("nether_glass", "all", type=glass)}, "minecraft:translucent")
+        old("nether_glass", meta, f"{glass}_glass", f"nether_glass.{glass}")
+        LOOT[f"{glass}_glass"] = {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0, "entries": [
+            {"type": "minecraft:item", "name": nid(f"{glass}_glass")}], "conditions": [{"condition": "minecraft:match_tool", "predicate": {"predicates": {
+                "minecraft:enchantments": [{"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}}]}]}
+        for kind in ("block", "item"):
+            tag(kind, "c:glass_blocks", nid(f"{glass}_glass"))
+    # thorn vines: the 1.12 natura_vine_north / natura_vine_up parts
+    vine = tex("nether_thorn_vine", "vine")
+    north = model("thorn_vines_side", f"{NS}:block/natura_vine_north", {"vine": vine, "particle": vine}, "minecraft:cutout")
+    up = model("thorn_vines_up", f"{NS}:block/natura_vine_up", {"vine": vine, "particle": vine}, "minecraft:cutout")
+    parts = []
+    for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
+        entry = {"model": north}
+        if y:
+            entry["y"] = y
+        parts.append({"when": {facing: "true"}, "apply": entry})
+    parts.append({"when": {"up": "true"}, "apply": {"model": up}})
+    multipart("thorn_vines", parts)
+    item_model("thorn_vines", layer0=vine)
+    old("nether_thorn_vines", 0, "thorn_vines", "nether_thorn_vines")
+    LOOT["thorn_vines"] = {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0, "entries": [{"type": "minecraft:item", "name": nid("thorn_vines")}],
+                                                               "conditions": [{"condition": "minecraft:match_tool", "predicate": {"items": "minecraft:shears"}}]}]}
+    tag("block", "minecraft:climbable", nid("thorn_vines"))
+    tag("block", "minecraft:mineable/axe", nid("thorn_vines"))
+    # glowshrooms
+    for meta, color in enumerate(["green", "blue", "purple"]):
+        cross_block(f"{color}_glowshroom", tex("nether_glowshroom", "cross", type=color))
+        old("nether_glowshroom", meta, f"{color}_glowshroom", f"nether_glowshroom.{color}")
+        self_drop(f"{color}_glowshroom")
+        large = f"{color}_large_glowshroom"
+        v = {}
+        for variant in ["north_west", "north", "north_east", "west", "center", "east", "south_west", "south", "south_east", "stem", "all_inside",
+                        "all_outside", "all_stem"]:
+            r = resolve(f"nether_{color}_large_glowshroom", variant=variant)
+            m = model(f"{large}_{variant}", parent_of(r), r["textures"], "minecraft:translucent")
+            v[f"variant={variant}"] = {"model": m}
+        blockstate(large, v)
+        item_model(large, f"{NS}:block/{large}_all_inside")
+        old(f"nether_{color}_large_glowshroom", 0, large, f"nether_{color}_large_glowshroom.all_inside")
+        silk = {"condition": "minecraft:match_tool", "predicate": {"predicates": {"minecraft:enchantments": [
+            {"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}}
+        # 1.12 quantityDropped: max(0, rand(10) - 7), so 1 in 10 one small glowshroom, 1 in 10 two; itself with Silk Touch
+        LOOT[large] = {"type": "minecraft:block", "pools": [
+            {"rolls": 1, "bonus_rolls": 0, "entries": [{"type": "minecraft:item", "name": nid(large), "conditions": [silk]}]},
+            {"rolls": 1, "bonus_rolls": 0, "conditions": [{"condition": "minecraft:inverted", "term": silk}], "entries": [
+                {"type": "minecraft:empty", "weight": 8},
+                {"type": "minecraft:item", "name": nid(f"{color}_glowshroom"), "weight": 1},
+                {"type": "minecraft:item", "name": nid(f"{color}_glowshroom"), "weight": 1, "functions": [
+                    {"function": "minecraft:set_count", "add": False, "count": 2}]}]}]}
+        tag("block", "minecraft:mineable/axe", nid(large))
+    # respawn obelisk
+    inactive = model("respawn_obelisk", "minecraft:block/cube_all", {"all": tex("respawn_obelisk", "all", type="inactive")})
+    active = model("respawn_obelisk_active", "minecraft:block/cube_all", {"all": tex("respawn_obelisk", "all", type="active")})
+    blockstate("respawn_obelisk", {"active=false": {"model": inactive}, "active=true": {"model": active}})
+    item_model("respawn_obelisk", inactive)
+    old("respawn_obelisk", 0, "respawn_obelisk", "respawn_obelisk.inactive")
+    self_drop("respawn_obelisk")
+    tag("block", "minecraft:mineable/axe", nid("respawn_obelisk"))
+    # netherrack furnace (one block with LIT, 1.12 had a second lit block)
+    v = {}
+    for lit, state_file in (("false", "netherrack_furnace"), ("true", "lit_netherrack_furnace")):
+        r = resolve(state_file, facing="north")["textures"]
+        m = model("netherrack_furnace" + ("_on" if lit == "true" else ""), "minecraft:block/orientable", {"top": r["top"], "front": r["front"], "side": r["side"]})
+        for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
+            entry = {"model": m}
+            if y:
+                entry["y"] = y
+            v[f"facing={facing},lit={lit}"] = entry
+    blockstate("netherrack_furnace", v)
+    item_model("netherrack_furnace", f"{NS}:block/netherrack_furnace")
+    old("netherrack_furnace", 0, "netherrack_furnace", "netherrack_furnace")
+    self_drop("netherrack_furnace")
+    tag("block", "minecraft:mineable/pickaxe", nid("netherrack_furnace"))
+    # blaze hopper: the 1.12 natura_hopper models
+    hopper = {"facing=down": f"{NS}:block/natura_hopper_down", "facing=north": f"{NS}:block/natura_hopper_side"}
+    v = {}
+    for facing, y in (("down", None), ("north", 0), ("east", 90), ("south", 180), ("west", 270)):
+        m = f"{NS}:block/natura_hopper_down" if facing == "down" else f"{NS}:block/natura_hopper_side"
+        for enabled in ("false", "true"):
+            entry = {"model": m}
+            if y:
+                entry["y"] = y
+            v[f"enabled={enabled},facing={facing}"] = entry
+    blockstate("blaze_hopper", v)
+    item_model("blaze_hopper", layer0=f"{NS}:item/hopper/blaze_hopper")
+    old("blaze_hopper", 0, "blaze_hopper", "blaze_hopper")
+    self_drop("blaze_hopper")
+    tag("block", "minecraft:mineable/pickaxe", nid("blaze_hopper"))
+    # netherrack lever, button, pressure plate
+    netherrack = "minecraft:block/netherrack"
+    lever = tex("nether_lever", "lever", facing="up_z", powered="false")
+    from_vanilla("nether_lever", "lever", {"particle": netherrack, "base": netherrack, "lever": lever}, item=False)
+    item_model("nether_lever", layer0=lever)
+    from_vanilla("nether_button", "stone_button", netherrack)
+    from_vanilla("nether_pressure_plate", "stone_pressure_plate", netherrack)
+    for b in ("nether_lever", "nether_button", "nether_pressure_plate"):
+        old(b, 0, b, b)
+        self_drop(b)
+    tag("block", "minecraft:mineable/pickaxe", nid("nether_pressure_plate"))
+    for kind in ("block", "item"):
+        tag(kind, "minecraft:buttons", nid("nether_button"))
+        tag(kind, "minecraft:stone_buttons", nid("nether_button"))
+        tag(kind, "minecraft:stone_pressure_plates", nid("nether_pressure_plate"))
+    # blaze rails
+    rails = [("blaze_rail", "rail", "blaze_rail", "blaze_rail_normal", "blaze_rail_normal_turned"),
+             ("blaze_powered_rail", "powered_rail", "blaze_rail_golden", "blaze_rail_golden", "blaze_rail_golden_powered"),
+             ("blaze_activator_rail", "activator_rail", "blaze_rail_activator", "blaze_rail_activator", "blaze_rail_activator_powered"),
+             ("blaze_detector_rail", "detector_rail", "blaze_rail_detector", "blaze_rail_detector", "blaze_rail_detector_powered")]
+    for name, vanilla_rail, old_id, plain, other in rails:
+        base = f"{NS}:block/rail/{plain}"
+        alt = f"{NS}:block/rail/{other}"
+
+        def rail_tex(key, model_name, base=base, alt=alt, vanilla_rail=vanilla_rail):
+            if vanilla_rail == "rail":
+                return alt if "corner" in model_name else base
+            return alt if model_name.endswith("_on") or "_on_" in model_name else base
+        from_vanilla(name, vanilla_rail, rail_tex, "minecraft:cutout", item=False)
+        item_model(name, layer0=base)
+        old(old_id, 0, name, old_id)
+        self_drop(name)
+        for kind in ("block", "item"):
+            tag(kind, "minecraft:rails", nid(name))
+
+
 def crop_drops(name, max_age, crop, seed, p):
     """1.12 BlockOverworldCrops: the crop when ripe (else the seed), and when ripe 3 more tries at a seed
     (rand(2 * max) <= age), never with fortune (1.12 dropped crops with fortune 0)."""
@@ -774,6 +941,8 @@ def smelting():
     smelt("bread_from_wheat_flour", nid("wheat_flour"), "minecraft:bread", 0.5)
     smelt("green_dye_from_saguaro", nid("saguaro"), "minecraft:green_dye", 0.2)
     smelt("impmeat_cooked", nid("impmeat_raw"), nid("impmeat_cooked"), 0.2)
+    smelt("soul_glass_from_smelting", "minecraft:soul_sand", nid("soul_glass"), 0.3)
+    smelt("heat_glass_from_smelting", nid("heat_sand"), nid("heat_glass"), 0.3)
     for log in ["maple_log", "amaranth_log", "silverbell_log", "tiger_log", "eucalyptus_log", "hopseed_log", "sakura_log", "willow_log",
                 "redwood_bark", "redwood_root", "redwood_heart"]:
         w(os.path.join(DATA, NS, "recipe", f"charcoal_from_{log}.json"), {"type": "minecraft:smelting", "category": "misc",
@@ -843,6 +1012,7 @@ def main():
     copy_models()
     woods()
     plants()
+    nether()
     items()
     recipes()
     smelting()

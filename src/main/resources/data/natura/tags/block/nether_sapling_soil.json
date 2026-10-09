@@ -1,6 +1,9 @@
 {
   "values": [
     "minecraft:soul_sand",
-    "minecraft:netherrack"
+    "minecraft:netherrack",
+    "natura:tainted_soil",
+    "natura:tainted_farmland_dry",
+    "natura:tainted_farmland_heated"
   ]
 }

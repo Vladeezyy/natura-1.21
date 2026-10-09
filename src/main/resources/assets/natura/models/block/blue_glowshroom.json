@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "natura:block/glowshroom/blue/blue_glowshroom"
+  },
+  "render_type": "minecraft:cutout"
+}

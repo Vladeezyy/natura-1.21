@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/rail_curved",
+  "textures": {
+    "rail": "natura:block/rail/blaze_rail_normal_turned"
+  },
+  "render_type": "minecraft:cutout"
+}
