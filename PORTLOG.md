@@ -16,7 +16,7 @@ NeoForge 21.1. The 1.12 source is the specification: `git clone -b 1.12 https://
 5. Tools: nether wood and quartz tools, kamas, bows, flint and blaze, imp armor. ✅
 6. Entities: imp, heatscar spider (+ baby), nitro creeper. ✅
 7. World generation: trees, berry bushes, crops, clouds, glowshrooms, saguaro, vines, nether trees, soil veins. ✅
-8. JEI, config, game tests, release.
+8. Integrations (JEI, Jade), logo, release. ✅
 
 ## Names
 
@@ -270,3 +270,16 @@ Differences:
   do that now. No retrogen.
 - The crops' light check (light 8 or sky) is the sky above them (the heightmap): no light is known while generating.
 - Blocks are placed without neighbour updates, like 1.12's flag 2.
+
+## Phase 8: integrations and release
+
+- JEI: the 1.12 plugin only hid the door blocks (separate from the door items then), the crops and the lit furnace.
+  Here the doors are one block with its item, the crops have no item and the lit furnace is a block state, so there is
+  nothing to hide and no plugin. The workbenches open the vanilla crafting menu, so JEI's recipe transfer and Crafting
+  Tweaks (1.12 had an IMC message for it) work with them as with the crafting table.
+- Jade (the 1.12 Waila plugin): the barley and cotton crops show the barley and cotton items (icon and name) and
+  "Growth: x %" / "Growth: Mature" (setting "Crop item and growth"). Optional: the plugin class is only loaded by Jade.
+- Logo (mods list): the nine overworld sapling textures (1.12 had no logo).
+- Config: the 1.12 options are in `config/natura-common.toml` (sections ENABLE-DISABLE, Entities, Mob-Changes,
+  Worldgen), with the 1.12 names and defaults; the dimension blacklists and the retrogen options are gone (phase 7).
+- 47 game tests (blocks, loot, recipes, trees, plants, nether blocks, tools, mobs, world generation).

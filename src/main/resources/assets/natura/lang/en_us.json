@@ -331,6 +331,7 @@
   "block.natura.willow_stairs": "Willow Stairs",
   "block.natura.willow_trapdoor": "Willow Trap Door",
   "block.natura.willow_workbench": "Willow Workbench",
+  "config.jade.plugin_natura.crop": "Crop item and growth",
   "entity.natura.babyheatscarspider": "Baby Heatscar Spider",
   "entity.natura.heatscarspider": "Heatscar Spider",
   "entity.natura.imp": "Imp",

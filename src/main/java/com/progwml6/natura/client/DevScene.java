@@ -109,7 +109,10 @@ public final class DevScene {
         at(775, mc -> mc.options.hideGui = true);
         at(780, mc -> server(mc, DevScene::mobs));
         at(820, mc -> shot(mc, "mobs"));
-        at(830, Minecraft::stop);
+        at(825, mc -> server(mc, DevScene::jadeCrop));
+        at(828, mc -> mc.options.hideGui = false);
+        at(860, mc -> shot(mc, "jade_crop"));
+        at(870, Minecraft::stop);
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -406,6 +409,17 @@ public final class DevScene {
             level.addFreshEntity(entity);
         }
         player.teleportTo(level, base.getX() + 5.5, base.getY() + 2.5, base.getZ() + 9.5, 180.0F, 12.0F);
+    }
+
+    /** A half grown barley crop under the crosshair: Jade shows the barley icon (the 1.12 Waila plugin) and its growth. */
+    private static void jadeCrop(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        BlockPos base = origin.offset(100, 0, 0);
+        box(level, base.offset(-3, 0, -3), base.offset(3, 4, 4), Blocks.AIR.defaultBlockState());
+        box(level, base.offset(-3, -1, -3), base.offset(3, -1, 4), Blocks.GRASS_BLOCK.defaultBlockState());
+        put(level, base.below(), Blocks.FARMLAND.defaultBlockState());
+        put(level, base, NaturaBlocks.BARLEY_CROP.get().defaultBlockState().setValue(com.progwml6.natura.common.block.NaturaCropBlock.AGE_3, 2));
+        player.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() + 2.5, 180.0F, 36.0F);
     }
 
     private static String shroomColor(String id) {

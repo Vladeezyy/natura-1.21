@@ -1073,6 +1073,8 @@ def languages():
         for tab, new in (("NaturaGeneral", "general"), ("NaturaWorld", "world"), ("NaturaDecorative", "decorative")):
             if f"itemGroup.{tab}" in src:
                 out[f"itemGroup.natura.{new}"] = src[f"itemGroup.{tab}"]
+        if new_name == "en_us":
+            out["config.jade.plugin_natura.crop"] = "Crop item and growth"  # the Jade plugin's setting
         w(os.path.join(ASSETS, "lang", new_name + ".json"), dict(sorted(out.items())))
     missing = [k for k in KEYS if k.split("#")[0] + ".name" not in english]
     if missing:
@@ -1098,8 +1100,6 @@ def gametest_area():
         f.write(area)
 
 
-# ---------------------------------------------------------------- output
-
 def worldgen():
     """1.12 IWorldGenerators: one configured feature each (natura:world with its kind), placed once per chunk with no
     placement modifiers (the feature does the 1.12 per-chunk rolls and biome checks), added to every biome."""
@@ -1114,6 +1114,8 @@ def worldgen():
           {"type": "neoforge:add_features", "biomes": {"type": "neoforge:any"}, "features": nid(kind), "step": step})
 
 
+# ---------------------------------------------------------------- output
+
 def main():
     copy_textures()
     copy_models()
@@ -1127,9 +1129,9 @@ def main():
     smelting()
     languages()
     gametest_area()
+    worldgen()
     for name, table in LOOT.items():
         w(os.path.join(DATA, NS, "loot_table", "blocks", name + ".json"), table)
-    worldgen()
     for kind, table in (("block", BLOCK_TAGS), ("item", ITEM_TAGS)):
         for name, values in table.items():
             ns, _, path = name.partition(":")

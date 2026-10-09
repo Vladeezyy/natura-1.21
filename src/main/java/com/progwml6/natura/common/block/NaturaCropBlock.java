@@ -52,6 +52,15 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
         this.registerDefaultState(this.stateDefinition.any().setValue(age, 0));
     }
 
+    public int getAge(BlockState state) {
+        return state.getValue(this.age);
+    }
+
+    /** The crop item (1.12's Waila plugin showed it instead of the seeds). */
+    public ItemLike crop() {
+        return this.crop.get();
+    }
+
     public static final IntegerProperty AGE_3 = IntegerProperty.create("age", 0, 3);
     public static final IntegerProperty AGE_4 = IntegerProperty.create("age", 0, 4);
 
