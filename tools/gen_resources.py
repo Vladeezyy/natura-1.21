@@ -813,6 +813,45 @@ def tools():
         tag("item", "minecraft:enchantable/durability", nid(f"imp_armor_{piece}"))
 
 
+ENTITIES = ["imp", "heatscarspider", "babyheatscarspider", "nitrocreeper"]
+EGG_NAMES = {"en_us": "%s Spawn Egg", "ru_ru": "Яйцо призыва: %s", "de_de": "%s-Spawn-Ei", "ja_jp": "%sのスポーンエッグ", "zh_cn": "%s刷怪蛋",
+             "zh_tw": "%s生怪蛋"}
+
+
+def entity_loot(name, pools):
+    w(os.path.join(DATA, NS, "loot_table", "entities", name + ".json"), {"type": "minecraft:entity", "pools": pools})
+
+
+def counted(item, lo, hi, looting_max):
+    """1.12 set_count {min, max} + looting_enchant {0, n}."""
+    return {"rolls": 1, "bonus_rolls": 0, "entries": [{"type": "minecraft:item", "name": item, "functions": [
+        {"function": "minecraft:set_count", "add": False, "count": {"type": "minecraft:uniform", "min": lo, "max": hi}},
+        {"function": "minecraft:enchanted_count_increase", "enchantment": "minecraft:looting", "count": {"type": "minecraft:uniform", "min": 0, "max": looting_max}}]}]}
+
+
+def entities():
+    """1.12 NaturaEntities: loot tables (1.12 imp and heatscarspider; the baby used the big spider's; the nitro creeper
+    dropped 2-5 gunpowder in code, charged 20-59 more), nether spawns, spawn eggs and names."""
+    entity_loot("imp", [counted(nid("impmeat_raw"), 0, 2, 1), counted(nid("imp_leather"), 0, 5, 1)])
+    entity_loot("heatscarspider", [counted(nid("flame_string"), 0, 5, 1)])
+    entity_loot("babyheatscarspider", [counted(nid("flame_string"), 0, 5, 1)])
+    charged = {"condition": "minecraft:entity_properties", "entity": "this", "predicate": {"nbt": "{powered:1b}"}}
+    creeper = [counted("minecraft:gunpowder", 2, 5, 1), counted("minecraft:gunpowder", 20, 59, 6)]
+    creeper[1]["conditions"] = [charged]
+    entity_loot("nitrocreeper", creeper)
+    spawns = [("imp", 10, 8, 12, None), ("heatscarspider", 10, 4, 4, "enableHeatscarSpider"), ("babyheatscarspider", 10, 4, 4, "enableHeatscarSpider"),
+              ("nitrocreeper", 8, 4, 6, None)]
+    for name, weight, lo, hi, setting in spawns:
+        modifier = {"type": "neoforge:add_spawns", "biomes": "#minecraft:is_nether",
+                    "spawners": {"type": nid(name), "weight": weight, "minCount": lo, "maxCount": hi}}
+        if setting:
+            modifier = {"neoforge:conditions": [{"type": "natura:config_option_enabled", "config_setting": setting}], **modifier}
+        w(os.path.join(DATA, NS, "neoforge", "biome_modifier", f"spawn_{name}.json"), modifier)
+    for name in ENTITIES:
+        KEYS[f"entity.natura.{name}"] = f"entity.{NS}.{name}"
+        item_model(f"{name}_spawn_egg", "minecraft:item/template_spawn_egg")
+
+
 def crop_drops(name, max_age, crop, seed, p):
     """1.12 BlockOverworldCrops: the crop when ripe (else the seed), and when ripe 3 more tries at a seed
     (rand(2 * max) <= age), never with fortune (1.12 dropped crops with fortune 0)."""
@@ -1025,6 +1064,10 @@ def languages():
             for suffix in (".name", ".tooltip"):
                 if base + suffix in src:
                     out[new_key + ("" if suffix == ".name" else ".tooltip")] = src[base + suffix]
+        if new_name in EGG_NAMES:
+            for name in ENTITIES:
+                if f"entity.{NS}.{name}" in out:
+                    out[f"item.{NS}.{name}_spawn_egg"] = EGG_NAMES[new_name] % out[f"entity.{NS}.{name}"]
         for tab, new in (("NaturaGeneral", "general"), ("NaturaWorld", "world"), ("NaturaDecorative", "decorative")):
             if f"itemGroup.{tab}" in src:
                 out[f"itemGroup.natura.{new}"] = src[f"itemGroup.{tab}"]
@@ -1062,6 +1105,7 @@ def main():
     plants()
     nether()
     tools()
+    entities()
     items()
     recipes()
     smelting()

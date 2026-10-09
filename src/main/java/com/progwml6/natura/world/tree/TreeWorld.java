@@ -131,7 +131,12 @@ public final class TreeWorld {
         return this.level instanceof WorldGenLevel gen && gen.getLevel().isFlat();
     }
 
-    /** The vanilla leaves distance (TreeFeature.updateLeaves) of every leaf this tree placed. */
+    /**
+     * The vanilla leaves distance (TreeFeature.updateLeaves) of every leaf this tree placed, at most 6: 1.12 leaves only
+     * checked for decay once something next to them changed (CHECK_DECAY), so the far ones of a grown tree (willow
+     * curtains, the hopseed crown edge) stayed until disturbed. A vanilla leaf recomputes its distance on a neighbour
+     * update, so these decay then, as in 1.12.
+     */
     public void finish() {
         Map<BlockPos, Integer> distance = new HashMap<>();
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
@@ -160,7 +165,7 @@ public final class TreeWorld {
         for (var entry : this.leaves.entrySet()) {
             BlockState current = this.level.getBlockState(entry.getKey());
             if (current.getBlock() instanceof LeavesBlock && current.hasProperty(LeavesBlock.DISTANCE) && done.add(entry.getKey())) {
-                int d = Math.min(7, distance.getOrDefault(entry.getKey(), 7));
+                int d = Math.min(6, distance.getOrDefault(entry.getKey(), 7));
                 this.level.setBlock(entry.getKey(), current.setValue(LeavesBlock.DISTANCE, d), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
             }
         }

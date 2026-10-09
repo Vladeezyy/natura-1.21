@@ -74,6 +74,11 @@ public final class NaturaGameTests {
         TESTS.put("kama", NaturaGameTests::kama);
         TESTS.put("flint_and_blaze", NaturaGameTests::flintAndBlaze);
         TESTS.put("imp_armor", NaturaGameTests::impArmor);
+        TESTS.put("mob_stats", NaturaGameTests::mobStats);
+        TESTS.put("heatscar_babies", NaturaGameTests::heatscarBabies);
+        TESTS.put("nitro_creeper", NaturaGameTests::nitroCreeper);
+        TESTS.put("imp_breeding", NaturaGameTests::impBreeding);
+        TESTS.put("mob_spawns", NaturaGameTests::mobSpawns);
     }
 
     private NaturaGameTests() {}
@@ -276,7 +281,8 @@ public final class NaturaGameTests {
      * leaves with a vanilla distance below 7 so they stay. The redwood needs 40 redwood saplings in the 7x7 square.
      */
     private static void saplingGrows(GameTestHelper helper, String tree) {
-        BlockPos pos = new BlockPos(4, 2, 4);
+        // the bloodwood hangs 8-15 blocks down from its ceiling: high enough to stay above the ground
+        BlockPos pos = new BlockPos(4, tree.equals("bloodwood") ? 22 : 2, 4);
         boolean nether = tree.equals("ghostwood") || tree.equals("fusewood") || tree.equals("darkwood") || tree.equals("bloodwood");
         BlockState soil = nether ? Blocks.NETHERRACK.defaultBlockState() : Blocks.GRASS_BLOCK.defaultBlockState();
         var sapling = (com.progwml6.natura.common.block.NaturaSaplingBlock) block(tree + "_sapling");
@@ -313,15 +319,16 @@ public final class NaturaGameTests {
         };
         helper.assertTrue(helper.getBlockState(pos).is(block(log)), tree + ": " + log + " where the sapling was, found " + helper.getBlockState(pos));
         int leaves = 0, decaying = 0;
-        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-16, -20, -16), pos.offset(16, 40, 16))) {
+        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-16, -24, -16), pos.offset(16, tree.equals("redwood") ? 160 : 40, 16))) {
             BlockState state = helper.getBlockState(p);
-            if (state.getBlock() instanceof net.minecraft.world.level.block.LeavesBlock && !state.getValue(BlockStateProperties.PERSISTENT)) {
+            boolean own = BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath().startsWith(tree);
+            if (own && state.getBlock() instanceof net.minecraft.world.level.block.LeavesBlock && !state.getValue(BlockStateProperties.PERSISTENT)) {
                 leaves++;
                 if (state.getValue(net.minecraft.world.level.block.LeavesBlock.DISTANCE) >= 7 && !tree.equals("redwood")) decaying++;
             }
         }
         helper.assertTrue(leaves > 0, tree + ": no leaves");
-        helper.assertTrue(decaying * 10 <= leaves, tree + ": " + decaying + " of " + leaves + " leaves would decay");
+        helper.assertTrue(decaying == 0, tree + ": " + decaying + " of " + leaves + " leaves would decay");
         helper.succeed();
     }
 
@@ -481,8 +488,11 @@ public final class NaturaGameTests {
         BlockPos pos = new BlockPos(4, 2, 4);
         helper.setBlock(pos.below(), Blocks.NETHERRACK);
         var small = (com.progwml6.natura.common.block.NaturaGlowshroomBlock) block("blue_glowshroom");
-        helper.setBlock(pos, small);
-        small.performBonemeal(helper.getLevel(), helper.getLevel().random, helper.absolutePos(pos), helper.getBlockState(pos));
+        // a tall one (stem 5-6) reaches the test area's barrier ceiling and does not grow: try a few times
+        for (int i = 0; i < 20 && !helper.getBlockState(pos).is(block("blue_large_glowshroom")); i++) {
+            helper.setBlock(pos, small);
+            small.performBonemeal(helper.getLevel(), helper.getLevel().random, helper.absolutePos(pos), helper.getBlockState(pos));
+        }
         helper.assertTrue(helper.getBlockState(pos).is(block("blue_large_glowshroom"))
                 && helper.getBlockState(pos).getValue(com.progwml6.natura.common.block.LargeGlowshroomBlock.VARIANT) == com.progwml6.natura.common.block.LargeGlowshroomBlock.Variant.STEM,
                 "bone meal grows a huge blue glowshroom: " + helper.getBlockState(pos));
@@ -607,6 +617,80 @@ public final class NaturaGameTests {
             helper.assertTrue(armor.getDefense() == defense[i] && armor.getEnchantmentValue() == 15, pieces[i] + " defense " + armor.getDefense());
         }
         helper.assertTrue(tool("imp_armor_chestplate").getMaxDamage() == 16 * 33, "imp armor durability factor 33");
+        helper.succeed();
+    }
+
+    private static void mobStats(GameTestHelper helper) {
+        var imp = helper.spawn(com.progwml6.natura.entities.NaturaEntities.IMP.get(), new BlockPos(2, 1, 2));
+        var spider = helper.spawn(com.progwml6.natura.entities.NaturaEntities.HEATSCAR_SPIDER.get(), new BlockPos(5, 1, 5));
+        var creeper = helper.spawn(com.progwml6.natura.entities.NaturaEntities.NITRO_CREEPER.get(), new BlockPos(2, 1, 5));
+        helper.assertTrue(imp.getMaxHealth() == 40 && imp.fireImmune(), "imps: 40 health, fire proof");
+        helper.assertTrue(spider.getMaxHealth() == 50 && spider.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE) == 4
+                && spider.fireImmune() && spider.getBbWidth() == 2.7F, "heatscar spiders: 50 health, 4 damage, 2.7 wide");
+        helper.assertTrue(creeper.fireImmune(), "nitro creepers are fire proof");
+        float health = creeper.getHealth();
+        var golem = helper.spawn(net.minecraft.world.entity.EntityType.IRON_GOLEM, new BlockPos(6, 1, 2));
+        creeper.hurt(helper.getLevel().damageSources().mobAttack(golem), 1.0F);
+        helper.assertTrue(!creeper.isAlive() || creeper.getHealth() <= 0, "an iron golem kills a nitro creeper in one hit");
+        imp.discard();
+        spider.discard();
+        golem.discard();
+        helper.succeed();
+    }
+
+    private static void heatscarBabies(GameTestHelper helper) {
+        // the game test server is on Peaceful, which removes spiders at once
+        var server = helper.getLevel().getServer();
+        Difficulty before = server.getWorldData().getDifficulty();
+        server.setDifficulty(Difficulty.NORMAL, true);
+        var spider = helper.spawn(com.progwml6.natura.entities.NaturaEntities.HEATSCAR_SPIDER.get(), new BlockPos(4, 1, 4));
+        spider.kill();
+        // the babies come when the body goes, after the 20 tick death animation (1.12 setDead)
+        helper.runAfterDelay(25, () -> {
+            var found = helper.getLevel().getEntities(com.progwml6.natura.entities.NaturaEntities.BABY_HEATSCAR_SPIDER.get(), helper.getBounds().inflate(2), e -> true);
+            int babies = found.size();
+            helper.assertTrue(babies >= 2 && babies <= 4, "a dead heatscar spider leaves 2-4 babies: " + babies);
+            found.forEach(net.minecraft.world.entity.Entity::discard);
+            server.setDifficulty(before, true);
+            helper.succeed();
+        });
+    }
+
+    /** Ignited, it blows up within 12 + difficulty ticks (vanilla 30). */
+    private static void nitroCreeper(GameTestHelper helper) {
+        var creeper = helper.spawn(com.progwml6.natura.entities.NaturaEntities.NITRO_CREEPER.get(), new BlockPos(4, 1, 4));
+        creeper.ignite();
+        helper.runAfterDelay(18, () -> {
+            helper.assertTrue(!creeper.isAlive(), "the nitro creeper exploded within 18 ticks");
+            helper.succeed();
+        });
+    }
+
+    private static void impBreeding(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        var imp = helper.spawn(com.progwml6.natura.entities.NaturaEntities.IMP.get(), new BlockPos(3, 1, 3));
+        ItemStack stew = new ItemStack(com.progwml6.natura.common.NaturaItems.SOUPS.get("darkwood_glowshroom_stew").get());
+        helper.assertTrue(imp.isFood(stew) && !imp.isFood(new ItemStack(com.progwml6.natura.common.NaturaItems.SOUPS.get("darkwood_mushroom_stew").get())),
+                "imps breed on glowshroom stews, not mushroom stews");
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stew);
+        imp.mobInteract(player, net.minecraft.world.InteractionHand.MAIN_HAND);
+        helper.assertTrue(imp.isInLove() && player.getInventory().countItem(com.progwml6.natura.common.NaturaItems.BOWLS.get("darkwood").get()) == 1,
+                "feeding a stew puts the imp in love and gives the darkwood bowl back");
+        imp.discard();
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Imps and nitro creepers spawn in the nether; heatscar spiders only with the config option (off). */
+    private static void mobSpawns(GameTestHelper helper) {
+        var modifiers = helper.getLevel().registryAccess().registryOrThrow(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS);
+        helper.assertTrue(modifiers.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Natura.MODID, "spawn_imp"))
+                && modifiers.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Natura.MODID, "spawn_nitrocreeper"))
+                && !modifiers.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Natura.MODID, "spawn_heatscarspider")),
+                "nether spawns: imps and nitro creepers, no heatscar spiders by default");
+        var spawns = helper.getLevel().registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(net.minecraft.world.level.biome.Biomes.NETHER_WASTES)
+                .value().getMobSettings().getMobs(net.minecraft.world.entity.MobCategory.CREATURE);
+        helper.assertTrue(spawns.unwrap().stream().anyMatch(s -> s.type == com.progwml6.natura.entities.NaturaEntities.IMP.get()), "imps spawn in the nether wastes");
         helper.succeed();
     }
 

@@ -106,7 +106,10 @@ public final class DevScene {
         at(758, mc -> mc.screen.mouseScrolled(mc.getWindow().getGuiScaledWidth() / 2.0, mc.getWindow().getGuiScaledHeight() / 2.0, 0, -10));
         at(768, mc -> shot(mc, "tab_general_tools"));
         at(770, mc -> mc.setScreen(null));
-        at(780, Minecraft::stop);
+        at(775, mc -> mc.options.hideGui = true);
+        at(780, mc -> server(mc, DevScene::mobs));
+        at(820, mc -> shot(mc, "mobs"));
+        at(830, Minecraft::stop);
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -378,6 +381,31 @@ public final class DevScene {
         }
         level.addFreshEntity(stand);
         player.teleportTo(level, pos.getX() + 0.5, pos.getY() + 0.4, pos.getZ() + 3.5, 180.0F, 5.0F);
+    }
+
+    /** The four mobs, frozen (no AI) on netherrack. */
+    private static void mobs(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        // the scene world is on Peaceful, which removes the monsters at once
+        level.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL, true);
+        BlockPos base = origin.offset(70, 0, 0);
+        box(level, base.offset(-6, 0, -6), base.offset(14, 8, 10), Blocks.AIR.defaultBlockState());
+        box(level, base.offset(-6, -1, -6), base.offset(14, -1, 10), Blocks.NETHERRACK.defaultBlockState());
+        var types = new net.minecraft.world.entity.EntityType<?>[] {com.progwml6.natura.entities.NaturaEntities.IMP.get(),
+                com.progwml6.natura.entities.NaturaEntities.HEATSCAR_SPIDER.get(), com.progwml6.natura.entities.NaturaEntities.BABY_HEATSCAR_SPIDER.get(),
+                com.progwml6.natura.entities.NaturaEntities.NITRO_CREEPER.get()};
+        double[] xs = {0, 3.5, 7.5, 10};
+        for (int i = 0; i < types.length; i++) {
+            var entity = types[i].create(level);
+            if (entity instanceof net.minecraft.world.entity.Mob mob) {
+                mob.setNoAi(true);
+                mob.setPersistenceRequired();
+            }
+            entity.moveTo(base.getX() + xs[i] + 0.5, base.getY(), base.getZ() + 0.5, 0.0F, 0.0F);
+            entity.setYHeadRot(0.0F);
+            level.addFreshEntity(entity);
+        }
+        player.teleportTo(level, base.getX() + 5.5, base.getY() + 2.5, base.getZ() + 9.5, 180.0F, 12.0F);
     }
 
     private static String shroomColor(String id) {

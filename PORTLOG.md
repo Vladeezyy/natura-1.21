@@ -14,7 +14,7 @@ NeoForge 21.1. The 1.12 source is the specification: `git clone -b 1.12 https://
 4. Nether blocks: heat sand, tainted soil, nether glass, thorn vines, glowshrooms, respawn obelisk, netherrack furnace,
    blaze hopper, blaze rails, nether lever / button / pressure plate; the clouds. ✅
 5. Tools: nether wood and quartz tools, kamas, bows, flint and blaze, imp armor. ✅
-6. Entities: imp, heatscar spider (+ baby), nitro creeper.
+6. Entities: imp, heatscar spider (+ baby), nitro creeper. ✅
 7. World generation: trees, berry bushes, crops, clouds, glowshrooms, saguaro, vines, nether trees; clouds.
 8. JEI, config, game tests, release.
 
@@ -109,7 +109,9 @@ As in 1.12:
 - Redwood: only with 40 redwood saplings in the 7x7 square; they all turn into the tree, the roots grow through dirt.
 
 Differences:
-- Leaves get the vanilla 1.21 distance when the tree is done (otherwise they would decay at once).
+- Leaves get the vanilla 1.21 distance when the tree is done, at most 6: 1.12 leaves only checked for decay once
+  something next to them changed, so the far ones of a grown tree (willow curtains, the hopseed crown edge) stayed
+  until disturbed; a vanilla leaf recomputes its distance on a neighbour update and then decays, as in 1.12.
 - Blocks are sent to the clients (1.12 placed the hopseed trunk with flag 0, invisible until the chunk reloaded).
 - 1.12 world limits (y 0, 256) are the 1.21 world bottom and top.
 - The 1.12 "Retroactive Generation" option is gone (1.21 has no retrogen).
@@ -197,3 +199,24 @@ As in 1.12:
 Differences:
 - 1.12 kamas also broke the block normally after shearing it (sheared drops plus the normal ones); here a kama breaking
   leaves gives the sheared drops only, like shears.
+
+## Phase 6: mobs
+
+As in 1.12 (ids `imp`, `heatscarspider`, `babyheatscarspider`, `nitrocreeper`, the 1.12 spawn egg colours):
+- Imp: fire-proof nether animal, 40 health, pig sounds, the 1.12 model. Follows players holding a Natura stew, runs
+  from players, breeds on the glowshroom stews and berry medley (giving the bowl back). Drops 0-2 raw imp meat and
+  0-5 imp leather (+ looting). Spawns in every nether biome (10, groups of 8-12) on any block in any light.
+- Heatscar spider (2.7 x 1.9, 50 health, speed 0.45, damage 4, 25 xp) and its baby (1.2 x 0.8, vanilla spider
+  stats): fire-proof, jump 0.62, extra fall damage past 5 blocks on top of the normal one, set the mobs they hit on
+  fire (5 s Normal, 10 s Hard; players were not EntityLiving in 1.12, so not players), drop 0-5 flame string. The big
+  one leaves 2-4 babies ("Minimum/Maximum Baby Heatscar Spiders on Spider Death") when it dies or despawns (1.12
+  setDead). They spawn only with "Enable Heatscar Spiders" (off by default; the biome modifiers have the config
+  condition), with no light check.
+- Nitro creeper: fire-proof, fuse 12 + the difficulty (+12 charged), blast 3 (charged 20, mob griefing decides block
+  damage), explodes when it falls more than 5 blocks, killed by one iron golem hit, drops 2-5 gunpowder (charged 20-59
+  more). It saves its fuse as "Fuse", which the vanilla creeper part reads too, so a reloaded one can go off at the
+  vanilla creeper's 12 tick fuse with a normal blast (1.12 did the same). Spawns in the nether (8, 4-6).
+
+Differences:
+- Entities are always registered (1.12 skipped the heatscar spiders when disabled); disabled, they just never spawn.
+- Spawn eggs are in the vanilla spawn egg tab; their names come from the entity names (1.12 had no egg names).

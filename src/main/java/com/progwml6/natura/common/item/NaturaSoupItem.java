@@ -17,6 +17,11 @@ public class NaturaSoupItem extends NaturaFoodItem {
         this.bowl = bowl;
     }
 
+    /** The bowl this stew gives back. */
+    public ItemStack bowl() {
+        return new ItemStack(this.bowl.get());
+    }
+
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         ItemStack result = super.finishUsingItem(stack, level, entity);

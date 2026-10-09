@@ -10,13 +10,17 @@ import com.progwml6.natura.common.NaturaConfig;
 
 import net.neoforged.neoforge.common.conditions.ICondition;
 
-/** 1.12 ConfigOptionEnabledConditionFactory: a recipe only there when a config option is on (natura:config_option_enabled). */
+/**
+ * 1.12 ConfigOptionEnabledConditionFactory: a recipe (or another data entry, like the heatscar spider spawns) only there
+ * when a config option is on (natura:config_option_enabled).
+ */
 public record ConfigOptionEnabledCondition(String setting) implements ICondition {
     public static final MapCodec<ConfigOptionEnabledCondition> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.STRING.fieldOf("config_setting").forGetter(ConfigOptionEnabledCondition::setting)).apply(i, ConfigOptionEnabledCondition::new));
 
     private static final Map<String, Supplier<Boolean>> SETTINGS = Map.of(
-            "enableWheatRecipe", NaturaConfig.ENABLE_WHEAT_RECIPE::get);
+            "enableWheatRecipe", NaturaConfig.ENABLE_WHEAT_RECIPE::get,
+            "enableHeatscarSpider", NaturaConfig.ENABLE_HEATSCAR_SPIDER::get);
 
     @Override
     public boolean test(IContext context) {
