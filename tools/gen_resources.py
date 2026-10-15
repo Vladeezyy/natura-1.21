@@ -1076,6 +1076,18 @@ def languages():
         if new_name == "en_us":
             out["config.jade.plugin_natura.crop"] = "Crop item and growth"  # the Jade plugin's setting
         w(os.path.join(ASSETS, "lang", new_name + ".json"), dict(sorted(out.items())))
+    # port translations (tools/lang): the required languages 1.12 Natura lacked (uk_ua, es_es, pt_br) and the keys
+    # missing from its ru_ru / de_de, merged over the converted files
+    extra = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lang")
+    for name in sorted(os.listdir(extra)):
+        path = os.path.join(ASSETS, "lang", name)
+        out = {}
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                out = json.load(f)
+        with open(os.path.join(extra, name), encoding="utf-8") as f:
+            out.update(json.load(f))
+        w(path, dict(sorted(out.items())))
     missing = [k for k in KEYS if k.split("#")[0] + ".name" not in english]
     if missing:
         print("no English name for:", missing)

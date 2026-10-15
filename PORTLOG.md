@@ -52,6 +52,10 @@ The translations come from the 1.12 language files with the keys renamed (`tile.
 `block.natura.maple_log`), the Mantle tooltips (`.tooltip`) too. Recipes are the 1.12 JSON recipes with the items
 renamed and the ore dictionary turned into tags (`plankWood` → `#minecraft:planks`, `stickWood` → `#c:rods/wooden`, ...).
 
+The port adds Ukrainian (`uk_ua`), Spanish (`es_es`) and Portuguese (Brazil) (`pt_br`), and the keys the 1.12 Russian and
+German files lacked (the doors of five woods, the Jade setting); they are in `tools/lang` and written for the port, not by
+native speakers. The 1.12 Russian darkwood flower tooltip had a literal `\Ц` instead of a line break; fixed.
+
 ## Phase 1: woods
 
 As in 1.12:

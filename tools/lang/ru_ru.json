@@ -1,0 +1,14 @@
+{
+  "block.natura.darkwood_door": "Дверь из древесины тёмного дерева",
+  "block.natura.darkwood_door.tooltip": "Дерево Нижнего мира",
+  "block.natura.darkwood_flowering_leaves.tooltip": "Дерево Нижнего мира\nЦветы",
+  "block.natura.fusewood_door": "Дверь из древесины плавкого дерева",
+  "block.natura.fusewood_door.tooltip": "Дерево Нижнего мира\nВзрывная личность",
+  "block.natura.maple_door": "Дверь из древесины клёна",
+  "block.natura.maple_door.tooltip": "Отчасти сладкий",
+  "block.natura.silverbell_door": "Дверь из древесины галезии",
+  "block.natura.silverbell_door.tooltip": "Серебряные колокольчики",
+  "block.natura.tiger_door": "Дверь из древесины тигрового дерева",
+  "block.natura.tiger_door.tooltip": "Дикое зерно",
+  "config.jade.plugin_natura.crop": "Урожай и рост"
+}

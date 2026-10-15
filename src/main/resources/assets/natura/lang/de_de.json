@@ -331,6 +331,7 @@
   "block.natura.willow_stairs": "Weidenholztreppe",
   "block.natura.willow_trapdoor": "Weidenholzfalltür",
   "block.natura.willow_workbench": "Weidenholzwerkbank",
+  "config.jade.plugin_natura.crop": "Feldfrucht und Wachstum",
   "entity.natura.babyheatscarspider": "Babyschwelspinne",
   "entity.natura.heatscarspider": "Schwelspinne",
   "entity.natura.imp": "Kobold",
