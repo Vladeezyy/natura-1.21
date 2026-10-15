@@ -48,6 +48,6 @@ script header). `./gradlew runGameTestServer` runs the game tests.
 
 ## License
 
-Like the original: the code is public domain under [CC0](http://creativecommons.org/publicdomain/zero/1.0/), the
-textures and binaries are under [CC-BY 3.0](http://creativecommons.org/licenses/by/3.0/) (original authors: mDiyo,
-progwml6 and the Slime Knights). See [LICENSE.md](LICENSE.md).
+The code of this port: **LGPL-3.0-only** ([LICENSE](LICENSE), GPL-3.0 text in [COPYING](licenses/COPYING)), Copyright (c) 2026 Vladeezyy (the original code was public domain under [CC0](http://creativecommons.org/publicdomain/zero/1.0/)).
+The textures and binaries stay under [CC-BY 3.0](http://creativecommons.org/licenses/by/3.0/) (original authors: mDiyo, progwml6 and the Slime Knights). The original license is kept in [LICENSE-ORIGINAL.md](licenses/LICENSE-ORIGINAL.md).
+Forks and modified versions must stay open under the same license and credit the authors. Please download the mod only from the official release pages.
