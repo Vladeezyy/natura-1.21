@@ -287,3 +287,26 @@ Differences:
 - Config: the 1.12 options are in `config/natura-common.toml` (sections ENABLE-DISABLE, Entities, Mob-Changes,
   Worldgen), with the 1.12 names and defaults; the dimension blacklists and the retrogen options are gone (phase 7).
 - 47 game tests (blocks, loot, recipes, trees, plants, nether blocks, tools, mobs, world generation).
+
+## Performance check (2026-10-17)
+
+Measured with `tools/bench.sh` (dev only: `src/main/java/.../dev/DevBench.java`, inert unless `-Dnatura.bench`), a
+fresh dev server world per case, NeoForge 21.1.256 on an Apple laptop (noisy: cases repeated and alternated).
+
+- **World generation**: a 32x32 chunk square 20000 blocks from spawn, with the Natura generation on and with every
+  "Generate ..." option off. Overworld 63–72 chunks/s on, 58–73 off; nether 81–90 on, 81–97 off: within the run-to-run
+  noise. JFR: all Natura code is 0.5 % of the samples while generating, most of it the nether minables (0.4 %).
+  Nothing to change.
+- **Grown crops kept random-ticking**: `isRandomlyTicking` was always true, while a grown crop does nothing (vanilla
+  crops stop ticking at max age). Now only growing barley and cotton tick. 16384 grown plants, random tick speed 300,
+  average server tick: before 1.245 ms (wheat 0.868); after, three alternated pairs 0.385 / 0.990 / 0.778 ms vs wheat
+  0.608 / 1.133 / 0.954 — on par with vanilla. Game test `grown_crops_do_not_tick`.
+- **Thorn vines** made a new `Random` (with the fixed 1.12 seed) for every entity inside them every tick; the roll is
+  always the same, so it is computed once (same behaviour).
+- **Tempting** cows, sheep and chickens built a new `Ingredient` for every animal that joined the level (every chunk
+  load); it is made once now.
+- Checked and left as they are: the client tints (computed when a chunk section is built, not per frame), the redwood
+  leaves decay scan (only after a tree is broken, stops at the first log), the berry bush and glowshroom random ticks
+  (same work as vanilla bushes and mushrooms), the tree generators (they read and write only the chunks the
+  decoration may touch and set the leaves distance once per tree).
+- 48 game tests pass.

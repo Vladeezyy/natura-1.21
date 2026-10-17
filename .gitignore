@@ -43,3 +43,6 @@ repo/
 _original/
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+
+# local measurement and test logs
+build-*.log

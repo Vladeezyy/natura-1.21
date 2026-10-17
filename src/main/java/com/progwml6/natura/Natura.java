@@ -46,6 +46,7 @@ public class Natura {
         CONDITIONS.register("config_option_enabled", () -> ConfigOptionEnabledCondition.CODEC);
         CONDITIONS.register(modBus);
         modBus.addListener(this::setup);
+        com.progwml6.natura.dev.DevBench.init();
         modBus.addListener(RegisterGameTestsEvent.class, event -> event.register(NaturaGameTests.class));
     }
 

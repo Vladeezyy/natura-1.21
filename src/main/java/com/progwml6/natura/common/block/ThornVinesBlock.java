@@ -16,16 +16,25 @@ import net.minecraft.world.level.block.state.BlockState;
  * Random made from the same fixed seed every time, so the roll always comes out the same; kept as in 1.12.
  */
 public class ThornVinesBlock extends VineBlock {
+    /** The 1.12 roll, the same every time: computed once instead of a new Random per entity and tick. */
+    private static final boolean PRICKS;
+    private static final boolean CACTUS;
+
+    static {
+        Random random = new Random();
+        random.setSeed(2 ^ 16 + 2 ^ 8 + (4 * 3 * 271));
+        PRICKS = random.nextInt(30) == 0;
+        CACTUS = PRICKS && random.nextBoolean();
+    }
+
     public ThornVinesBlock(Properties properties) {
         super(properties);
     }
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        Random random = new Random();
-        random.setSeed(2 ^ 16 + 2 ^ 8 + (4 * 3 * 271));
-        if (!(entity instanceof ItemEntity) && !(entity instanceof Ghast) && random.nextInt(30) == 0) {
-            DamageSource source = random.nextBoolean() ? level.damageSources().cactus() : level.damageSources().lava();
+        if (PRICKS && !(entity instanceof ItemEntity) && !(entity instanceof Ghast)) {
+            DamageSource source = CACTUS ? level.damageSources().cactus() : level.damageSources().lava();
             entity.hurt(source, 1);
         }
     }

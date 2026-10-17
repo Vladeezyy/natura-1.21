@@ -58,6 +58,7 @@ public final class NaturaGameTests {
         TESTS.put("recipes", NaturaGameTests::recipes);
         TESTS.put("workbench_menu", NaturaGameTests::workbenchMenu);
         TESTS.put("crops", NaturaGameTests::crops);
+        TESTS.put("grown_crops_do_not_tick", NaturaGameTests::grownCropsDoNotTick);
         TESTS.put("berry_bushes", NaturaGameTests::berryBushes);
         TESTS.put("saguaro", NaturaGameTests::saguaro);
         TESTS.put("food", NaturaGameTests::food);
@@ -336,6 +337,18 @@ public final class NaturaGameTests {
     }
 
     /** Barley: planted on farmland, bone meal adds 2-5 stages, picked when ripe (back to stage 1, one barley). */
+    /** A grown crop gets no random ticks (as vanilla crops), a growing one does. */
+    private static void grownCropsDoNotTick(GameTestHelper helper) {
+        for (var block : new net.minecraft.world.level.block.Block[] {NaturaBlocks.BARLEY_CROP.get(), NaturaBlocks.COTTON_CROP.get()}) {
+            var crop = (com.progwml6.natura.common.block.NaturaCropBlock) block;
+            if (!crop.withAge(0).isRandomlyTicking() || crop.withAge(crop.getMaxAge()).isRandomlyTicking()) {
+                helper.fail(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block) + ": growing should tick, grown should not");
+                return;
+            }
+        }
+        helper.succeed();
+    }
+
     private static void crops(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         BlockPos pos = new BlockPos(2, 2, 2);

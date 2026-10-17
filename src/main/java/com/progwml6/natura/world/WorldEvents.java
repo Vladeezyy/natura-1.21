@@ -19,6 +19,14 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
  */
 @EventBusSubscriber(modid = Natura.MODID)
 public final class WorldEvents {
+    /** Made once: an Ingredient per joining cow, sheep or chicken was a new object on every chunk load. */
+    private static final com.google.common.base.Supplier<Ingredient> MATERIALS = com.google.common.base.Suppliers.memoize(() -> Ingredient.of(
+            NaturaItems.BARLEY.get(), NaturaItems.BARLEY_FLOUR.get(), NaturaItems.WHEAT_FLOUR.get(), NaturaItems.COTTON.get(),
+            NaturaItems.SULFUR_POWDER.get(), NaturaItems.GHOSTWOOD_FLETCHING.get(), NaturaItems.IMP_LEATHER.get(), NaturaItems.FLAME_STRING.get(),
+            NaturaItems.BLUE_DYE.get()));
+    private static final com.google.common.base.Supplier<Ingredient> SEEDS = com.google.common.base.Suppliers.memoize(() -> Ingredient.of(
+            NaturaItems.BARLEY_SEEDS.get(), NaturaItems.COTTON_SEEDS.get()));
+
     private WorldEvents() {}
 
     @SubscribeEvent
@@ -28,12 +36,10 @@ public final class WorldEvents {
         }
         if (event.getEntity() instanceof Cow || event.getEntity() instanceof Sheep) {
             var animal = (net.minecraft.world.entity.animal.Animal) event.getEntity();
-            animal.goalSelector.addGoal(3, new TemptGoal(animal, 0.25D, Ingredient.of(NaturaItems.BARLEY.get(), NaturaItems.BARLEY_FLOUR.get(),
-                    NaturaItems.WHEAT_FLOUR.get(), NaturaItems.COTTON.get(), NaturaItems.SULFUR_POWDER.get(), NaturaItems.GHOSTWOOD_FLETCHING.get(),
-                    NaturaItems.IMP_LEATHER.get(), NaturaItems.FLAME_STRING.get(), NaturaItems.BLUE_DYE.get()), false));
+            animal.goalSelector.addGoal(3, new TemptGoal(animal, 0.25D, MATERIALS.get(), false));
         }
         if (event.getEntity() instanceof Chicken chicken) {
-            chicken.goalSelector.addGoal(3, new TemptGoal(chicken, 0.25D, Ingredient.of(NaturaItems.BARLEY_SEEDS.get(), NaturaItems.COTTON_SEEDS.get()), false));
+            chicken.goalSelector.addGoal(3, new TemptGoal(chicken, 0.25D, SEEDS.get(), false));
         }
     }
 }

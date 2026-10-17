@@ -52,6 +52,10 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
         this.registerDefaultState(this.stateDefinition.any().setValue(age, 0));
     }
 
+    public BlockState withAge(int age) {
+        return this.defaultBlockState().setValue(this.age, age);
+    }
+
     public int getAge(BlockState state) {
         return state.getValue(this.age);
     }
@@ -120,7 +124,8 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
 
     @Override
     protected boolean isRandomlyTicking(BlockState state) {
-        return true;
+        // a grown crop has nothing to do (as vanilla crops): no random ticks for whole fields of ripe barley and cotton
+        return state.getValue(this.age) < this.maxAge;
     }
 
     @Override
