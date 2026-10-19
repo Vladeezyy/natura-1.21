@@ -59,6 +59,9 @@ public final class DevBench {
             buildField(server.overworld());
             server.overworld().getGameRules().set(GameRules.RANDOM_TICK_SPEED, 300, server);
             stage = 10;
+        } else if (MODE.equals("carts")) {
+            buildCarts(server.overworld());
+            stage = 10;
         }
     }
 
@@ -106,8 +109,20 @@ public final class DevBench {
                 tickNanos += System.nanoTime() - tickStart;
             }
             if (ticks == 100 + 1200) {
-                Natura.LOG.info("[bench] crops {} {} plants: {} ms per tick (average of 1200 ticks, random tick speed 300)",
-                        System.getProperty("natura.bench.crop", "natura"), 128 * 128, String.format("%.3f", tickNanos / 1200 / 1e6));
+                var items = new java.util.TreeMap<String, Integer>();
+                for (var e : server.overworld().getAllEntities()) {
+                    if (e instanceof net.minecraft.world.entity.item.ItemEntity item) {
+                        items.merge(item.getItem().getItem().toString(), item.getItem().getCount(), Integer::sum);
+                    }
+                }
+                Natura.LOG.info("[bench] item entities: {}", items);
+                if (MODE.equals("carts")) {
+                    Natura.LOG.info("[bench] carts {} {} carts: {} ms per tick (average of 1200 ticks)",
+                            System.getProperty("natura.bench.rail", "blaze"), CARTS * CARTS, String.format("%.3f", tickNanos / 1200 / 1e6));
+                } else {
+                    Natura.LOG.info("[bench] crops {} {} plants: {} ms per tick (average of 1200 ticks, random tick speed 300)",
+                            System.getProperty("natura.bench.crop", "natura"), 128 * 128, String.format("%.3f", tickNanos / 1200 / 1e6));
+                }
                 stage = 99;
                 server.halt(false);
             }
@@ -133,6 +148,37 @@ public final class DevBench {
                 BlockPos pos = origin.offset(x, 0, z);
                 level.setBlock(pos.below(), (x % 9 == 4 && z % 9 == 4) ? Blocks.WATER.defaultBlockState() : farmland, Block.UPDATE_CLIENTS);
                 level.setBlock(pos, (x % 9 == 4 && z % 9 == 4) ? Blocks.AIR.defaultBlockState() : crop, Block.UPDATE_CLIENTS);
+            }
+        }
+    }
+
+    private static final int CARTS = 32;
+
+    /** 32 straight tracks of 32 rails (Natura blaze rails or vanilla rails, natura.bench.rail), a minecart on every rail. */
+    private static void buildCarts(ServerLevel level) {
+        boolean vanilla = System.getProperty("natura.bench.rail", "blaze").equals("vanilla");
+        Block rail = vanilla ? Blocks.RAIL : NaturaBlocks.NETHER.get("blaze_rail").get();
+        BlockPos origin = new BlockPos(5000, 200, 5000);
+        for (int cx = 0; cx < 4; cx++) {
+            for (int cz = 0; cz < 6; cz++) {
+                level.setChunkForced((origin.getX() >> 4) + cx, (origin.getZ() >> 4) + cz, true);
+            }
+        }
+        for (int row = 0; row < CARTS; row++) {
+            for (int i = 0; i < CARTS; i++) {
+                BlockPos pos = origin.offset(i, 0, row * 3);
+                level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+                level.setBlock(pos, rail.defaultBlockState(), Block.UPDATE_ALL);
+            }
+        }
+        for (int row = 0; row < CARTS; row++) {
+            for (int i = 0; i < CARTS; i++) {
+                var cart = net.minecraft.world.entity.EntityTypes.MINECART.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                if (cart != null) {
+                    BlockPos pos = origin.offset(i, 0, row * 3);
+                    cart.snapTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0F, 0.0F);
+                    level.addFreshEntity(cart);
+                }
             }
         }
     }
