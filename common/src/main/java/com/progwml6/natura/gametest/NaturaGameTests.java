@@ -279,6 +279,11 @@ public final class NaturaGameTests {
         // vanilla recipes take the Natura wood through the tags
         out = craft(helper, 1, 2, planks, planks);
         helper.assertTrue(out.is(Items.STICK), "two planks -> vanilla sticks: " + out);
+        // a choice of berry tags per slot
+        var berries = com.progwml6.natura.common.NaturaItems.BERRIES;
+        out = craft(helper, 2, 2, new ItemStack(com.progwml6.natura.common.NaturaItems.BOWLS.get("ghostwood").get()), new ItemStack(berries.get("raspberry").get()),
+                new ItemStack(berries.get("blueberry").get()), new ItemStack(berries.get("blackberry").get()));
+        helper.assertTrue(out.is(com.progwml6.natura.common.NaturaItems.SOUPS.get("berry_medley").get()), "bowl and three berries -> berry medley: " + out);
         helper.succeed();
     }
 
