@@ -338,7 +338,7 @@ public final class NaturaBlocks {
 
     private static <B extends Block> void leaves(String id, Function<BlockBehaviour.Properties, B> block, int encouragement, int flammability) {
         BlockEntry<B> holder = block(id, () -> block.apply(Registration.blockProps().mapColor(MapColor.PLANT).strength(0.2F).randomTicks()
-                .sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, l, p, type) -> type == EntityType.OCELOT || type == EntityType.PARROT)
+                .sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, l, p, type) -> type == net.minecraft.world.entity.EntityTypes.OCELOT || type == net.minecraft.world.entity.EntityTypes.PARROT)
                 .isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p) -> false).ignitedByLava().pushReaction(PushReaction.DESTROY).isRedstoneConductor((s, l, p) -> false)), TAB_WORLD);
         LEAVES.put(id, holder);
         if (flammability > 0) {

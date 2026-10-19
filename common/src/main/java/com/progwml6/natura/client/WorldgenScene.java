@@ -79,7 +79,7 @@ public final class WorldgenScene {
             command(server.overworld(), "time set noon");
             command(server.overworld(), "weather clear");
         }));
-        at(45, mc -> mc.options.hideGui = true);
+        at(45, mc -> hideGui(mc, true));
         int t = 50;
         for (Shot shot : shots) {
             at(t, mc -> server(mc, p -> go(p, shot)));
@@ -101,13 +101,13 @@ public final class WorldgenScene {
         if (!opened && mc.options.onboardAccessibility) {
             mc.options.onboardAccessibility = false;
             mc.options.save();
-            mc.setScreen(new TitleScreen());
+            mc.gui.setScreen(new TitleScreen());
             return;
         }
-        if (!opened && mc.getOverlay() == null && mc.screen instanceof TitleScreen) {
+        if (!opened && mc.gui.overlay() == null && mc.gui.screen() instanceof TitleScreen) {
             opened = true;
             if (mc.getLevelSource().levelExists(WORLD)) {
-                mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.setScreen(new TitleScreen()));
+                mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.gui.setScreen(new TitleScreen()));
             } else {
                 LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, new LevelSettings.DifficultySettings(Difficulty.PEACEFUL, false, false),
                         true, WorldDataConfiguration.DEFAULT);
@@ -118,8 +118,8 @@ public final class WorldgenScene {
         }
         if (mc.player == null || mc.getSingleplayerServer() == null) return;
         mc.options.pauseOnLostFocus = false;
-        if (mc.screen instanceof net.minecraft.client.gui.screens.PauseScreen) {
-            mc.setScreen(null);
+        if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen) {
+            mc.gui.setScreen(null);
         }
         tick++;
         for (Step step : STEPS) {
@@ -216,7 +216,7 @@ public final class WorldgenScene {
     }
 
     private static void shot(Minecraft mc, String name) {
-        Screenshot.grab(mc.gameDirectory, "worldgen_" + name + ".png", mc.getMainRenderTarget(), 1, msg -> Natura.LOG.info("[worldgen scene] {}", msg.getString()));
+        Screenshot.grab(mc.gameDirectory, "worldgen_" + name + ".png", mc.gameRenderer.mainRenderTarget(), 1, msg -> Natura.LOG.info("[worldgen scene] {}", msg.getString()));
     }
 
     private WorldgenScene() {}
@@ -230,5 +230,12 @@ public final class WorldgenScene {
     static void command(ServerLevel level, String command) {
         MinecraftServer server = level.getServer();
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), command);
+    }
+
+    /** 26.2: the HUD hides through Minecraft.gui.hud (no options.hideGui). */
+    private static void hideGui(Minecraft mc, boolean hidden) {
+        if (mc.gui.hud.isHidden() != hidden) {
+            mc.gui.hud.toggle();
+        }
     }
 }

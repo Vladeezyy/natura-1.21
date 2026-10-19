@@ -128,7 +128,7 @@ public final class NaturaGameTests {
         com.progwml6.natura.platform.Services.PLATFORM.configureMockConnection(connection);
         helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        Vec3 pos = helper.absolutePos(new BlockPos(2, 1, 2)).getBottomCenter();
+        Vec3 pos = Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(2, 1, 2)));
         player.snapTo(pos.x, pos.y, pos.z, 0, 0);
         return player;
     }
@@ -259,7 +259,7 @@ public final class NaturaGameTests {
         helper.setBlock(log, block("fusewood_log"));
         helper.setBlock(new BlockPos(3, 1, 3), Blocks.DIRT);
         // a pig next to it takes the damage (the just joined test player is still spawn-invulnerable)
-        var pig = helper.spawn(net.minecraft.world.entity.EntityType.PIG, new BlockPos(2, 1, 4));
+        var pig = helper.spawn(net.minecraft.world.entity.EntityTypes.PIG, new BlockPos(2, 1, 4));
         float health = pig.getHealth();
         player.gameMode.destroyBlock(helper.absolutePos(log));
         server.setDifficulty(before, true);
@@ -488,8 +488,8 @@ public final class NaturaGameTests {
     }
 
     private static void tempt(GameTestHelper helper) {
-        var cow = helper.spawn(net.minecraft.world.entity.EntityType.COW, new BlockPos(2, 1, 2));
-        var chicken = helper.spawn(net.minecraft.world.entity.EntityType.CHICKEN, new BlockPos(4, 1, 4));
+        var cow = helper.spawn(net.minecraft.world.entity.EntityTypes.COW, new BlockPos(2, 1, 2));
+        var chicken = helper.spawn(net.minecraft.world.entity.EntityTypes.CHICKEN, new BlockPos(4, 1, 4));
         boolean cowTempted = cow.goalSelector.getAvailableGoals().stream().anyMatch(g -> g.getGoal() instanceof net.minecraft.world.entity.ai.goal.TemptGoal t
                 && t.toString() != null);
         helper.assertTrue(cowTempted && chicken.goalSelector.getAvailableGoals().stream().filter(g -> g.getGoal() instanceof net.minecraft.world.entity.ai.goal.TemptGoal).count() >= 2,
@@ -499,7 +499,7 @@ public final class NaturaGameTests {
 
     private static void heatSandAndGlass(GameTestHelper helper) {
         helper.setBlock(new BlockPos(2, 1, 2), block("heat_sand"));
-        var pig = helper.spawn(net.minecraft.world.entity.EntityType.PIG, new BlockPos(2, 2, 2));
+        var pig = helper.spawn(net.minecraft.world.entity.EntityTypes.PIG, new BlockPos(2, 2, 2));
         float health = pig.getHealth();
         helper.getBlockState(new BlockPos(2, 1, 2)).entityInside(helper.getLevel(), helper.absolutePos(new BlockPos(2, 1, 2)), pig, net.minecraft.world.entity.InsideBlockEffectApplier.NOOP, true);
         helper.assertTrue(pig.getHealth() < health, "heat sand burns a pig");
@@ -547,7 +547,7 @@ public final class NaturaGameTests {
         BlockState active = helper.getBlockState(pos);
         helper.assertTrue(active.getValue(com.progwml6.natura.common.block.RespawnObeliskBlock.ACTIVE) && active.getLightEmission() == 7, "the obelisk lights up");
         helper.assertTrue(player.getRespawnConfig() != null && helper.absolutePos(pos).equals(player.getRespawnConfig().respawnData().pos()), "the respawn point is the obelisk");
-        var spawn = ((com.progwml6.natura.common.block.RespawnObeliskBlock) active.getBlock()).getRespawnPosition(active, net.minecraft.world.entity.EntityType.PLAYER,
+        var spawn = ((com.progwml6.natura.common.block.RespawnObeliskBlock) active.getBlock()).getRespawnPosition(active, net.minecraft.world.entity.EntityTypes.PLAYER,
                 helper.getLevel(), helper.absolutePos(pos), 0);
         helper.assertTrue(spawn.isPresent() && spawn.get().position().y > helper.absolutePos(pos).getY() + 1, "the player respawns on top");
         player.discard();
@@ -583,12 +583,12 @@ public final class NaturaGameTests {
             helper.setBlock(new BlockPos(x, 0, 3), Blocks.STONE);
             helper.setBlock(new BlockPos(x, 1, 3), block("blaze_rail"));
         }
-        var cart = helper.spawn(net.minecraft.world.entity.EntityType.MINECART, new Vec3(0.5, 1.0, 3.5));
+        var cart = helper.spawn(net.minecraft.world.entity.EntityTypes.MINECART, new Vec3(0.5, 1.0, 3.5));
         cart.setDeltaMovement(2.0, 0.0, 0.0);
         double start = cart.getX();
         helper.setBlock(new BlockPos(1, 0, 6), Blocks.REDSTONE_BLOCK);
         helper.setBlock(new BlockPos(1, 1, 6), block("blaze_activator_rail"));
-        var hopper = helper.spawn(net.minecraft.world.entity.EntityType.HOPPER_MINECART, new Vec3(1.5, 1.0, 6.5));
+        var hopper = helper.spawn(net.minecraft.world.entity.EntityTypes.HOPPER_MINECART, new Vec3(1.5, 1.0, 6.5));
         helper.runAfterDelay(4, () -> {
             double moved = cart.getX() - start;
             helper.assertTrue(moved > 2.2, "a cart on blaze rails moves 0.65 a tick (vanilla 0.4): " + moved + " in 4 ticks");
@@ -608,7 +608,7 @@ public final class NaturaGameTests {
                 "a cloud is solid only at the bottom");
         helper.setBlock(pos.above(), block("white_cloud"));
         helper.assertTrue(helper.getBlockState(pos.above()).getCollisionShape(helper.getLevel(), helper.absolutePos(pos.above())).isEmpty(), "a cloud on a cloud has no collision");
-        var pig = helper.spawn(net.minecraft.world.entity.EntityType.PIG, pos);
+        var pig = helper.spawn(net.minecraft.world.entity.EntityTypes.PIG, pos);
         pig.fallDistance = 10;
         pig.setDeltaMovement(0, -1, 0);
         helper.getBlockState(pos).entityInside(helper.getLevel(), helper.absolutePos(pos), pig, net.minecraft.world.entity.InsideBlockEffectApplier.NOOP, true);
@@ -651,7 +651,7 @@ public final class NaturaGameTests {
         helper.assertTrue(leaves.size() == 1 && leaves.get(0).is(block("maple_leaves").asItem()), "a kama gets the leaves: " + leaves);
         helper.assertTrue(tool("ghostwood_kama").getDestroySpeed(Blocks.COBWEB.defaultBlockState()) == 15.0F, "cobweb breaks at 15");
         ServerPlayer player = player(helper);
-        var sheep = helper.spawn(net.minecraft.world.entity.EntityType.SHEEP, new BlockPos(3, 1, 3));
+        var sheep = helper.spawn(net.minecraft.world.entity.EntityTypes.SHEEP, new BlockPos(3, 1, 3));
         ItemStack kama = tool("fusewood_kama");
         kama.interactLivingEntity(player, sheep, net.minecraft.world.InteractionHand.MAIN_HAND);
         helper.assertTrue(sheep.isSheared() && kama.getDamageValue() == 1, "the kama shears a sheep");
@@ -697,7 +697,7 @@ public final class NaturaGameTests {
                 && spider.fireImmune() && spider.getBbWidth() == 2.7F, "heatscar spiders: 50 health, 4 damage, 2.7 wide");
         helper.assertTrue(creeper.fireImmune(), "nitro creepers are fire proof");
         float health = creeper.getHealth();
-        var golem = helper.spawn(net.minecraft.world.entity.EntityType.IRON_GOLEM, new BlockPos(6, 1, 2));
+        var golem = helper.spawn(net.minecraft.world.entity.EntityTypes.IRON_GOLEM, new BlockPos(6, 1, 2));
         creeper.hurtServer(helper.getLevel(), helper.getLevel().damageSources().mobAttack(golem), 1.0F);
         helper.assertTrue(!creeper.isAlive() || creeper.getHealth() <= 0, "an iron golem kills a nitro creeper in one hit");
         imp.discard();

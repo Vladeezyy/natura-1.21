@@ -186,7 +186,7 @@ public class RedwoodTreeGenerator extends NaturaTreeGenerator {
     }
 
     protected static boolean canGrowInto(BlockState state) {
-        return state.isAir() || state.is(BlockTags.LEAVES) || TreeWorld.isDirtOrGrass(state) || state.is(BlockTags.LOGS) || state.is(BlockTags.SAPLINGS)
+        return state.isAir() || state.is(BlockTags.LEAVES) || TreeWorld.isDirtOrGrass(state) || state.is(BlockTags.LOGS) || (state.getBlock() instanceof net.minecraft.world.level.block.SaplingBlock || state.getBlock() instanceof com.progwml6.natura.common.block.NaturaSaplingBlock)
                 || state.is(Blocks.VINE);
     }
 

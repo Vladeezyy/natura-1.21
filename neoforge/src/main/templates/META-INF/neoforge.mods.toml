@@ -8,7 +8,8 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 displayURL="https://github.com/progwml6/Natura"
-logoFile="natura_logo.png"
+# NeoForge 26.2+: logoFile is deprecated (a warning screen before the main menu)
+bannerFile="natura_logo.png"
 logoBlur=false
 credits="Original credits: mDiyo, Slime Knights; Samtrion, tterrag"
 authors="mDiyo, progwml6 and the Slime Knights (original); port contributors"

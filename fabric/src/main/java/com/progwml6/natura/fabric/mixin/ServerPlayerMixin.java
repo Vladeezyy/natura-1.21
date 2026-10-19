@@ -24,7 +24,7 @@ public abstract class ServerPlayerMixin {
         BlockPos pos = config.respawnData().pos();
         BlockState state = level.getBlockState(pos);
         if (!config.forced() && state.getBlock() instanceof RespawnObeliskBlock obelisk) {
-            cir.setReturnValue(obelisk.getRespawnPosition(state, EntityType.PLAYER, level, pos, config.respawnData().yaw()));
+            cir.setReturnValue(obelisk.getRespawnPosition(state, net.minecraft.world.entity.EntityTypes.PLAYER, level, pos, config.respawnData().yaw()));
         }
     }
 }

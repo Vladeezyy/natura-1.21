@@ -40,7 +40,7 @@ public class NaturaFabric implements ModInitializer {
         ResourceConditions.register(ConfigCondition.TYPE);
         NaturaBlocks.registerFlammability();
         // the blaze hopper uses the vanilla hopper block entity (NeoForge: BlockEntityTypeAddBlocksEvent)
-        ((FabricBlockEntityType) BlockEntityType.HOPPER).addValidBlock(NaturaBlocks.BLAZE_HOPPER.get());
+        ((FabricBlockEntityType) net.minecraft.world.level.block.entity.BlockEntityTypes.HOPPER).addValidBlock(NaturaBlocks.BLAZE_HOPPER.get());
         NaturaEntities.attributes(FabricDefaultAttributeRegistry::register);
         NaturaEntities.placements(new NaturaEntities.PlacementRegistrar() {
             @Override

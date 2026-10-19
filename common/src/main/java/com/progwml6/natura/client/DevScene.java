@@ -58,20 +58,20 @@ public final class DevScene {
                 NaturaWood.EUCALYPTUS, NaturaWood.HOPSEED, NaturaWood.SAKURA, NaturaWood.REDWOOD};
         NaturaWood[] nether = {NaturaWood.GHOSTWOOD, NaturaWood.BLOODWOOD, NaturaWood.FUSEWOOD, NaturaWood.DARKWOOD};
         at(50, mc -> server(mc, p -> gallery(p, overworld)));
-        at(52, mc -> mc.options.hideGui = true);
+        at(52, mc -> hideGui(mc, true));
         at(90, mc -> shot(mc, "woods_overworld"));
         at(95, mc -> server(mc, p -> gallery(p, nether)));
         at(135, mc -> shot(mc, "woods_nether"));
         at(140, mc -> server(mc, DevScene::logsAndLeaves));
         at(180, mc -> shot(mc, "logs_leaves"));
-        at(185, mc -> mc.options.hideGui = false);
+        at(185, mc -> hideGui(mc, false));
         String[] tabNames = {"general", "world", "decorative"};
         for (int i = 0; i < 3; i++) {
             int t = 190 + i * 20, index = i;
-            at(t, mc -> mc.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true)));
+            at(t, mc -> mc.gui.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true)));
             at(t + 4, mc -> selectTab(mc, index == 0 ? NaturaTabs.GENERAL.get() : index == 1 ? NaturaTabs.WORLD.get() : NaturaTabs.DECORATIVE.get()));
             at(t + 14, mc -> shot(mc, "tab_" + tabNames[index]));
-            at(t + 16, mc -> mc.setScreen(null));
+            at(t + 16, mc -> mc.gui.setScreen(null));
         }
         at(260, mc -> server(mc, p -> {
             BlockPos bench = origin.offset(0, 0, 8);
@@ -81,7 +81,7 @@ public final class DevScene {
         }));
         at(280, mc -> shot(mc, "workbench_gui"));
         at(285, mc -> mc.player.closeContainer());
-        at(290, mc -> mc.options.hideGui = true);
+        at(290, mc -> hideGui(mc, true));
         at(300, mc -> server(mc, p -> trees(p, new String[] {"maple", "silverbell", "amaranth", "tiger", "willow", "eucalyptus", "hopseed", "sakura"}, false)));
         at(360, mc -> shot(mc, "trees_overworld"));
         at(370, mc -> server(mc, p -> trees(p, new String[] {"ghostwood", "fusewood", "darkwood", "bloodwood"}, true)));
@@ -98,17 +98,17 @@ public final class DevScene {
         at(700, mc -> shot(mc, "nether_blocks"));
         at(705, mc -> server(mc, DevScene::armorStand));
         at(740, mc -> shot(mc, "imp_armor"));
-        at(745, mc -> mc.options.hideGui = false);
-        at(750, mc -> mc.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true)));
+        at(745, mc -> hideGui(mc, false));
+        at(750, mc -> mc.gui.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true)));
         at(754, mc -> selectTab(mc, NaturaTabs.GENERAL.get()));
-        at(758, mc -> mc.screen.mouseScrolled(mc.getWindow().getGuiScaledWidth() / 2.0, mc.getWindow().getGuiScaledHeight() / 2.0, 0, -10));
+        at(758, mc -> mc.gui.screen().mouseScrolled(mc.getWindow().getGuiScaledWidth() / 2.0, mc.getWindow().getGuiScaledHeight() / 2.0, 0, -10));
         at(768, mc -> shot(mc, "tab_general_tools"));
-        at(770, mc -> mc.setScreen(null));
-        at(775, mc -> mc.options.hideGui = true);
+        at(770, mc -> mc.gui.setScreen(null));
+        at(775, mc -> hideGui(mc, true));
         at(780, mc -> server(mc, DevScene::mobs));
         at(820, mc -> shot(mc, "mobs"));
         at(825, mc -> server(mc, DevScene::jadeCrop));
-        at(828, mc -> mc.options.hideGui = false);
+        at(828, mc -> hideGui(mc, false));
         at(860, mc -> shot(mc, "jade_crop"));
         at(870, Minecraft::stop);
     }
@@ -127,10 +127,10 @@ public final class DevScene {
         if (mc.options.onboardAccessibility) {
             mc.options.onboardAccessibility = false;
             mc.options.save();
-            mc.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
+            mc.gui.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
             return true;
         }
-        if (mc.getOverlay() != null || !(mc.screen instanceof net.minecraft.client.gui.screens.TitleScreen)) {
+        if (mc.gui.overlay() != null || !(mc.gui.screen() instanceof net.minecraft.client.gui.screens.TitleScreen)) {
             return true;
         }
         worldCreated = true;
@@ -140,7 +140,7 @@ public final class DevScene {
                 new net.minecraft.world.level.LevelSettings.DifficultySettings(net.minecraft.world.Difficulty.PEACEFUL, false, false), true,
                 net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
         mc.createWorldOpenFlows().createFreshLevel(name, settings, new net.minecraft.world.level.levelgen.WorldOptions(20261019L, false, false),
-                net.minecraft.world.level.levelgen.presets.WorldPresets::createFlatWorldDimensions, new net.minecraft.client.gui.screens.TitleScreen());
+                net.minecraft.world.level.levelgen.presets.WorldPresets::createTestWorldDimensions, new net.minecraft.client.gui.screens.TitleScreen());
         return true;
     }
 
@@ -156,8 +156,8 @@ public final class DevScene {
         if (mc.player == null || mc.getSingleplayerServer() == null) return;
         // The window is usually unfocused while this runs: never pause, or the integrated server stops.
         mc.options.pauseOnLostFocus = false;
-        if (mc.screen instanceof net.minecraft.client.gui.screens.PauseScreen) {
-            mc.setScreen(null);
+        if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen) {
+            mc.gui.setScreen(null);
         }
         tick++;
         for (Step step : STEPS) {
@@ -488,7 +488,7 @@ public final class DevScene {
     }
 
     private static void selectTab(Minecraft mc, CreativeModeTab tab) {
-        if (!(mc.screen instanceof CreativeModeInventoryScreen screen)) return;
+        if (!(mc.gui.screen() instanceof CreativeModeInventoryScreen screen)) return;
         try {
             var method = CreativeModeInventoryScreen.class.getDeclaredMethod("selectTab", CreativeModeTab.class);
             method.setAccessible(true);
@@ -499,7 +499,7 @@ public final class DevScene {
     }
 
     private static void shot(Minecraft mc, String name) {
-        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), 1, msg -> Natura.LOG.info("[scene] {}", msg.getString()));
+        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.gameRenderer.mainRenderTarget(), 1, msg -> Natura.LOG.info("[scene] {}", msg.getString()));
     }
 
     private DevScene() {}
@@ -513,5 +513,12 @@ public final class DevScene {
     static void command(ServerLevel level, String command) {
         MinecraftServer server = level.getServer();
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), command);
+    }
+
+    /** 26.2: the HUD hides through Minecraft.gui.hud (no options.hideGui). */
+    private static void hideGui(Minecraft mc, boolean hidden) {
+        if (mc.gui.hud.isHidden() != hidden) {
+            mc.gui.hud.toggle();
+        }
     }
 }

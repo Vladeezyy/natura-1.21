@@ -389,3 +389,10 @@ obfuscation (no Parchment, no remapping). Resources: `tools/convert_26.py` turns
   as on 1.21.1). Fabric: an annotated class (`FabricGameTests`, 100 ticks like the 1.21.1 tests) and the tree
   environments as data. 50 tests pass on NeoForge, Fabric and the Fabric release jar.
 - Scenes: the scene makes a new flat world itself (time and weather by command).
+
+## Minecraft 26.2 (branch mc/26.2, 2026-10-19)
+
+NeoForge 26.2.0.93, Fabric API 0.161.0. Only renames: the entity type and block entity type constants are in
+`EntityTypes` / `BlockEntityTypes`; the sapling tag is gone (the redwood check asks for a sapling block); the screen,
+overlay and HUD toggle are in `Minecraft.gui`, the main render target in the game renderer (scenes); no
+`BlockPos.getBottomCenter`. NeoForge: `bannerFile` instead of the deprecated `logoFile`. Resources as on 26.1.2.

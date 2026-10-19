@@ -65,7 +65,7 @@ public class NaturaNeoForge {
         NeoForgePlatform.deferred(NeoForgeRegistries.Keys.CONDITION_CODECS).register(
                 com.progwml6.natura.common.recipe.ConfigOptionEnabledCondition.ID, () -> (MapCodec<? extends ICondition>) ConfigCondition.CODEC);
 
-        modBus.addListener(BlockEntityTypeAddBlocksEvent.class, event -> event.modify(BlockEntityType.HOPPER, NaturaBlocks.BLAZE_HOPPER.get()));
+        modBus.addListener(BlockEntityTypeAddBlocksEvent.class, event -> event.modify(net.minecraft.world.level.block.entity.BlockEntityTypes.HOPPER, NaturaBlocks.BLAZE_HOPPER.get()));
         modBus.addListener(FMLCommonSetupEvent.class, event -> event.enqueueWork(NaturaBlocks::registerFlammability));
         modBus.addListener(EntityAttributeCreationEvent.class, event -> NaturaEntities.attributes(event::put));
         modBus.addListener(RegisterSpawnPlacementsEvent.class, event -> NaturaEntities.placements(new NaturaEntities.PlacementRegistrar() {
