@@ -5,12 +5,8 @@
     "AB"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:blaze_rod"
-    },
-    "B": {
-      "item": "minecraft:flint"
-    }
+    "A": "minecraft:blaze_rod",
+    "B": "minecraft:flint"
   },
   "result": {
     "id": "natura:flint_and_blaze"

@@ -7,9 +7,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "tag": "c:crops/potato"
-    }
+    "A": "#c:crops/potato"
   },
   "result": {
     "id": "natura:potatoes_seed_bag"

@@ -1,9 +1,7 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "ingredient": {
-    "item": "natura:heat_sand"
-  },
+  "ingredient": "natura:heat_sand",
   "result": {
     "id": "natura:heat_glass"
   },

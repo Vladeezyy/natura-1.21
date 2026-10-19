@@ -6,6 +6,8 @@ import java.util.Random;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -25,7 +27,8 @@ public class NaturaLeavesBlock extends LeavesBlock {
     private final boolean dropsRedstone;
 
     public NaturaLeavesBlock(Properties properties, boolean dropsRedstone) {
-        super(properties);
+        // 1.12 leaves had no falling leaf particles
+        super(0.0F, properties);
         this.dropsRedstone = dropsRedstone;
     }
 
@@ -33,11 +36,11 @@ public class NaturaLeavesBlock extends LeavesBlock {
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         List<ItemStack> drops = super.getDrops(state, params);
         if (this.dropsRedstone) {
-            ItemStack tool = params.getOptionalParameter(LootContextParams.TOOL);
+            ItemInstance tool = params.getOptionalParameter(LootContextParams.TOOL);
             ServerLevel level = params.getLevel();
             var enchantments = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
             boolean silk = tool != null && EnchantmentHelper.getItemEnchantmentLevel(enchantments.getOrThrow(Enchantments.SILK_TOUCH), tool) > 0;
-            boolean sheared = tool != null && com.progwml6.natura.platform.Services.PLATFORM.isShears(tool);
+            boolean sheared = tool instanceof ItemStack stack && com.progwml6.natura.platform.Services.PLATFORM.isShears(stack);
             if (!silk && !sheared) {
                 int fortune = tool == null ? 0 : EnchantmentHelper.getItemEnchantmentLevel(enchantments.getOrThrow(Enchantments.FORTUNE), tool);
                 Random rand = new Random();
@@ -51,10 +54,16 @@ public class NaturaLeavesBlock extends LeavesBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock())) {
-            RedwoodLeavesBlock.beginLeavesDecay(level, pos, 2);
-        }
-        super.onRemove(state, level, pos, newState, movedByPiston);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        RedwoodLeavesBlock.beginLeavesDecay(level, pos, 2);
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+    }
+
+    @Override
+    protected void spawnFallingLeavesParticle(Level level, BlockPos pos, RandomSource random) {}
+
+    @Override
+    public com.mojang.serialization.MapCodec<? extends LeavesBlock> codec() {
+        throw new UnsupportedOperationException();
     }
 }

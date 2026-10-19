@@ -6,12 +6,8 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "item": "natura:hopseed_stick"
-    },
-    "B": {
-      "item": "natura:hopseed_planks"
-    }
+    "A": "natura:hopseed_stick",
+    "B": "natura:hopseed_planks"
   },
   "result": {
     "id": "natura:hopseed_fence_gate"

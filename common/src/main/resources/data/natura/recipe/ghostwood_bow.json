@@ -7,12 +7,8 @@
     "AB "
   ],
   "key": {
-    "A": {
-      "item": "natura:flame_string"
-    },
-    "B": {
-      "item": "natura:ghostwood_stick"
-    }
+    "A": "natura:flame_string",
+    "B": "natura:ghostwood_stick"
   },
   "result": {
     "id": "natura:ghostwood_bow"

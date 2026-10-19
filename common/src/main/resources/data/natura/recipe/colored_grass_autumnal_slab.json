@@ -5,9 +5,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "natura:autumnal_grass"
-    }
+    "A": "natura:autumnal_grass"
   },
   "result": {
     "id": "natura:autumnal_grass_slab",

@@ -1,5 +1,7 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.world.level.block.entity.FuelValues;
+
 import com.progwml6.natura.common.NaturaBlocks;
 
 import net.minecraft.core.BlockPos;
@@ -24,8 +26,8 @@ public class NetherrackFurnaceBlockEntity extends AbstractFurnaceBlockEntity {
     }
 
     @Override
-    protected int getBurnDuration(ItemStack fuel) {
-        return super.getBurnDuration(fuel) * 2;
+    protected int getBurnDuration(FuelValues fuelValues, ItemStack fuel) {
+        return super.getBurnDuration(fuelValues, fuel) * 2;
     }
 
     @Override

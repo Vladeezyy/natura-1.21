@@ -1,39 +1,31 @@
 package com.progwml6.natura.tools;
 
-import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.progwml6.natura.Natura;
 import com.progwml6.natura.common.NaturaBlocks;
-
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.DiggerItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
-import com.progwml6.natura.platform.Entry;
 import com.progwml6.natura.platform.ItemEntry;
 import com.progwml6.natura.platform.Registration;
 import com.progwml6.natura.platform.Services;
+
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAssets;
 
 /**
  * 1.12 NaturaTools: ghostwood (wood), bloodwood (its own: mines like iron, 350 uses, speed 7, damage +3, enchantability
@@ -41,49 +33,15 @@ import net.minecraft.world.level.block.Block;
  * bloodwood 1501, darkwood 162, fusewood 28 uses), flint and blaze, and imp armor.
  */
 public final class NaturaTools {
-    public static final Tier BLOODWOOD = new Tier() {
-        @Override
-        public int getUses() {
-            return 350;
-        }
-
-        @Override
-        public float getSpeed() {
-            return 7.0F;
-        }
-
-        @Override
-        public float getAttackDamageBonus() {
-            return 3.0F;
-        }
-
-        @Override
-        public TagKey<Block> getIncorrectBlocksForDrops() {
-            return BlockTags.INCORRECT_FOR_IRON_TOOL;
-        }
-
-        @Override
-        public int getEnchantmentValue() {
-            return 24;
-        }
-
-        @Override
-        public Ingredient getRepairIngredient() {
-            return Ingredient.EMPTY;
-        }
-    };
+    /** 1.12 bloodwood: mines like iron, 350 uses, speed 7, damage +3, enchantability 24, no repair item (an empty tag). */
+    public static final ToolMaterial BLOODWOOD = new ToolMaterial(BlockTags.INCORRECT_FOR_IRON_TOOL, 350, 7.0F, 3.0F, 24,
+            TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Natura.MODID, "bloodwood_tool_materials")));
 
     /** 1.12 "Imp": durability factor 33, 1 / 3 / 2 / 1 (boots, leggings, chestplate, helmet), enchantability 15, no repair item. */
-    public static final Entry<ArmorMaterial, ArmorMaterial> IMP = Registration.register(Registries.ARMOR_MATERIAL, "imp", () -> {
-        Map<ArmorItem.Type, Integer> defense = new EnumMap<>(ArmorItem.Type.class);
-        defense.put(ArmorItem.Type.BOOTS, 1);
-        defense.put(ArmorItem.Type.LEGGINGS, 3);
-        defense.put(ArmorItem.Type.CHESTPLATE, 2);
-        defense.put(ArmorItem.Type.HELMET, 1);
-        defense.put(ArmorItem.Type.BODY, 2);
-        return new ArmorMaterial(defense, 15, SoundEvents.ARMOR_EQUIP_GENERIC, () -> Ingredient.EMPTY,
-                List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(Natura.MODID, "imp"))), 0.0F, 0.0F);
-    });
+    public static final ArmorMaterial IMP = new ArmorMaterial(33, Map.of(ArmorType.BOOTS, 1, ArmorType.LEGGINGS, 3, ArmorType.CHESTPLATE, 2,
+            ArmorType.HELMET, 1, ArmorType.BODY, 2), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F,
+            TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Natura.MODID, "imp_armor_materials")),
+            ResourceKey.create(EquipmentAssets.ROOT_ID, Identifier.fromNamespaceAndPath(Natura.MODID, "imp")));
 
     public static final Map<String, ItemEntry<Item>> TOOLS = new LinkedHashMap<>();
     /** The imp armor with the enchantments its 1.12 creative tab stacks had. */
@@ -91,47 +49,48 @@ public final class NaturaTools {
 
     static {
         // 1.12 order: imp armor (NaturaEntities loaded), then the nether tools
-        armor("imp_armor_helmet", ArmorItem.Type.HELMET, Enchantments.PROTECTION);
-        armor("imp_armor_chestplate", ArmorItem.Type.CHESTPLATE, Enchantments.BLAST_PROTECTION);
-        armor("imp_armor_leggings", ArmorItem.Type.LEGGINGS, Enchantments.PROJECTILE_PROTECTION);
-        armor("imp_armor_boots", ArmorItem.Type.BOOTS, Enchantments.FEATHER_FALLING);
-        woodTools("ghostwood", Tiers.WOOD, 384);
+        armor("imp_armor_helmet", ArmorType.HELMET, Enchantments.PROTECTION);
+        armor("imp_armor_chestplate", ArmorType.CHESTPLATE, Enchantments.BLAST_PROTECTION);
+        armor("imp_armor_leggings", ArmorType.LEGGINGS, Enchantments.PROJECTILE_PROTECTION);
+        armor("imp_armor_boots", ArmorType.BOOTS, Enchantments.FEATHER_FALLING);
+        woodTools("ghostwood", ToolMaterial.WOOD, 384);
         woodTools("bloodwood", BLOODWOOD, 1501);
-        woodTools("darkwood", Tiers.STONE, 162);
-        woodTools("fusewood", Tiers.IRON, 28);
-        tools("netherquartz", Tiers.STONE);
-        register("flint_and_blaze", new Item.Properties().stacksTo(1), FlintAndBlazeItem::new);
+        woodTools("darkwood", ToolMaterial.STONE, 162);
+        woodTools("fusewood", ToolMaterial.IRON, 28);
+        tools("netherquartz", ToolMaterial.STONE);
+        register("flint_and_blaze", p -> new FlintAndBlazeItem(p.stacksTo(1)));
     }
 
     private NaturaTools() {}
 
     public static void init() {}
 
-    private static ItemEntry<Item> register(String id, Item.Properties properties, java.util.function.Function<Item.Properties, Item> item) {
-        ItemEntry<Item> holder = NaturaBlocks.ITEMS.register(id, () -> item.apply(properties));
+    private static ItemEntry<Item> register(String id, java.util.function.Function<Item.Properties, Item> item) {
+        ItemEntry<Item> holder = NaturaBlocks.ITEMS.register(id, () -> item.apply(Registration.itemProps()));
         NaturaBlocks.TAB_GENERAL.add(holder);
         TOOLS.put(id, holder);
         return holder;
     }
 
-    private static void armor(String id, ArmorItem.Type type, ResourceKey<Enchantment> enchantment) {
-        ItemEntry<Item> holder = register(id, new Item.Properties().durability(type.getDurability(33)), p -> new ArmorItem(IMP.holder(), type, p));
+    private static void armor(String id, ArmorType type, ResourceKey<Enchantment> enchantment) {
+        ItemEntry<Item> holder = register(id, p -> new Item(p.humanoidArmor(IMP, type)));
         ENCHANTED.put(holder, List.of(enchantment, Enchantments.FIRE_PROTECTION));
     }
 
-    private static void tools(String wood, Tier tier) {
-        register(wood + "_sword", new Item.Properties(), p -> new SwordItem(tier, p.attributes(SwordItem.createAttributes(tier, 3, -2.4F))));
-        register(wood + "_pickaxe", new Item.Properties(), p -> new PickaxeItem(tier, p.attributes(DiggerItem.createAttributes(tier, 1.0F, -2.8F))));
-        register(wood + "_shovel", new Item.Properties(), p -> new ShovelItem(tier, p.attributes(DiggerItem.createAttributes(tier, 1.5F, -3.0F))));
+    private static void tools(String wood, ToolMaterial tier) {
+        register(wood + "_sword", p -> new Item(p.sword(tier, 3.0F, -2.4F)));
+        register(wood + "_pickaxe", p -> new Item(p.pickaxe(tier, 1.0F, -2.8F)));
+        register(wood + "_shovel", p -> new ShovelItem(tier, 1.5F, -3.0F, p));
         // 1.12 ItemAxe damage / speed per vanilla material, bloodwood its own 3 / -3.0
-        float damage = tier == Tiers.WOOD ? 6.0F : tier == BLOODWOOD ? 3.0F : tier == Tiers.STONE ? 7.0F : 6.0F;
-        float speed = tier == Tiers.WOOD ? -3.2F : tier == BLOODWOOD ? -3.0F : tier == Tiers.STONE ? -3.2F : -3.1F;
-        register(wood + "_axe", new Item.Properties(), p -> new AxeItem(tier, p.attributes(DiggerItem.createAttributes(tier, damage, speed))));
-        register(wood + "_kama", new Item.Properties(), p -> Services.PLATFORM.kama(tier, p));
+        float damage = tier == ToolMaterial.WOOD ? 6.0F : tier == BLOODWOOD ? 3.0F : tier == ToolMaterial.STONE ? 7.0F : 6.0F;
+        float speed = tier == ToolMaterial.WOOD ? -3.2F : tier == BLOODWOOD ? -3.0F : tier == ToolMaterial.STONE ? -3.2F : -3.1F;
+        register(wood + "_axe", p -> new AxeItem(tier, damage, speed, p));
+        register(wood + "_kama", p -> Services.PLATFORM.kama(tier, p));
     }
 
-    private static void woodTools(String wood, Tier tier, int bowDurability) {
+    private static void woodTools(String wood, ToolMaterial tier, int bowDurability) {
         tools(wood, tier);
-        register(wood + "_bow", new Item.Properties().durability(bowDurability), BowItem::new);
+        // vanilla bows: enchantability 1
+        register(wood + "_bow", p -> new BowItem(p.durability(bowDurability).enchantable(1)));
     }
 }

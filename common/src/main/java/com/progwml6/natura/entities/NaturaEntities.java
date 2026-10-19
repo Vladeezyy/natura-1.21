@@ -4,6 +4,7 @@ import com.progwml6.natura.Natura;
 import com.progwml6.natura.common.NaturaBlocks;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
@@ -30,34 +31,38 @@ import com.progwml6.natura.platform.ItemEntry;
  */
 public final class NaturaEntities {
     public static final Entry<EntityType<?>, EntityType<ImpEntity>> IMP = Registration.register(Registries.ENTITY_TYPE, "imp", () -> EntityType.Builder
-            .of(ImpEntity::new, MobCategory.CREATURE).sized(0.9F, 0.9F).fireImmune().clientTrackingRange(2).updateInterval(5).build("natura:imp"));
+            .of(ImpEntity::new, MobCategory.CREATURE).sized(0.9F, 0.9F).fireImmune().clientTrackingRange(2).updateInterval(5).build(key("imp")));
     public static final Entry<EntityType<?>, EntityType<HeatscarSpiderEntity>> HEATSCAR_SPIDER = Registration.register(Registries.ENTITY_TYPE, "heatscarspider",
             () -> EntityType.Builder.<HeatscarSpiderEntity>of((type, level) -> new HeatscarSpiderEntity(type, level, false), MobCategory.MONSTER)
-                    .sized(2.7F, 1.9F).fireImmune().clientTrackingRange(2).updateInterval(5).build("natura:heatscarspider"));
+                    .sized(2.7F, 1.9F).fireImmune().clientTrackingRange(2).updateInterval(5).build(key("heatscarspider")));
     public static final Entry<EntityType<?>, EntityType<HeatscarSpiderEntity>> BABY_HEATSCAR_SPIDER = Registration.register(Registries.ENTITY_TYPE, "babyheatscarspider",
             () -> EntityType.Builder.<HeatscarSpiderEntity>of((type, level) -> new HeatscarSpiderEntity(type, level, true), MobCategory.MONSTER)
-                    .sized(1.2F, 0.8F).fireImmune().clientTrackingRange(2).updateInterval(5).build("natura:babyheatscarspider"));
+                    .sized(1.2F, 0.8F).fireImmune().clientTrackingRange(2).updateInterval(5).build(key("babyheatscarspider")));
     public static final Entry<EntityType<?>, EntityType<NitroCreeperEntity>> NITRO_CREEPER = Registration.register(Registries.ENTITY_TYPE, "nitrocreeper", () -> EntityType.Builder
-            .of(NitroCreeperEntity::new, MobCategory.MONSTER).sized(0.6F, 1.7F).fireImmune().clientTrackingRange(4).updateInterval(5).build("natura:nitrocreeper"));
+            .of(NitroCreeperEntity::new, MobCategory.MONSTER).sized(0.6F, 1.7F).fireImmune().clientTrackingRange(4).updateInterval(5).build(key("nitrocreeper")));
 
     public static final ItemEntry<Item> IMP_SPAWN_EGG = NaturaBlocks.ITEMS.register("imp_spawn_egg",
-            () -> Services.PLATFORM.spawnEgg(IMP, 0xF29735, 0x2E1F10, new Item.Properties()));
+            () -> Services.PLATFORM.spawnEgg(IMP, 0xF29735, 0x2E1F10, Registration.itemProps()));
     public static final ItemEntry<Item> HEATSCAR_SPIDER_SPAWN_EGG = NaturaBlocks.ITEMS.register("heatscarspider_spawn_egg",
-            () -> Services.PLATFORM.spawnEgg(HEATSCAR_SPIDER, 0xE64D10, 0x57B1BD, new Item.Properties()));
+            () -> Services.PLATFORM.spawnEgg(HEATSCAR_SPIDER, 0xE64D10, 0x57B1BD, Registration.itemProps()));
     public static final ItemEntry<Item> BABY_HEATSCAR_SPIDER_SPAWN_EGG = NaturaBlocks.ITEMS.register("babyheatscarspider_spawn_egg",
-            () -> Services.PLATFORM.spawnEgg(BABY_HEATSCAR_SPIDER, 0xE64D10, 0x57B1BD, new Item.Properties()));
+            () -> Services.PLATFORM.spawnEgg(BABY_HEATSCAR_SPIDER, 0xE64D10, 0x57B1BD, Registration.itemProps()));
     public static final ItemEntry<Item> NITRO_CREEPER_SPAWN_EGG = NaturaBlocks.ITEMS.register("nitrocreeper_spawn_egg",
-            () -> Services.PLATFORM.spawnEgg(NITRO_CREEPER, 0xF73E6C, 0x9B5004, new Item.Properties()));
+            () -> Services.PLATFORM.spawnEgg(NITRO_CREEPER, 0xF73E6C, 0x9B5004, Registration.itemProps()));
 
     private NaturaEntities() {}
 
     public static void init() {}
 
+    private static ResourceKey<EntityType<?>> key(String name) {
+        return ResourceKey.create(Registries.ENTITY_TYPE, net.minecraft.resources.Identifier.fromNamespaceAndPath(Natura.MODID, name));
+    }
+
     /** The 1.12 attributes (NeoForge EntityAttributeCreationEvent, Fabric FabricDefaultAttributeRegistry). */
     public static void attributes(BiConsumer<EntityType<? extends LivingEntity>, AttributeSupplier> event) {
         event.accept(IMP.get(), ImpEntity.createAttributes().build());
         event.accept(HEATSCAR_SPIDER.get(), HeatscarSpiderEntity.createAttributes().build());
-        event.accept(BABY_HEATSCAR_SPIDER.get(), net.minecraft.world.entity.monster.Spider.createAttributes().build());
+        event.accept(BABY_HEATSCAR_SPIDER.get(), net.minecraft.world.entity.monster.spider.Spider.createAttributes().build());
         event.accept(NITRO_CREEPER.get(), net.minecraft.world.entity.monster.Creeper.createAttributes().build());
     }
 

@@ -1,5 +1,7 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.world.level.storage.LevelData;
+
 import java.util.Optional;
 import java.util.Random;
 
@@ -50,13 +52,13 @@ public class RespawnObeliskBlock extends Block {
         Random rand = new Random();
         rand.setSeed(2 ^ 16 + 2 ^ 8 + (4 * 3 * 271));
         if (player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.setRespawnPosition(level.dimension(), pos, 0.0F, false, false);
+            serverPlayer.setRespawnPosition(new ServerPlayer.RespawnConfig(LevelData.RespawnData.of(level.dimension(), pos, 0.0F, 0.0F), false), false);
             serverPlayer.sendSystemMessage(player.getDisplayName().copy().append(": Spawn point set!"));
         }
         level.setBlock(pos, this.defaultBlockState().setValue(ACTIVE, true), Block.UPDATE_ALL);
         level.playLocalSound(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, SoundEvents.PORTAL_AMBIENT, SoundSource.BLOCKS, 0.5F,
                 rand.nextFloat() * 0.4F + 0.8F, false);
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     /** NeoForge IBlockExtension.isBed (same signature); Fabric: a mixin into the respawn lookup calls it. */
@@ -69,7 +71,7 @@ public class RespawnObeliskBlock extends Block {
         if (!state.getValue(ACTIVE)) {
             return Optional.empty();
         }
-        return Optional.of(new ServerPlayer.RespawnPosAngle(new Vec3(pos.getX() + 0.5D, pos.getY() + 1.1D, pos.getZ() + 0.5D), orientation));
+        return Optional.of(new ServerPlayer.RespawnPosAngle(new Vec3(pos.getX() + 0.5D, pos.getY() + 1.1D, pos.getZ() + 0.5D), orientation, 0.0F));
     }
 
     @Override
@@ -88,7 +90,7 @@ public class RespawnObeliskBlock extends Block {
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.setRespawnPosition(Level.OVERWORLD, null, 0.0F, false, false);
+            serverPlayer.setRespawnPosition(null, false);
         }
         return super.playerWillDestroy(level, pos, state, player);
     }

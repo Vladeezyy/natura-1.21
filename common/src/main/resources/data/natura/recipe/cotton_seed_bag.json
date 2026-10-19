@@ -7,9 +7,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "tag": "c:seeds/cotton"
-    }
+    "A": "#c:seeds/cotton"
   },
   "result": {
     "id": "natura:cotton_seed_bag"

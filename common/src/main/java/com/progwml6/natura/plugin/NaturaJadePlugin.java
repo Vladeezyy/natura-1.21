@@ -4,7 +4,7 @@ import com.progwml6.natura.Natura;
 import com.progwml6.natura.common.block.NaturaCropBlock;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -15,8 +15,8 @@ import snownee.jade.api.JadeIds;
 import snownee.jade.api.WailaPlugin;
 import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.theme.IThemeHelper;
-import snownee.jade.api.ui.IElement;
-import snownee.jade.api.ui.IElementHelper;
+import snownee.jade.api.ui.Element;
+import snownee.jade.api.ui.JadeUI;
 
 /** The 1.12 Waila plugin: the barley and cotton crops show the barley and cotton items and their growth. */
 @WailaPlugin
@@ -30,12 +30,12 @@ public class NaturaJadePlugin implements IWailaPlugin {
     public enum Crop implements IBlockComponentProvider {
         INSTANCE;
 
-        private static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(Natura.MODID, "crop");
+        private static final Identifier UID = Identifier.fromNamespaceAndPath(Natura.MODID, "crop");
 
         @Override
-        public IElement getIcon(BlockAccessor accessor, IPluginConfig config, IElement currentIcon) {
+        public Element getIcon(BlockAccessor accessor, IPluginConfig config, Element currentIcon) {
             if (accessor.getBlock() instanceof NaturaCropBlock crop) {
-                return IElementHelper.get().item(new ItemStack(crop.crop()));
+                return JadeUI.item(new ItemStack(crop.crop()));
             }
             return null;
         }
@@ -55,7 +55,7 @@ public class NaturaJadePlugin implements IWailaPlugin {
         }
 
         @Override
-        public ResourceLocation getUid() {
+        public Identifier getUid() {
             return UID;
         }
     }

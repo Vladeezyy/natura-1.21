@@ -1,5 +1,16 @@
 package com.progwml6.natura.common;
 
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
+
+import net.minecraft.world.item.component.Consumables;
+
+import net.minecraft.world.item.component.Consumable;
+
+import java.util.List;
+
+import java.util.ArrayList;
+
+import com.progwml6.natura.platform.Registration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -64,8 +75,8 @@ public final class NaturaItems {
         BERRIES.put("blightberry", food("blightberry", 1, 0.4F, 16, effect(MobEffects.REGENERATION, 8 * 20), effect(MobEffects.POISON, 5 * 20),
                 effect(MobEffects.WITHER, 5 * 20)));
         BERRIES.put("duskberry", food("duskberry", 1, 0.4F, 16, effect(MobEffects.NIGHT_VISION, 15 * 20), effect(MobEffects.BLINDNESS, 3 * 20)));
-        BERRIES.put("skyberry", food("skyberry", 1, 0.4F, 16, effect(MobEffects.JUMP, 8 * 20), effect(MobEffects.MOVEMENT_SLOWDOWN, 3 * 20)));
-        BERRIES.put("stingberry", food("stingberry", 1, 0.4F, 16, effect(MobEffects.DAMAGE_BOOST, 10 * 20), effect(MobEffects.DIG_SLOWDOWN, 10 * 20)));
+        BERRIES.put("skyberry", food("skyberry", 1, 0.4F, 16, effect(MobEffects.JUMP_BOOST, 8 * 20), effect(MobEffects.SLOWNESS, 3 * 20)));
+        BERRIES.put("stingberry", food("stingberry", 1, 0.4F, 16, effect(MobEffects.STRENGTH, 10 * 20), effect(MobEffects.MINING_FATIGUE, 10 * 20)));
     }
 
     /**
@@ -109,7 +120,7 @@ public final class NaturaItems {
     public static void init() {}
 
     private static ItemEntry<Item> register(String id, Function<Item.Properties, Item> item) {
-        ItemEntry<Item> holder = NaturaBlocks.ITEMS.register(id, () -> item.apply(new Item.Properties()));
+        ItemEntry<Item> holder = NaturaBlocks.ITEMS.register(id, () -> item.apply(Registration.itemProps()));
         NaturaBlocks.TAB_GENERAL.add(holder);
         return holder;
     }
@@ -129,23 +140,28 @@ public final class NaturaItems {
     }
 
     private static Effect[] glowshroom() {
-        return new Effect[] {effect(MobEffects.NIGHT_VISION, 45 * 25), effect(MobEffects.POISON, 16 * 25), effect(MobEffects.DIG_SLOWDOWN, 8 * 25)};
+        return new Effect[] {effect(MobEffects.NIGHT_VISION, 45 * 25), effect(MobEffects.POISON, 16 * 25), effect(MobEffects.MINING_FATIGUE, 8 * 25)};
     }
 
-    private static FoodProperties foodProperties(int nutrition, float saturation, int ticks, Effect... effects) {
-        FoodProperties.Builder builder = new FoodProperties.Builder().nutrition(nutrition).saturationModifier(saturation);
-        for (Effect e : effects) {
-            builder.effect(new MobEffectInstance(e.effect(), e.duration(), 0), 1.0F);
+    /** The food, eaten in `ticks` ticks, with its effects (26.x: the Consumable component). */
+    private static Item.Properties food(Item.Properties properties, int nutrition, float saturation, int ticks, Effect... effects) {
+        FoodProperties food = new FoodProperties.Builder().nutrition(nutrition).saturationModifier(saturation).build();
+        Consumable.Builder consumable = Consumables.defaultFood().consumeSeconds(ticks / 20.0F);
+        if (effects.length > 0) {
+            List<MobEffectInstance> instances = new ArrayList<>();
+            for (Effect e : effects) {
+                instances.add(new MobEffectInstance(e.effect(), e.duration(), 0));
+            }
+            consumable.onConsume(new ApplyStatusEffectsConsumeEffect(instances));
         }
-        FoodProperties food = builder.build();
-        return new FoodProperties(food.nutrition(), food.saturation(), false, ticks / 20.0F, food.usingConvertsTo(), food.effects());
+        return properties.food(food, consumable.build());
     }
 
     private static ItemEntry<Item> food(String id, int nutrition, float saturation, int ticks, Effect... effects) {
-        return register(id, p -> new NaturaFoodItem(p.food(foodProperties(nutrition, saturation, ticks, effects))));
+        return register(id, p -> new NaturaFoodItem(food(p, nutrition, saturation, ticks, effects)));
     }
 
     private static ItemEntry<Item> soup(String id, int nutrition, float saturation, Supplier<? extends ItemLike> bowl, Effect... effects) {
-        return register(id, p -> new NaturaSoupItem(bowl, p.food(foodProperties(nutrition, saturation, 32, effects))));
+        return register(id, p -> new NaturaSoupItem(bowl, food(p, nutrition, saturation, 32, effects)));
     }
 }

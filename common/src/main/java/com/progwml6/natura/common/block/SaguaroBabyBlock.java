@@ -1,5 +1,11 @@
 package com.progwml6.natura.common.block;
 
+import org.jspecify.annotations.Nullable;
+
+import net.minecraft.world.level.redstone.Orientation;
+
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+
 import com.mojang.serialization.MapCodec;
 import com.progwml6.natura.common.NaturaBlocks;
 import com.progwml6.natura.world.tree.SaguaroGenerator;
@@ -64,16 +70,16 @@ public class SaguaroBabyBlock extends Block {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
         if (!state.canSurvive(level, pos)) {
             level.destroyBlock(pos, true);
         }
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (!(entity instanceof ItemEntity)) {
-            entity.hurt(level.damageSources().cactus(), 1.0F);
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
+        if (level instanceof ServerLevel server && !(entity instanceof ItemEntity)) {
+            entity.hurtServer(server, level.damageSources().cactus(), 1.0F);
         }
     }
 

@@ -7,15 +7,9 @@
     "BBB"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:bone_block"
-    },
-    "B": {
-      "item": "minecraft:string"
-    },
-    "C": {
-      "item": "minecraft:paper"
-    }
+    "A": "minecraft:bone_block",
+    "B": "minecraft:string",
+    "C": "minecraft:paper"
   },
   "result": {
     "id": "natura:bonemeal_bag"

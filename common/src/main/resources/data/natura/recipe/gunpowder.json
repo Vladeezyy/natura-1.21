@@ -6,9 +6,7 @@
     "AA"
   ],
   "key": {
-    "A": {
-      "tag": "c:dusts/sulfur"
-    }
+    "A": "#c:dusts/sulfur"
   },
   "result": {
     "id": "minecraft:gunpowder"

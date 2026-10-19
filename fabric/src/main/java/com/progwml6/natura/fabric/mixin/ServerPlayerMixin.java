@@ -19,11 +19,12 @@ import net.minecraft.world.level.block.state.BlockState;
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin {
     @Inject(method = "findRespawnAndUseSpawnBlock", at = @At("HEAD"), cancellable = true)
-    private static void natura$obelisk(ServerLevel level, BlockPos pos, float angle, boolean forced, boolean keepInventory,
+    private static void natura$obelisk(ServerLevel level, ServerPlayer.RespawnConfig config, boolean consumeSpawnBlock,
                                        CallbackInfoReturnable<Optional<ServerPlayer.RespawnPosAngle>> cir) {
+        BlockPos pos = config.respawnData().pos();
         BlockState state = level.getBlockState(pos);
-        if (!forced && state.getBlock() instanceof RespawnObeliskBlock obelisk) {
-            cir.setReturnValue(obelisk.getRespawnPosition(state, EntityType.PLAYER, level, pos, angle));
+        if (!config.forced() && state.getBlock() instanceof RespawnObeliskBlock obelisk) {
+            cir.setReturnValue(obelisk.getRespawnPosition(state, EntityType.PLAYER, level, pos, config.respawnData().yaw()));
         }
     }
 }

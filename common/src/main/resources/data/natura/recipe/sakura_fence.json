@@ -6,12 +6,8 @@
     "BAB"
   ],
   "key": {
-    "A": {
-      "item": "natura:sakura_stick"
-    },
-    "B": {
-      "item": "natura:sakura_planks"
-    }
+    "A": "natura:sakura_stick",
+    "B": "natura:sakura_planks"
   },
   "result": {
     "id": "natura:sakura_fence",

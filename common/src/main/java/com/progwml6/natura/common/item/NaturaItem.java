@@ -1,5 +1,8 @@
 package com.progwml6.natura.common.item;
 
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
+
 import java.util.List;
 
 import net.minecraft.ChatFormatting;
@@ -16,15 +19,15 @@ public class NaturaItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         addTooltip(this.getDescriptionId(), tooltip);
     }
 
-    public static void addTooltip(String descriptionId, List<Component> tooltip) {
+    public static void addTooltip(String descriptionId, Consumer<Component> tooltip) {
         String key = descriptionId + ".tooltip";
         if (Language.getInstance().has(key)) {
             for (String line : Language.getInstance().getOrDefault(key).split("\n")) {
-                tooltip.add(Component.literal(line).withStyle(ChatFormatting.GRAY));
+                tooltip.accept(Component.literal(line).withStyle(ChatFormatting.GRAY));
             }
         }
     }

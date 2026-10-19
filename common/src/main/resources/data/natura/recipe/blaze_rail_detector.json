@@ -7,15 +7,9 @@
     "ACA"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:blaze_rod"
-    },
-    "B": {
-      "item": "natura:nether_pressure_plate"
-    },
-    "C": {
-      "tag": "c:dusts/redstone"
-    }
+    "A": "minecraft:blaze_rod",
+    "B": "natura:nether_pressure_plate",
+    "C": "#c:dusts/redstone"
   },
   "result": {
     "id": "natura:blaze_detector_rail",

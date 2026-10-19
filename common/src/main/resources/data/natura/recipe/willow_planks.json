@@ -5,9 +5,7 @@
     "A"
   ],
   "key": {
-    "A": {
-      "item": "natura:willow_log"
-    }
+    "A": "natura:willow_log"
   },
   "result": {
     "id": "natura:willow_planks",

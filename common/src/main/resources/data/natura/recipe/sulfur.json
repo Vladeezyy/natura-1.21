@@ -6,9 +6,7 @@
     "AA"
   ],
   "key": {
-    "A": {
-      "item": "natura:sulfur_cloud"
-    }
+    "A": "natura:sulfur_cloud"
   },
   "result": {
     "id": "natura:sulfur_powder"

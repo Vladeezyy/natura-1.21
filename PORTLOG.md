@@ -357,3 +357,35 @@ interface (`common/.../platform`), found with `ServiceLoader`.
   powered blaze activator rail turns a hopper cart off; it checks the Fabric minecart mixin) (`:neoforge:runGameTestServer`, `:fabric:runGametest`, `:fabric:prodGametest`
   on the release jar). The two biome modifier tests check the biomes (features, nether spawns) instead of the NeoForge
   biome modifier registry.
+
+## Minecraft 26.1.2 (branch mc/26.1.2, 2026-10-19)
+
+NeoForge 26.1.2.122, Fabric API 0.155.3 / Loader 0.19.5, Java 25 (also for Gradle: Loom 1.18), Gradle 9.8.1, no
+obfuscation (no Parchment, no remapping). Resources: `tools/convert_26.py` turns the 1.21.1 output of
+`tools/gen_resources.py` (main) into the 26.x formats.
+
+- Registration: blocks and items need their id in their properties; `Registration.blockProps()` / `itemProps()` set the
+  id of the entry being made (the factories run with it). Block items use the block's name (`useBlockDescriptionPrefix`).
+- Tools: `ToolMaterial` (bloodwood: an empty repair tag, 1.12 had no repair item), swords and pickaxes are plain items
+  with the tool properties; imp armor: an `ArmorMaterial` with an equipment asset (`assets/natura/equipment/imp.json`,
+  textures moved to `textures/entity/equipment`). Bows: enchantability 1, as the vanilla bow.
+- Food: the eating time and the effects are the `Consumable` component; the effect tooltip reads it.
+- Spawn eggs: textures drawn from the 1.21.1 egg textures and the 1.12 colours (`convert_26.py`).
+- Client: block tints are `BlockTintSource`s; the item tints (leaves, colored grass) are constant tints in the item
+  definitions (`assets/natura/items`), with the 1.12 static colours; the bows show their first pulling model while used
+  (1.12 only ever showed that one); render layers come from the textures (no `render_type` handling on Fabric).
+- Mobs: render states (`ImpModel` on `LivingEntityRenderState`); `TemptGoal` needs the tempt range attribute
+  (`Animal.createAnimalAttributes`); imp sounds are the classic pig sound variant.
+- Nether check (imp spawns, nether bushes, ash and sulfur clouds): the dimension's `water_evaporates` attribute (was
+  `DimensionType.ultraWarm`).
+- Blaze rails: NeoForge 26.x has no rail speed / minecart pass hooks; a common mixin into `OldMinecartBehavior` gives the
+  0.65 speed and runs the golden rail's push at the end of the track move on both loaders. NeoForge still asks
+  `PoweredRailBlock.isActivatorRail`; on Fabric a mixin treats the blaze rails as the powered / activator rail.
+- Flammability: `FireBlock.setFlammable` is private again in NeoForge 26.x: a common invoker mixin.
+- Obelisk respawn: `RespawnConfig` / `RespawnData`; the Fabric mixin follows the new `findRespawnAndUseSpawnBlock`.
+- Recipes: ingredients are strings; a choice of several tags (the berry medley) became an item tag of its own
+  (`data/natura/tags/item/recipe`). New check in the `recipes` game test: bowl and three berries make a berry medley.
+- Game tests: registered test functions and test instances; the trees run in environments of their own (one batch each
+  as on 1.21.1). Fabric: an annotated class (`FabricGameTests`, 100 ticks like the 1.21.1 tests) and the tree
+  environments as data. 50 tests pass on NeoForge, Fabric and the Fabric release jar.
+- Scenes: the scene makes a new flat world itself (time and weather by command).

@@ -6,12 +6,8 @@
     "BAB"
   ],
   "key": {
-    "A": {
-      "item": "natura:tiger_stick"
-    },
-    "B": {
-      "item": "natura:tiger_planks"
-    }
+    "A": "natura:tiger_stick",
+    "B": "natura:tiger_planks"
   },
   "result": {
     "id": "natura:tiger_fence",

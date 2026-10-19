@@ -29,18 +29,18 @@ public final class NaturaTabs {
     public static void init() {}
 
     private static Entry<CreativeModeTab, CreativeModeTab> tab(String name, List<ItemEntry<? extends Item>> items, Supplier<ItemStack> icon) {
-        return Registration.register(Registries.CREATIVE_MODE_TAB, name, () -> Services.PLATFORM.creativeTabBuilder().title(Component.translatable("itemGroup.natura." + name)).icon(icon)
-                .displayItems((params, output) -> items.forEach(item -> {
+        return Registration.register(Registries.CREATIVE_MODE_TAB, name, () -> Services.PLATFORM.creativeTab(Component.translatable("itemGroup.natura." + name), icon,
+                (holders, output) -> items.forEach(item -> {
                     // 1.12 imp armor came enchanted in the creative tab
                     var enchantments = com.progwml6.natura.tools.NaturaTools.ENCHANTED.get(item);
                     if (enchantments == null) {
-                        output.accept(item.get());
+                        output.accept(new ItemStack(item.get()));
                         return;
                     }
                     ItemStack stack = new ItemStack(item.get());
-                    var lookup = params.holders().lookupOrThrow(Registries.ENCHANTMENT);
+                    var lookup = holders.lookupOrThrow(Registries.ENCHANTMENT);
                     enchantments.forEach(key -> stack.enchant(lookup.getOrThrow(key), 1));
                     output.accept(stack);
-                })).build());
+                })));
     }
 }

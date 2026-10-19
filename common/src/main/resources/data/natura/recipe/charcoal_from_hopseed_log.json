@@ -1,9 +1,7 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "ingredient": {
-    "item": "natura:hopseed_log"
-  },
+  "ingredient": "natura:hopseed_log",
   "result": {
     "id": "minecraft:charcoal"
   },

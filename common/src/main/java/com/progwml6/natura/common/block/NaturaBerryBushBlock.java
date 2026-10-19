@@ -116,7 +116,7 @@ public class NaturaBerryBushBlock extends Block implements BonemealableBlock {
         if (state.getValue(AGE) != 3) {
             return false;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.setBlock(pos, this.defaultBlockState().setValue(AGE, 2), Block.UPDATE_CLIENTS);
             giveAtFeet(level, player, new ItemStack(this.berry.get()));
         }
@@ -135,7 +135,7 @@ public class NaturaBerryBushBlock extends Block implements BonemealableBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        return this.pick(state, level, pos, player) ? InteractionResult.sidedSuccess(level.isClientSide) : InteractionResult.PASS;
+        return this.pick(state, level, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
     }
 
     @Override

@@ -7,9 +7,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "natura:bloodwood_planks"
-    }
+    "A": "natura:bloodwood_planks"
   },
   "result": {
     "id": "natura:bloodwood_stairs",

@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "natura:wheat_seed_bag"
-    }
+    "natura:wheat_seed_bag"
   ],
   "result": {
     "id": "minecraft:wheat_seeds",

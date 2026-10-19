@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "natura:topiary_grass"
-    },
-    {
-      "tag": "c:dyes/red"
-    }
+    "natura:topiary_grass",
+    "#c:dyes/red"
   ],
   "result": {
     "id": "natura:autumnal_grass"

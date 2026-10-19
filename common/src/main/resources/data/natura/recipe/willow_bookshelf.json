@@ -7,12 +7,8 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "item": "natura:willow_planks"
-    },
-    "B": {
-      "item": "minecraft:book"
-    }
+    "A": "natura:willow_planks",
+    "B": "minecraft:book"
   },
   "result": {
     "id": "natura:willow_bookshelf"

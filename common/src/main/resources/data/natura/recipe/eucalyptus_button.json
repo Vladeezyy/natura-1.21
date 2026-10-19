@@ -5,9 +5,7 @@
     "A"
   ],
   "key": {
-    "A": {
-      "item": "natura:eucalyptus_planks"
-    }
+    "A": "natura:eucalyptus_planks"
   },
   "result": {
     "id": "natura:eucalyptus_button"

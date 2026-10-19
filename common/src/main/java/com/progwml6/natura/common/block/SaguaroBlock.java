@@ -1,5 +1,9 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.world.level.ScheduledTickAccess;
+
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+
 import java.util.Map;
 
 import com.mojang.serialization.MapCodec;
@@ -65,7 +69,7 @@ public class SaguaroBlock extends Block {
         if (state.getBlock() instanceof SaguaroBlock) {
             return true;
         }
-        return state.isSolidRender(level, pos) && !state.is(Blocks.PUMPKIN) && !state.is(Blocks.CARVED_PUMPKIN) && !state.is(Blocks.JACK_O_LANTERN)
+        return state.isSolidRender() && !state.is(Blocks.PUMPKIN) && !state.is(Blocks.CARVED_PUMPKIN) && !state.is(Blocks.JACK_O_LANTERN)
                 && !state.is(Blocks.MELON);
     }
 
@@ -92,7 +96,8 @@ public class SaguaroBlock extends Block {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbor, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction direction, BlockPos neighborPos,
+                                     BlockState neighbor, RandomSource random) {
         return state.setValue(PROPERTIES.get(direction), connects(level, neighborPos));
     }
 
@@ -107,9 +112,9 @@ public class SaguaroBlock extends Block {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (!(entity instanceof ItemEntity)) {
-            entity.hurt(level.damageSources().cactus(), 1.0F);
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
+        if (level instanceof ServerLevel server && !(entity instanceof ItemEntity)) {
+            entity.hurtServer(server, level.damageSources().cactus(), 1.0F);
         }
     }
 
@@ -120,7 +125,7 @@ public class SaguaroBlock extends Block {
 
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (level.getLevelData().isRaining() && level.isEmptyBlock(pos.above())) {
+        if (level.isRaining() && level.isEmptyBlock(pos.above())) {
             boolean canGrow = random.nextInt(20) == 0;
             if (com.progwml6.natura.platform.Services.PLATFORM.canCropGrow(level, pos, state, canGrow)) {
                 Direction side = switch (random.nextInt(4)) {

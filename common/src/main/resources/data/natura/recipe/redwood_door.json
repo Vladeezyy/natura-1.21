@@ -7,9 +7,7 @@
     "AA"
   ],
   "key": {
-    "A": {
-      "item": "natura:redwood_planks"
-    }
+    "A": "natura:redwood_planks"
   },
   "result": {
     "id": "natura:redwood_door",

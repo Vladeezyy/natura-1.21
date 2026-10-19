@@ -5,9 +5,7 @@
     "A"
   ],
   "key": {
-    "A": {
-      "item": "natura:fusewood_log"
-    }
+    "A": "natura:fusewood_log"
   },
   "result": {
     "id": "natura:fusewood_planks",

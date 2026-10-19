@@ -6,12 +6,8 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "item": "natura:willow_stick"
-    },
-    "B": {
-      "item": "natura:willow_planks"
-    }
+    "A": "natura:willow_stick",
+    "B": "natura:willow_planks"
   },
   "result": {
     "id": "natura:willow_fence_gate"

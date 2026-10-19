@@ -7,12 +7,8 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "natura:fusewood_planks"
-    },
-    "B": {
-      "item": "minecraft:book"
-    }
+    "A": "natura:fusewood_planks",
+    "B": "minecraft:book"
   },
   "result": {
     "id": "natura:fusewood_bookshelf"

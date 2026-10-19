@@ -1,9 +1,7 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "ingredient": {
-    "item": "natura:tiger_log"
-  },
+  "ingredient": "natura:tiger_log",
   "result": {
     "id": "minecraft:charcoal"
   },

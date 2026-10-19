@@ -17,6 +17,9 @@ Heyo, Redwood trees! Chop them all day long!
 Unofficial port of Natura (progwml6 / Slime Knights; code CC0, textures CC-BY 3.0) to Minecraft ${minecraft_version} / NeoForge.
 '''
 
+[[mixins]]
+config="natura.mixins.json"
+
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"

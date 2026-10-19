@@ -272,7 +272,7 @@ public class NaturaWorldFeature extends Feature<NaturaWorldFeature.Config> {
 
     // 1.12 NetherBerryBushesGenerator
     private static void netherBerryBushes(Random random, int xPos, int zPos, TreeWorld world, WorldGenLevel level) {
-        if (!level.dimensionType().ultraWarm()) {
+        if (!waterEvaporates(level)) {
             return;
         }
         netherBush(NaturaConfig.GENERATE_BLIGHTBERRIES.get(), NaturaConfig.BLIGHTBERRY_RARITY.get(), NaturaConfig.BLIGHTBERRY_RANGE.get(), "blightberry", random, xPos, zPos, world);
@@ -355,7 +355,7 @@ public class NaturaWorldFeature extends Feature<NaturaWorldFeature.Config> {
             int blocks = size < 5 ? 10 : size < 9 ? 20 : size < 11 ? 30 : 40;
             new CloudsGenerator(blocks, cloud("white")).generateCloud(random, world, pos);
         }
-        if (level.dimensionType().ultraWarm()) {
+        if (waterEvaporates(level)) {
             if (NaturaConfig.GENERATE_ASH_CLOUDS.get() && random.nextInt(NaturaConfig.ASH_RARITY.get()) == 0) {
                 BlockPos pos = at(random, xPos, () -> random.nextInt(NaturaConfig.ASH_RANGE.get()) + NaturaConfig.ASH_HEIGHT.get(), zPos);
                 int size = random.nextInt(12);
@@ -485,5 +485,10 @@ public class NaturaWorldFeature extends Feature<NaturaWorldFeature.Config> {
                 sand.generate(world, random, at(random, xPos, () -> yPos + random.nextInt(10), zPos));
             }
         }
+    }
+
+    /** 1.12 doesWaterVaporize (the nether): the dimension's water_evaporates attribute (26.x; was DimensionType.ultraWarm). */
+    private static boolean waterEvaporates(WorldGenLevel level) {
+        return level.dimensionType().attributes().applyModifier(net.minecraft.world.attribute.EnvironmentAttributes.WATER_EVAPORATES, false);
     }
 }

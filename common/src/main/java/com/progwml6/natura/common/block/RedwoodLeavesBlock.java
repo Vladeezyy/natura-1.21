@@ -32,7 +32,7 @@ public class RedwoodLeavesBlock extends NaturaLeavesBlock {
 
     /** 1.12 Block.beginLeavesDecay for every redwood leaf in the cube of the given radius around pos. */
     public static void beginLeavesDecay(Level level, BlockPos pos, int radius) {
-        if (level.isClientSide || !level.hasChunksAt(pos.offset(-radius - 1, -radius - 1, -radius - 1), pos.offset(radius + 1, radius + 1, radius + 1))) {
+        if (level.isClientSide() || !level.hasChunksAt(pos.offset(-radius - 1, -radius - 1, -radius - 1), pos.offset(radius + 1, radius + 1, radius + 1))) {
             return;
         }
         for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {

@@ -7,15 +7,9 @@
     "CCC"
   ],
   "key": {
-    "A": {
-      "tag": "c:glass_blocks"
-    },
-    "B": {
-      "tag": "minecraft:wooden_slabs"
-    },
-    "C": {
-      "tag": "c:gems/quartz"
-    }
+    "A": "#c:glass_blocks",
+    "B": "#minecraft:wooden_slabs",
+    "C": "#c:gems/quartz"
   },
   "result": {
     "id": "minecraft:daylight_detector"

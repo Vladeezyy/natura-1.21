@@ -1,9 +1,7 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "ingredient": {
-    "item": "natura:impmeat_raw"
-  },
+  "ingredient": "natura:impmeat_raw",
   "result": {
     "id": "natura:impmeat_cooked"
   },

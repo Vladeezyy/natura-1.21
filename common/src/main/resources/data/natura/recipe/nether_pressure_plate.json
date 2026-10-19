@@ -5,9 +5,7 @@
     "AA"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:netherrack"
-    }
+    "A": "minecraft:netherrack"
   },
   "result": {
     "id": "natura:nether_pressure_plate"

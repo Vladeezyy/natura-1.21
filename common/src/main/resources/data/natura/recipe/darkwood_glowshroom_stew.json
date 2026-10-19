@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "natura:darkwood_bowl"
-    },
-    {
-      "item": "natura:green_glowshroom"
-    },
-    {
-      "item": "natura:blue_glowshroom"
-    },
-    {
-      "item": "natura:purple_glowshroom"
-    }
+    "natura:darkwood_bowl",
+    "natura:green_glowshroom",
+    "natura:blue_glowshroom",
+    "natura:purple_glowshroom"
   ],
   "result": {
     "id": "natura:darkwood_glowshroom_stew"

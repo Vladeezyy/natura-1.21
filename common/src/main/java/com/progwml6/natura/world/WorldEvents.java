@@ -4,9 +4,9 @@ import com.progwml6.natura.common.NaturaItems;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.TemptGoal;
-import net.minecraft.world.entity.animal.Chicken;
-import net.minecraft.world.entity.animal.Cow;
-import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.animal.chicken.Chicken;
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.item.crafting.Ingredient;
 
 /**

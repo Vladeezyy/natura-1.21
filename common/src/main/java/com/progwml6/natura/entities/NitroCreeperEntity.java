@@ -1,11 +1,17 @@
 package com.progwml6.natura.entities;
 
+import net.minecraft.server.level.ServerLevel;
+
+import net.minecraft.world.level.storage.ValueOutput;
+
+import net.minecraft.world.level.storage.ValueInput;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.Level;
 
@@ -32,8 +38,8 @@ public class NitroCreeperEntity extends Creeper {
     }
 
     @Override
-    public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
-        if (!this.level().isClientSide) {
+    public boolean causeFallDamage(double distance, float multiplier, DamageSource source) {
+        if (!this.level().isClientSide()) {
             if (distance > 5.0F) {
                 this.explode();
                 return false;
@@ -44,17 +50,15 @@ public class NitroCreeperEntity extends Creeper {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.putShort("Fuse", (short) this.fuseTime);
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putShort("Fuse", (short) this.fuseTime);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        if (tag.contains("Fuse", 99)) {
-            this.fuseTime = tag.getShort("Fuse");
-        }
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.fuseTime = input.getShortOr("Fuse", (short) this.fuseTime);
     }
 
     @Override
@@ -83,7 +87,7 @@ public class NitroCreeperEntity extends Creeper {
     }
 
     private void explode() {
-        if (!this.level().isClientSide && this.isAlive()) {
+        if (!this.level().isClientSide() && this.isAlive()) {
             float f = this.isPowered() ? 20.0F : 3.0F;
             this.dead = true;
             this.level().explode(this, this.getX(), this.getY(), this.getZ(), this.explosionRadius * f, Level.ExplosionInteraction.MOB);
@@ -97,10 +101,10 @@ public class NitroCreeperEntity extends Creeper {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         if (source.getEntity() instanceof IronGolem) {
             amount = 1000;
         }
-        return super.hurt(source, amount);
+        return super.hurtServer(level, source, amount);
     }
 }

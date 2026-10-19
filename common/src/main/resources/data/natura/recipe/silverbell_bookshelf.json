@@ -7,12 +7,8 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "item": "natura:silverbell_planks"
-    },
-    "B": {
-      "item": "minecraft:book"
-    }
+    "A": "natura:silverbell_planks",
+    "B": "minecraft:book"
   },
   "result": {
     "id": "natura:silverbell_bookshelf"

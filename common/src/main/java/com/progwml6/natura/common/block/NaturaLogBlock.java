@@ -1,5 +1,7 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.server.level.ServerLevel;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -12,10 +14,8 @@ public class NaturaLogBlock extends RotatedPillarBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock())) {
-            RedwoodLeavesBlock.beginLeavesDecay(level, pos, 4);
-        }
-        super.onRemove(state, level, pos, newState, movedByPiston);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        RedwoodLeavesBlock.beginLeavesDecay(level, pos, 4);
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 }

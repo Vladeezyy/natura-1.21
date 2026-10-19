@@ -6,12 +6,8 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "item": "natura:fusewood_stick"
-    },
-    "B": {
-      "item": "natura:fusewood_planks"
-    }
+    "A": "natura:fusewood_stick",
+    "B": "natura:fusewood_planks"
   },
   "result": {
     "id": "natura:fusewood_fence_gate"

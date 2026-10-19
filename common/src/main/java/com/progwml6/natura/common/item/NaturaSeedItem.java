@@ -37,11 +37,11 @@ public class NaturaSeedItem extends NaturaItem {
         }
         BlockState soil = level.getBlockState(pos);
         if (soil.is(Blocks.FARMLAND) && level.isEmptyBlock(pos.above())) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 level.setBlock(pos.above(), this.crop.get().defaultBlockState(), Block.UPDATE_ALL);
             }
             context.getItemInHand().consume(1, player);
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
     }

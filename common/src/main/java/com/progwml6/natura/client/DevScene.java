@@ -48,10 +48,10 @@ public final class DevScene {
         at(40, mc -> server(mc, p -> {
             p.setGameMode(GameType.CREATIVE);
             p.getInventory().clearContent();
-            ServerLevel level = p.serverLevel();
+            ServerLevel level = p.level();
             // the same light on every run: noon, clear sky
-            level.setDayTime(6000);
-            level.setWeatherParameters(6000, 0, false, false);
+            command(level, "time set noon");
+            command(level, "weather clear");
             origin = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, p.blockPosition());
         }));
         NaturaWood[] overworld = {NaturaWood.MAPLE, NaturaWood.SILVERBELL, NaturaWood.AMARANTH, NaturaWood.TIGER, NaturaWood.WILLOW,
@@ -75,9 +75,9 @@ public final class DevScene {
         }
         at(260, mc -> server(mc, p -> {
             BlockPos bench = origin.offset(0, 0, 8);
-            p.serverLevel().setBlock(bench, NaturaBlocks.WOODS.get(NaturaWood.SAKURA).workbench().get().defaultBlockState(), 3);
-            p.teleportTo(p.serverLevel(), bench.getX() + 0.5, bench.getY(), bench.getZ() + 2.5, 180.0F, 30.0F);
-            p.openMenu(p.serverLevel().getBlockState(bench).getMenuProvider(p.serverLevel(), bench));
+            p.level().setBlock(bench, NaturaBlocks.WOODS.get(NaturaWood.SAKURA).workbench().get().defaultBlockState(), 3);
+            tp(p, p.level(), bench.getX() + 0.5, bench.getY(), bench.getZ() + 2.5, 180.0F, 30.0F);
+            p.openMenu(p.level().getBlockState(bench).getMenuProvider(p.level(), bench));
         }));
         at(280, mc -> shot(mc, "workbench_gui"));
         at(285, mc -> mc.player.closeContainer());
@@ -88,9 +88,9 @@ public final class DevScene {
         at(430, mc -> shot(mc, "trees_nether"));
         at(440, mc -> server(mc, DevScene::redwood));
         at(520, mc -> shot(mc, "tree_redwood"));
-        at(525, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), redwoodBase.getX() + 26.5, redwoodBase.getY() + 60, redwoodBase.getZ() + 26.5, 135.0F, 10.0F)));
+        at(525, mc -> server(mc, p -> tp(p, p.level(), redwoodBase.getX() + 26.5, redwoodBase.getY() + 60, redwoodBase.getZ() + 26.5, 135.0F, 10.0F)));
         at(560, mc -> shot(mc, "tree_redwood_crown"));
-        at(565, mc -> server(mc, p -> p.teleportTo(p.serverLevel(), redwoodBase.getX() + 14.5, redwoodBase.getY() + 2, redwoodBase.getZ() + 14.5, 135.0F, -35.0F)));
+        at(565, mc -> server(mc, p -> tp(p, p.level(), redwoodBase.getX() + 14.5, redwoodBase.getY() + 2, redwoodBase.getZ() + 14.5, 135.0F, -35.0F)));
         at(600, mc -> shot(mc, "tree_redwood_base"));
         at(610, mc -> server(mc, DevScene::plants));
         at(650, mc -> shot(mc, "plants"));
@@ -113,6 +113,37 @@ public final class DevScene {
         at(870, Minecraft::stop);
     }
 
+    private static boolean worldCreated;
+
+    /**
+     * 26.x: a new flat world from the title screen (a natura_scene world of 1.21.1 opens with the upgrade screen, and
+     * --quickPlaySingleplayer does not create one). Returns true while the scene waits for it.
+     */
+    static boolean createWorld(Minecraft mc) {
+        if (mc.player != null) {
+            worldCreated = true;
+            return false;
+        }
+        if (mc.options.onboardAccessibility) {
+            mc.options.onboardAccessibility = false;
+            mc.options.save();
+            mc.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
+            return true;
+        }
+        if (mc.getOverlay() != null || !(mc.screen instanceof net.minecraft.client.gui.screens.TitleScreen)) {
+            return true;
+        }
+        worldCreated = true;
+        mc.options.pauseOnLostFocus = false;
+        String name = "natura_scene_" + System.currentTimeMillis();
+        var settings = new net.minecraft.world.level.LevelSettings(name, GameType.CREATIVE,
+                new net.minecraft.world.level.LevelSettings.DifficultySettings(net.minecraft.world.Difficulty.PEACEFUL, false, false), true,
+                net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
+        mc.createWorldOpenFlows().createFreshLevel(name, settings, new net.minecraft.world.level.levelgen.WorldOptions(20261019L, false, false),
+                net.minecraft.world.level.levelgen.presets.WorldPresets::createFlatWorldDimensions, new net.minecraft.client.gui.screens.TitleScreen());
+        return true;
+    }
+
     private static void at(int t, Consumer<Minecraft> action) {
         STEPS.add(new Step(t, action));
     }
@@ -121,6 +152,7 @@ public final class DevScene {
     public static void onTick() {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if (!worldCreated && createWorld(mc)) return;
         if (mc.player == null || mc.getSingleplayerServer() == null) return;
         // The window is usually unfocused while this runs: never pause, or the integrated server stops.
         mc.options.pauseOnLostFocus = false;
@@ -156,7 +188,7 @@ public final class DevScene {
 
     /** Every block of the given woods: one column per wood, a tower of full blocks behind rows of the shapes. */
     private static void gallery(ServerPlayer player, NaturaWood[] woods) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         clear(level);
         for (int i = 0; i < woods.length; i++) {
             NaturaWood wood = woods[i];
@@ -189,7 +221,7 @@ public final class DevScene {
 
     /** The log pieces (axes, redwood, bloodwood quarters and bark) and every leaves block. */
     private static void logsAndLeaves(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         clear(level);
         int x = 0;
         for (var entry : NaturaBlocks.LOGS.entrySet()) {
@@ -224,7 +256,7 @@ public final class DevScene {
 
     /** One grown tree per sapling in a row, 12 blocks apart (nether ones on netherrack, bloodwood under a ceiling). */
     private static void trees(ServerPlayer player, String[] names, boolean nether) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos base = origin.offset(0, 0, 60);
         box(level, base.offset(-8, 0, -10), base.offset(names.length * 12 + 4, 40, 10), Blocks.AIR.defaultBlockState());
         box(level, base.offset(-8, -1, -10), base.offset(names.length * 12 + 4, -1, 10),
@@ -238,14 +270,14 @@ public final class DevScene {
             }
             BlockState state = sapling.defaultBlockState().setValue(net.minecraft.world.level.block.SaplingBlock.STAGE, 1);
             level.setBlock(pos, state, 3);
-            sapling.advanceTree(level, pos, state, level.random);
+            sapling.advanceTree(level, pos, state, level.getRandom());
         }
         double cx = base.getX() + (names.length - 1) * 6 + 0.5;
-        player.teleportTo(level, cx, base.getY() + 8, base.getZ() + 14 + names.length * 2, 180.0F, 12.0F);
+        tp(player, level, cx, base.getY() + 8, base.getZ() + 14 + names.length * 2, 180.0F, 12.0F);
     }
 
     private static void redwood(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos base = origin.offset(0, 0, 160);
         redwoodBase = base;
         box(level, base.offset(-30, 0, -30), base.offset(30, 150, 30), Blocks.AIR.defaultBlockState());
@@ -257,13 +289,13 @@ public final class DevScene {
                 level.setBlock(base.offset(x, 0, z), state, 3);
             }
         }
-        sapling.advanceTree(level, base, state, level.random);
-        player.teleportTo(level, base.getX() + 0.5, base.getY() + 40, base.getZ() + 95, 180.0F, -14.0F);
+        sapling.advanceTree(level, base, state, level.getRandom());
+        tp(player, level, base.getX() + 0.5, base.getY() + 40, base.getZ() + 95, 180.0F, -14.0F);
     }
 
     /** Crops at every stage, berry bushes at every stage, saguaro, colored grass, bluebells. */
     private static void plants(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos base = origin.offset(0, 0, -40);
         box(level, base.offset(-4, 0, -4), base.offset(24, 12, 16), Blocks.AIR.defaultBlockState());
         box(level, base.offset(-4, -1, -4), base.offset(24, -1, 16), Blocks.GRASS_BLOCK.defaultBlockState());
@@ -303,12 +335,12 @@ public final class DevScene {
             put(level, base.offset(gx, 1, 12), NaturaBlocks.BLUEBELLS.get().defaultBlockState());
             gx += 4;
         }
-        player.teleportTo(level, base.getX() + 10.5, base.getY() + 7, base.getZ() + 22, 180.0F, 28.0F);
+        tp(player, level, base.getX() + 10.5, base.getY() + 7, base.getZ() + 22, 180.0F, 28.0F);
     }
 
     /** Heat sand, tainted soil, glass, thorn vines, glowshrooms, obelisk, furnace, hopper, redstone parts, rails, clouds. */
     private static void netherBlocks(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos base = origin.offset(40, 0, 0);
         box(level, base.offset(-6, 0, -8), base.offset(28, 14, 14), Blocks.AIR.defaultBlockState());
         box(level, base.offset(-6, -1, -8), base.offset(28, -1, 14), Blocks.NETHERRACK.defaultBlockState());
@@ -330,7 +362,7 @@ public final class DevScene {
             BlockPos huge = base.offset(x * 4 - 2, 0, -2);
             for (int attempt = 0; attempt < 20 && !level.getBlockState(huge).is(NaturaBlocks.LARGE_GLOWSHROOMS.get(shroomColor(shroom.getId().getPath())).get()); attempt++) {
                 level.setBlock(huge, shroom.get().defaultBlockState(), 3);
-                shroom.get().performBonemeal(level, level.random, huge, shroom.get().defaultBlockState());
+                shroom.get().performBonemeal(level, level.getRandom(), huge, shroom.get().defaultBlockState());
             }
             x += 2;
         }
@@ -363,12 +395,12 @@ public final class DevScene {
             put(level, base.offset(19 + c * 2, 3, 9), cloud.get().defaultBlockState());
             c++;
         }
-        player.teleportTo(level, base.getX() + 12.5, base.getY() + 9, base.getZ() + 24, 180.0F, 25.0F);
+        tp(player, level, base.getX() + 12.5, base.getY() + 9, base.getZ() + 24, 180.0F, 25.0F);
     }
 
     /** An armor stand in imp armor holding a bloodwood kama, next to the nether gallery. */
     private static void armorStand(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos pos = origin.offset(52, 0, 18);
         var stand = new net.minecraft.world.entity.decoration.ArmorStand(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
         stand.setYRot(0);
@@ -381,12 +413,12 @@ public final class DevScene {
             stand.setItemSlot(slots[i], new net.minecraft.world.item.ItemStack(com.progwml6.natura.tools.NaturaTools.TOOLS.get(pieces[i]).get()));
         }
         level.addFreshEntity(stand);
-        player.teleportTo(level, pos.getX() + 0.5, pos.getY() + 0.4, pos.getZ() + 3.5, 180.0F, 5.0F);
+        tp(player, level, pos.getX() + 0.5, pos.getY() + 0.4, pos.getZ() + 3.5, 180.0F, 5.0F);
     }
 
     /** The four mobs, frozen (no AI) on netherrack. */
     private static void mobs(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         // the scene world is on Peaceful, which removes the monsters at once
         level.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL, true);
         BlockPos base = origin.offset(70, 0, 0);
@@ -397,27 +429,27 @@ public final class DevScene {
                 com.progwml6.natura.entities.NaturaEntities.NITRO_CREEPER.get()};
         double[] xs = {0, 3.5, 7.5, 10};
         for (int i = 0; i < types.length; i++) {
-            var entity = types[i].create(level);
+            var entity = types[i].create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             if (entity instanceof net.minecraft.world.entity.Mob mob) {
                 mob.setNoAi(true);
                 mob.setPersistenceRequired();
             }
-            entity.moveTo(base.getX() + xs[i] + 0.5, base.getY(), base.getZ() + 0.5, 0.0F, 0.0F);
+            entity.snapTo(base.getX() + xs[i] + 0.5, base.getY(), base.getZ() + 0.5, 0.0F, 0.0F);
             entity.setYHeadRot(0.0F);
             level.addFreshEntity(entity);
         }
-        player.teleportTo(level, base.getX() + 5.5, base.getY() + 2.5, base.getZ() + 9.5, 180.0F, 12.0F);
+        tp(player, level, base.getX() + 5.5, base.getY() + 2.5, base.getZ() + 9.5, 180.0F, 12.0F);
     }
 
     /** A half grown barley crop under the crosshair: Jade shows the barley icon (the 1.12 Waila plugin) and its growth. */
     private static void jadeCrop(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos base = origin.offset(100, 0, 0);
         box(level, base.offset(-3, 0, -3), base.offset(3, 4, 4), Blocks.AIR.defaultBlockState());
         box(level, base.offset(-3, -1, -3), base.offset(3, -1, 4), Blocks.GRASS_BLOCK.defaultBlockState());
         put(level, base.below(), Blocks.FARMLAND.defaultBlockState());
         put(level, base, NaturaBlocks.BARLEY_CROP.get().defaultBlockState().setValue(com.progwml6.natura.common.block.NaturaCropBlock.AGE_3, 2));
-        player.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() + 2.5, 180.0F, 36.0F);
+        tp(player, level, base.getX() + 0.5, base.getY(), base.getZ() + 2.5, 180.0F, 36.0F);
     }
 
     private static String shroomColor(String id) {
@@ -452,7 +484,7 @@ public final class DevScene {
         float pitch = (float) Math.toDegrees(Math.atan2(eyeY - ty, ez - tz));
         player.getAbilities().flying = true;
         player.onUpdateAbilities();
-        player.teleportTo(player.serverLevel(), cx, eyeY - player.getEyeHeight(), ez, 180.0F, pitch);
+        tp(player, player.level(), cx, eyeY - player.getEyeHeight(), ez, 180.0F, pitch);
     }
 
     private static void selectTab(Minecraft mc, CreativeModeTab tab) {
@@ -467,8 +499,19 @@ public final class DevScene {
     }
 
     private static void shot(Minecraft mc, String name) {
-        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), msg -> Natura.LOG.info("[scene] {}", msg.getString()));
+        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), 1, msg -> Natura.LOG.info("[scene] {}", msg.getString()));
     }
 
     private DevScene() {}
+
+    /** 26.x teleportTo: absolute position, the camera follows. */
+    private static void tp(ServerPlayer player, ServerLevel level, double x, double y, double z, float yRot, float xRot) {
+        player.teleportTo(level, x, y, z, java.util.Set.of(), yRot, xRot, true);
+    }
+
+    /** 26.x: time and weather by command (the time API moved to clocks). */
+    static void command(ServerLevel level, String command) {
+        MinecraftServer server = level.getServer();
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), command);
+    }
 }

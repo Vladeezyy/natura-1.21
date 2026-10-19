@@ -7,15 +7,9 @@
     "ACA"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:blaze_rod"
-    },
-    "B": {
-      "item": "minecraft:redstone_torch"
-    },
-    "C": {
-      "tag": "c:rods/wooden"
-    }
+    "A": "minecraft:blaze_rod",
+    "B": "minecraft:redstone_torch",
+    "C": "#c:rods/wooden"
   },
   "result": {
     "id": "natura:blaze_activator_rail",

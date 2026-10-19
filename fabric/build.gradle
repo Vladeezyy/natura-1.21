@@ -1,6 +1,6 @@
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom'
+    id 'net.fabricmc.fabric-loom'
 }
 
 repositories {
@@ -12,15 +12,16 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
-    }
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    // 26.x: no obfuscation, no mappings, plain configurations (no mod* ones)
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
-    modCompileOnly "maven.modrinth:jade:${jade_version}+fabric"
-    modLocalRuntime "maven.modrinth:jade:${jade_version}+fabric"
+    compileOnly "maven.modrinth:jade:${jade_version}+fabric"
+    localRuntime "maven.modrinth:jade:${jade_version}+fabric"
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
 }
 
 loom {
@@ -46,7 +47,6 @@ loom {
         scene {
             client()
             name 'Scene'
-            programArgs '--quickPlaySingleplayer', 'natura_scene'
             vmArg '-Dnatura.scene=true'
             runDir('run')
         }
@@ -65,19 +65,19 @@ tasks.matching { it.name == 'runGametest' }.configureEach {
     doFirst { new File(gameTestDir, 'world').deleteDir() }
 }
 
-// The release jar on a real (intermediary-mapped) Fabric server with Fabric API: runs the GameTests there.
+// The release jar on a real Fabric server with Fabric API: runs the GameTests there.
 configurations {
     productionMods { transitive = false }
 }
 dependencies {
     productionMods "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     // not part of the Fabric API bundle; without it the server ignores -Dfabric-api.gametest and just keeps running
-    productionMods "net.fabricmc.fabric-api:fabric-gametest-api-v1:2.0.5+6fc22b9919"
+    productionMods "net.fabricmc.fabric-api:fabric-gametest-api-v1:${fabric_gametest_version}"
 }
 def prodDir = file('run-prod')
 tasks.register('prodGametest', net.fabricmc.loom.task.prod.ServerProductionRunTask) {
-    dependsOn remapJar
-    mods.from(remapJar.archiveFile)
+    dependsOn jar
+    mods.from(jar.archiveFile)
     mods.from(configurations.productionMods)
     jvmArgs.add('-Dfabric-api.gametest')
     runDir = prodDir

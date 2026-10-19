@@ -7,9 +7,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "tag": "c:crops/cotton"
-    }
+    "A": "#c:crops/cotton"
   },
   "result": {
     "id": "minecraft:white_wool"

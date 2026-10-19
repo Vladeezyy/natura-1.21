@@ -6,9 +6,7 @@
     " A "
   ],
   "key": {
-    "A": {
-      "tag": "c:glass_blocks"
-    }
+    "A": "#c:glass_blocks"
   },
   "result": {
     "id": "minecraft:glass_bottle",

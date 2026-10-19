@@ -11,7 +11,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
@@ -38,23 +38,31 @@ import net.minecraft.world.level.block.state.BlockState;
  * AI speeds multiplied the default 0.7 movement speed.
  */
 public class ImpEntity extends Animal {
+    /** The pig sounds (26.x: the classic pig sound variant). */
+    private static final net.minecraft.world.entity.animal.pig.PigSoundVariant.PigSoundSet PIG = SoundEvents.PIG_SOUNDS
+            .get(net.minecraft.world.entity.animal.pig.PigSoundVariants.SoundSet.CLASSIC).adultSounds();
+
     public ImpEntity(EntityType<? extends ImpEntity> type, Level level) {
         super(type, level);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Animal.createMobAttributes().add(Attributes.MAX_HEALTH, 40.0D).add(Attributes.MOVEMENT_SPEED, 0.7D);
+        return Animal.createAnimalAttributes().add(Attributes.MAX_HEALTH, 40.0D).add(Attributes.MOVEMENT_SPEED, 0.7D);
     }
 
-    private static Ingredient soups() {
-        return Ingredient.of(NaturaItems.SOUPS.values().stream().map(s -> new ItemStack(s.get())));
+    /** The Natura stews (made once: the tempt goal asks every tick). */
+    private static final com.google.common.base.Supplier<java.util.Set<net.minecraft.world.item.Item>> SOUPS = com.google.common.base.Suppliers.memoize(
+            () -> NaturaItems.SOUPS.values().stream().map(com.progwml6.natura.platform.ItemEntry::get).collect(java.util.stream.Collectors.toSet()));
+
+    private static boolean isSoup(ItemStack stack) {
+        return SOUPS.get().contains(stack.getItem());
     }
 
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new PanicGoal(this, 0.38D));
-        this.goalSelector.addGoal(2, new TemptGoal(this, 0.3D, soups(), false));
+        this.goalSelector.addGoal(2, new TemptGoal(this, 0.3D, ImpEntity::isSoup, false));
         this.goalSelector.addGoal(3, new BreedGoal(this, 0.25D));
         this.goalSelector.addGoal(4, new AvoidEntityGoal<>(this, Player.class, 8.0F, 0.25D, 0.3D));
         this.goalSelector.addGoal(5, new FollowParentGoal(this, 0.28D));
@@ -75,7 +83,7 @@ public class ImpEntity extends Animal {
         if (stack.getItem() instanceof com.progwml6.natura.common.item.NaturaSoupItem soup) {
             ItemStack bowl = soup.bowl();
             if (!player.getInventory().add(bowl)) {
-                player.drop(bowl, false, false);
+                player.drop(bowl, false);
             }
         }
         if (!player.getAbilities().instabuild) {
@@ -85,31 +93,31 @@ public class ImpEntity extends Animal {
 
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob other) {
-        return NaturaEntities.IMP.get().create(level);
+        return NaturaEntities.IMP.get().create(level, EntitySpawnReason.BREEDING);
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.PIG_AMBIENT;
+        return PIG.ambientSound().value();
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.PIG_HURT;
+        return PIG.hurtSound().value();
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.PIG_DEATH;
+        return PIG.deathSound().value();
     }
 
     @Override
     protected void playStepSound(BlockPos pos, BlockState state) {
-        this.playSound(SoundEvents.PIG_STEP, 0.15F, 1.0F);
+        this.playSound(SoundEvents.PIG_STEP.value(), 0.15F, 1.0F);
     }
 
     /** 1.12 getCanSpawnHere: in a dimension where water vaporizes (the nether), on any block and in any light. */
-    public static boolean checkImpSpawnRules(EntityType<ImpEntity> type, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
-        return level.dimensionType().ultraWarm();
+    public static boolean checkImpSpawnRules(EntityType<ImpEntity> type, ServerLevelAccessor level, EntitySpawnReason reason, BlockPos pos, RandomSource random) {
+        return level.dimensionType().attributes().applyModifier(net.minecraft.world.attribute.EnvironmentAttributes.WATER_EVAPORATES, false);
     }
 }

@@ -16,7 +16,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.block.VegetationBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -26,7 +26,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * stays on mycelium, netherrack, soul sand or tainted soil in any light, elsewhere on a solid top in light below 13, and
  * bone meal (40%) grows its huge glowshroom.
  */
-public class NaturaGlowshroomBlock extends BushBlock implements BonemealableBlock {
+public class NaturaGlowshroomBlock extends VegetationBlock implements BonemealableBlock {
     private static final VoxelShape SHAPE = Block.box(5, 0, 5, 11, 6, 11);
     private final String color;
 
@@ -36,7 +36,7 @@ public class NaturaGlowshroomBlock extends BushBlock implements BonemealableBloc
     }
 
     @Override
-    protected MapCodec<? extends BushBlock> codec() {
+    protected MapCodec<? extends VegetationBlock> codec() {
         throw new UnsupportedOperationException();
     }
 
@@ -47,12 +47,12 @@ public class NaturaGlowshroomBlock extends BushBlock implements BonemealableBloc
 
     @Override
     protected boolean mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos) {
-        return state.isSolidRender(level, pos);
+        return state.isSolidRender();
     }
 
     @Override
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        if (pos.getY() < level.getMinBuildHeight() || pos.getY() >= level.getMaxBuildHeight()) {
+        if (pos.getY() < level.getMinY() || pos.getY() >= level.getMaxY() + 1) {
             return false;
         }
         BlockState below = level.getBlockState(pos.below());

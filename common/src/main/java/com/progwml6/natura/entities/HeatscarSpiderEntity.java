@@ -13,10 +13,10 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.monster.spider.Spider;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.SoundType;
@@ -52,12 +52,14 @@ public class HeatscarSpiderEntity extends Spider {
     }
 
     @Override
-    public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
+    public boolean causeFallDamage(double distance, float multiplier, DamageSource source) {
         boolean hurt = super.causeFallDamage(distance, multiplier, source);
-        int i = Mth.ceil(distance - 5.0F);
+        int i = Mth.ceil(distance - 5.0D);
         if (i > 0) {
             this.playSound(i > 4 ? SoundEvents.GENERIC_BIG_FALL : SoundEvents.GENERIC_SMALL_FALL, 1.0F, 1.0F);
-            this.hurt(this.damageSources().fall(), i);
+            if (this.level() instanceof ServerLevel server) {
+                this.hurtServer(server, this.damageSources().fall(), i);
+            }
             BlockState state = this.level().getBlockState(BlockPos.containing(this.getX(), this.getY() - 0.2D, this.getZ()));
             if (!state.isAir()) {
                 SoundType sound = state.getSoundType();
@@ -69,8 +71,8 @@ public class HeatscarSpiderEntity extends Spider {
     }
 
     @Override
-    public boolean doHurtTarget(Entity target) {
-        if (super.doHurtTarget(target)) {
+    public boolean doHurtTarget(ServerLevel level, Entity target) {
+        if (super.doHurtTarget(level, target)) {
             if (target instanceof Mob) {
                 int time = switch (this.level().getDifficulty()) {
                     case NORMAL -> 5;
@@ -87,17 +89,17 @@ public class HeatscarSpiderEntity extends Spider {
     }
 
     @Override
-    public void remove(RemovalReason reason) {
-        if (!this.baby && !this.level().isClientSide && (reason == RemovalReason.KILLED || reason == RemovalReason.DISCARDED)) {
+    public void remove(Entity.RemovalReason reason) {
+        if (!this.baby && !this.level().isClientSide() && (reason == Entity.RemovalReason.KILLED || reason == Entity.RemovalReason.DISCARDED)) {
             int min = NaturaConfig.BABY_HEATSCAR_MINIMUM.get();
             int num = NaturaConfig.BABY_HEATSCAR_MAXIMUM.get() - min + 1;
             int amount = this.random.nextInt(Math.max(1, num)) + min;
             for (int i = 0; i < amount; i++) {
                 double f = this.random.nextDouble() * 2;
                 double f1 = this.random.nextDouble() * 2;
-                HeatscarSpiderEntity baby = NaturaEntities.BABY_HEATSCAR_SPIDER.get().create(this.level());
+                HeatscarSpiderEntity baby = NaturaEntities.BABY_HEATSCAR_SPIDER.get().create(this.level(), EntitySpawnReason.MOB_SUMMONED);
                 if (baby != null) {
-                    baby.moveTo(this.getX() + f, this.getY() + 0.5D, this.getZ() + f1, this.random.nextFloat() * 360.0F, 0.0F);
+                    baby.snapTo(this.getX() + f, this.getY() + 0.5D, this.getZ() + f1, this.random.nextFloat() * 360.0F, 0.0F);
                     this.level().addFreshEntity(baby);
                 }
             }
@@ -106,7 +108,7 @@ public class HeatscarSpiderEntity extends Spider {
     }
 
     /** 1.12 getCanSpawnHere: not on Peaceful, no light check (the collision and liquid checks are the vanilla ones). */
-    public static boolean checkHeatscarSpawnRules(EntityType<? extends Mob> type, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
+    public static boolean checkHeatscarSpawnRules(EntityType<? extends Mob> type, ServerLevelAccessor level, EntitySpawnReason reason, BlockPos pos, RandomSource random) {
         return level.getDifficulty() != Difficulty.PEACEFUL && NaturaConfig.ENABLE_HEATSCAR_SPIDER.get();
     }
 }

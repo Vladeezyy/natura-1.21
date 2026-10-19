@@ -7,9 +7,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "natura:silverbell_planks"
-    }
+    "A": "natura:silverbell_planks"
   },
   "result": {
     "id": "natura:silverbell_stairs",

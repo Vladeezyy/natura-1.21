@@ -49,7 +49,7 @@ public class NaturaSeedBagItem extends NaturaItem {
                 }
                 if (this.sustains(level.getBlockState(position)) && level.isEmptyBlock(position.above())) {
                     planted = true;
-                    if (!level.isClientSide) {
+                    if (!level.isClientSide()) {
                         level.setBlock(position.above(), this.crop.get().defaultBlockState(), Block.UPDATE_ALL);
                     }
                 }
@@ -59,10 +59,10 @@ public class NaturaSeedBagItem extends NaturaItem {
             if (player == null || !player.getAbilities().instabuild) {
                 stack.shrink(1);
             }
-            if (stack.isEmpty() && !level.isClientSide) {
+            if (stack.isEmpty() && !level.isClientSide()) {
                 level.levelEvent(2001, last, Block.getId(this.crop.get().defaultBlockState()));
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }

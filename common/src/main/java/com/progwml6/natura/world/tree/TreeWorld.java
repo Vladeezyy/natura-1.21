@@ -43,7 +43,7 @@ public final class TreeWorld {
      * generators reached further (the redwood crowns), so outside that this reads air and does not write.
      */
     private boolean readable(BlockPos pos) {
-        if (pos.getY() < this.level.getMinBuildHeight() || pos.getY() >= this.level.getMaxBuildHeight()) {
+        if (pos.getY() < this.level.getMinY() || pos.getY() >= this.level.getMaxY() + 1) {
             return false;
         }
         return !(this.level instanceof net.minecraft.server.level.WorldGenRegion region)
@@ -56,8 +56,8 @@ public final class TreeWorld {
         }
         if (this.level instanceof net.minecraft.server.level.WorldGenRegion region) {
             var center = region.getCenter();
-            return Math.abs(center.x - net.minecraft.core.SectionPos.blockToSectionCoord(pos.getX())) <= 1
-                    && Math.abs(center.z - net.minecraft.core.SectionPos.blockToSectionCoord(pos.getZ())) <= 1;
+            return Math.abs(center.x() - net.minecraft.core.SectionPos.blockToSectionCoord(pos.getX())) <= 1
+                    && Math.abs(center.z() - net.minecraft.core.SectionPos.blockToSectionCoord(pos.getZ())) <= 1;
         }
         return true;
     }
@@ -109,12 +109,12 @@ public final class TreeWorld {
 
     /** 1.12 Block.canBeReplacedByLeaves: not an opaque cube. */
     public boolean canBeReplacedByLeaves(BlockState state, BlockPos pos) {
-        return !state.isSolidRender(this.level, pos);
+        return !state.isSolidRender();
     }
 
     /** 1.12 IBlockState.isFullBlock: an opaque full cube. */
     public boolean isFullBlock(BlockState state, BlockPos pos) {
-        return state.isSolidRender(this.level, pos);
+        return state.isSolidRender();
     }
 
     /** 1.12 Blocks.DIRT (dirt, coarse dirt, podzol) or Blocks.GRASS. */
@@ -142,12 +142,12 @@ public final class TreeWorld {
 
     /** 1.12 y 0. */
     public int bottom() {
-        return this.level.getMinBuildHeight();
+        return this.level.getMinY();
     }
 
     /** 1.12 y 256 (world.getActualHeight() in the overworld). */
     public int top() {
-        return this.level.getMaxBuildHeight();
+        return this.level.getMaxY() + 1;
     }
 
     /** 1.12 world.getWorldType() == WorldType.FLAT. */

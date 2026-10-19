@@ -6,9 +6,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "natura:willow_planks"
-    }
+    "A": "natura:willow_planks"
   },
   "result": {
     "id": "natura:willow_trapdoor",

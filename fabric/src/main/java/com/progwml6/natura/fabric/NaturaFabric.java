@@ -1,6 +1,11 @@
 package com.progwml6.natura.fabric;
 
-import com.google.common.collect.ImmutableSet;
+import net.minecraft.resources.RegistryOps;
+
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityType;
+
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mojang.serialization.Codec;
@@ -16,19 +21,15 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditionType;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
-import org.jetbrains.annotations.Nullable;
 
 /** The Fabric entry point: the common registrations (right away) and the Fabric API events wired to the common code. */
 public class NaturaFabric implements ModInitializer {
@@ -39,8 +40,7 @@ public class NaturaFabric implements ModInitializer {
         ResourceConditions.register(ConfigCondition.TYPE);
         NaturaBlocks.registerFlammability();
         // the blaze hopper uses the vanilla hopper block entity (NeoForge: BlockEntityTypeAddBlocksEvent)
-        BlockEntityType.HOPPER.validBlocks = ImmutableSet.<Block>builder().addAll(BlockEntityType.HOPPER.validBlocks)
-                .add(NaturaBlocks.BLAZE_HOPPER.get()).build();
+        ((FabricBlockEntityType) BlockEntityType.HOPPER).addValidBlock(NaturaBlocks.BLAZE_HOPPER.get());
         NaturaEntities.attributes(FabricDefaultAttributeRegistry::register);
         NaturaEntities.placements(new NaturaEntities.PlacementRegistrar() {
             @Override
@@ -50,7 +50,7 @@ public class NaturaFabric implements ModInitializer {
                 SpawnPlacementsInvoker.invokeRegister(type, placement, heightmap, predicate);
             }
         });
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> NaturaEntities.spawnEggs().forEach(egg -> entries.accept(egg.get())));
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> NaturaEntities.spawnEggs().forEach(egg -> output.accept(egg.get())));
         FabricBiomeModifiers.register();
         ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> WorldEvents.onJoin(entity));
         if (DevBench.active()) {
@@ -65,7 +65,7 @@ public class NaturaFabric implements ModInitializer {
         static final MapCodec<ConfigCondition> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
                 Codec.STRING.fieldOf(ConfigOptionEnabledCondition.FIELD).forGetter(ConfigCondition::setting)).apply(i, ConfigCondition::new));
         static final ResourceConditionType<ConfigCondition> TYPE = ResourceConditionType.create(
-                ResourceLocation.fromNamespaceAndPath(Natura.MODID, ConfigOptionEnabledCondition.ID), CODEC);
+                Identifier.fromNamespaceAndPath(Natura.MODID, ConfigOptionEnabledCondition.ID), CODEC);
 
         @Override
         public ResourceConditionType<?> getType() {
@@ -73,7 +73,7 @@ public class NaturaFabric implements ModInitializer {
         }
 
         @Override
-        public boolean test(@Nullable HolderLookup.Provider registryLookup) {
+        public boolean test(RegistryOps.RegistryInfoLookup registryLookup) {
             return ConfigOptionEnabledCondition.test(this.setting);
         }
     }

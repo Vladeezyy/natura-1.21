@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.progwml6.natura.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["FireBlockInvoker", "OldMinecartBehaviorMixin"],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

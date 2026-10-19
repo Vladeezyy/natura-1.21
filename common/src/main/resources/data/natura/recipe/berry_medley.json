@@ -2,51 +2,10 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "tag": "natura:wooden_bowls"
-    },
-    [
-      {
-        "tag": "c:crops/raspberry"
-      },
-      {
-        "tag": "c:crops/blueberry"
-      },
-      {
-        "tag": "c:crops/blackberry"
-      },
-      {
-        "tag": "c:crops/maloberry"
-      }
-    ],
-    [
-      {
-        "tag": "c:crops/blueberry"
-      },
-      {
-        "tag": "c:crops/blackberry"
-      },
-      {
-        "tag": "c:crops/maloberry"
-      },
-      {
-        "tag": "c:crops/strawberry"
-      }
-    ],
-    [
-      {
-        "tag": "c:crops/blackberry"
-      },
-      {
-        "tag": "c:crops/maloberry"
-      },
-      {
-        "tag": "c:crops/strawberry"
-      },
-      {
-        "tag": "c:crops/cranberry"
-      }
-    ]
+    "#natura:wooden_bowls",
+    "#natura:recipe/berry_medley_1",
+    "#natura:recipe/berry_medley_2",
+    "#natura:recipe/berry_medley_3"
   ],
   "result": {
     "id": "natura:berry_medley"

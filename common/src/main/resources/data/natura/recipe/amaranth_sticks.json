@@ -6,9 +6,7 @@
     " A"
   ],
   "key": {
-    "A": {
-      "item": "natura:amaranth_planks"
-    }
+    "A": "natura:amaranth_planks"
   },
   "result": {
     "id": "natura:amaranth_stick",

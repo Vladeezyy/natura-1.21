@@ -6,12 +6,8 @@
   ],
   "key": {
     "A": [
-      {
-        "item": "natura:bloodwood_log"
-      },
-      {
-        "item": "natura:bloodwood_bark"
-      }
+      "natura:bloodwood_log",
+      "natura:bloodwood_bark"
     ]
   },
   "result": {

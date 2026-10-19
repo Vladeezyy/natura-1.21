@@ -7,9 +7,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:netherrack"
-    }
+    "A": "minecraft:netherrack"
   },
   "result": {
     "id": "natura:netherrack_furnace"

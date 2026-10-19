@@ -7,15 +7,9 @@
     "BBB"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:nether_wart_block"
-    },
-    "B": {
-      "item": "minecraft:string"
-    },
-    "C": {
-      "item": "minecraft:paper"
-    }
+    "A": "minecraft:nether_wart_block",
+    "B": "minecraft:string",
+    "C": "minecraft:paper"
   },
   "result": {
     "id": "natura:nether_wart_seed_bag"

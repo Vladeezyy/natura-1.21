@@ -7,12 +7,12 @@ import com.progwml6.natura.common.block.NaturaCropBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 
@@ -48,7 +48,7 @@ public final class DevBench {
 
     public static void start(MinecraftServer server) {
         for (ServerLevel level : server.getAllLevels()) {
-            level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false, server);
+            level.getGameRules().set(GameRules.SPAWN_MOBS, false, server);
         }
         if (MODE.equals("gen")) {
             stage = 1;
@@ -57,7 +57,7 @@ public final class DevBench {
             force(server.overworld(), true);
         } else if (MODE.equals("crops")) {
             buildField(server.overworld());
-            server.overworld().getGameRules().getRule(GameRules.RULE_RANDOMTICKING).set(300, server);
+            server.overworld().getGameRules().set(GameRules.RANDOM_TICK_SPEED, 300, server);
             stage = 10;
         }
     }
@@ -127,7 +127,7 @@ public final class DevBench {
                 level.setChunkForced((origin.getX() >> 4) + cx, (origin.getZ() >> 4) + cz, true);
             }
         }
-        BlockState farmland = Blocks.FARMLAND.defaultBlockState().setValue(FarmBlock.MOISTURE, 7);
+        BlockState farmland = Blocks.FARMLAND.defaultBlockState().setValue(FarmlandBlock.MOISTURE, 7);
         for (int x = 0; x < 128; x++) {
             for (int z = 0; z < 128; z++) {
                 BlockPos pos = origin.offset(x, 0, z);

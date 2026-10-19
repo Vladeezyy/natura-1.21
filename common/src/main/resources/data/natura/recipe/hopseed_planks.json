@@ -5,9 +5,7 @@
     "A"
   ],
   "key": {
-    "A": {
-      "item": "natura:hopseed_log"
-    }
+    "A": "natura:hopseed_log"
   },
   "result": {
     "id": "natura:hopseed_planks",

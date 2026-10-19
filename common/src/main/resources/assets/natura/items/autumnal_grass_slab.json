@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "natura:item/autumnal_grass_slab",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -3593472
+      }
+    ]
+  }
+}

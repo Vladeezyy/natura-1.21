@@ -6,12 +6,12 @@ import com.progwml6.natura.Natura;
 
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.Mth;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.GrassColor;
 import net.minecraft.world.level.biome.Biome;
 
@@ -22,8 +22,8 @@ import net.minecraft.world.level.biome.Biome;
 public final class GrassColorizer implements ResourceManagerReloadListener {
     private static int[] blue = new int[65536];
     private static int[] orange = new int[65536];
-    private static final ResourceLocation BLUE = ResourceLocation.fromNamespaceAndPath(Natura.MODID, "textures/colormap/bluegrasscolor.png");
-    private static final ResourceLocation ORANGE = ResourceLocation.fromNamespaceAndPath(Natura.MODID, "textures/colormap/orangegrasscolor.png");
+    private static final Identifier BLUE = Identifier.fromNamespaceAndPath(Natura.MODID, "textures/colormap/bluegrasscolor.png");
+    private static final Identifier ORANGE = Identifier.fromNamespaceAndPath(Natura.MODID, "textures/colormap/orangegrasscolor.png");
 
     @Override
     public void onResourceManagerReload(ResourceManager manager) {

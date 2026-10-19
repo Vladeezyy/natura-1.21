@@ -1,6 +1,6 @@
 package com.progwml6.natura.tools;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import com.progwml6.natura.common.item.NaturaItem;
 
@@ -10,8 +10,10 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,9 +27,9 @@ import net.minecraft.world.level.gameevent.GameEvent;
  * other shearable mobs) and gets the sheared drops of leaves, grass and vines (NeoForge: the shears item abilities, in
  * its subclass; both: the c:tools/shears tag).
  */
-public class KamaItem extends SwordItem {
-    public KamaItem(Tier tier, Properties properties) {
-        super(tier, properties.attributes(SwordItem.createAttributes(tier, 3, -2.4F)));
+public class KamaItem extends Item {
+    public KamaItem(ToolMaterial tier, Properties properties) {
+        super(properties.sword(tier, 3.0F, -2.4F));
     }
 
     @Override
@@ -47,18 +49,18 @@ public class KamaItem extends SwordItem {
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
         // vanilla shearable mobs (NeoForge: its IShearable ones, in its subclass)
         if (entity instanceof Shearable target && target.readyForShearing()) {
-            if (!entity.level().isClientSide) {
-                target.shear(SoundSource.PLAYERS);
+            if (entity.level() instanceof ServerLevel level) {
+                target.shear(level, SoundSource.PLAYERS, stack);
                 entity.gameEvent(GameEvent.SHEAR, player);
-                stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+                stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
             }
-            return InteractionResult.sidedSuccess(entity.level().isClientSide);
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         NaturaItem.addTooltip(this.getDescriptionId(), tooltip);
     }
 }

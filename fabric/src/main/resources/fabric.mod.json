@@ -18,9 +18,9 @@
     "main": ["com.progwml6.natura.fabric.NaturaFabric"],
     "client": ["com.progwml6.natura.fabric.NaturaFabricClient"],
     "jade": ["com.progwml6.natura.plugin.NaturaJadePlugin"],
-    "fabric-gametest": ["com.progwml6.natura.gametest.NaturaGameTests"]
+    "fabric-gametest": ["com.progwml6.natura.fabric.FabricGameTests"]
   },
-  "mixins": ["natura.fabric.mixins.json"],
+  "mixins": ["natura.mixins.json", "natura.fabric.mixins.json"],
   "accessWidener": "natura.accesswidener",
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",

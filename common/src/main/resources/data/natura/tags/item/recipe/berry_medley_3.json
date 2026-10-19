@@ -1,0 +1,20 @@
+{
+  "values": [
+    {
+      "id": "#c:crops/blackberry",
+      "required": false
+    },
+    {
+      "id": "#c:crops/maloberry",
+      "required": false
+    },
+    {
+      "id": "#c:crops/strawberry",
+      "required": false
+    },
+    {
+      "id": "#c:crops/cranberry",
+      "required": false
+    }
+  ]
+}

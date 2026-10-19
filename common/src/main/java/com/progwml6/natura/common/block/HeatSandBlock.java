@@ -1,5 +1,9 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.server.level.ServerLevel;
+
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
@@ -37,18 +41,21 @@ public class HeatSandBlock extends FallingBlock {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
         burn(level, entity);
     }
 
     /** 1.12: players with an empty boots slot, or mobs (EntityLiving) that do not resist fire. */
     static void burn(Level level, Entity entity) {
+        if (!(level instanceof ServerLevel server)) {
+            return;
+        }
         if (entity instanceof Player player) {
             if (player.getItemBySlot(EquipmentSlot.FEET).isEmpty()) {
-                entity.hurt(level.damageSources().inFire(), 1);
+                entity.hurtServer(server, level.damageSources().inFire(), 1);
             }
         } else if (entity instanceof Mob && !entity.fireImmune()) {
-            entity.hurt(level.damageSources().inFire(), 1);
+            entity.hurtServer(server, level.damageSources().inFire(), 1);
         }
     }
 

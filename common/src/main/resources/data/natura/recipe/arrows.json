@@ -7,15 +7,9 @@
     " B "
   ],
   "key": {
-    "A": {
-      "item": "minecraft:flint"
-    },
-    "B": {
-      "item": "natura:ghostwood_fletching"
-    },
-    "C": {
-      "tag": "c:rods/wooden"
-    }
+    "A": "minecraft:flint",
+    "B": "natura:ghostwood_fletching",
+    "C": "#c:rods/wooden"
   },
   "result": {
     "id": "minecraft:arrow",

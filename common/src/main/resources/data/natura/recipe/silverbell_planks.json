@@ -5,9 +5,7 @@
     "A"
   ],
   "key": {
-    "A": {
-      "item": "natura:silverbell_log"
-    }
+    "A": "natura:silverbell_log"
   },
   "result": {
     "id": "natura:silverbell_planks",

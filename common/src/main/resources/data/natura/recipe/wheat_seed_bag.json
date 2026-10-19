@@ -7,9 +7,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:wheat_seeds"
-    }
+    "A": "minecraft:wheat_seeds"
   },
   "result": {
     "id": "natura:wheat_seed_bag"

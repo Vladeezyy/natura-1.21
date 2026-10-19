@@ -10,19 +10,19 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.ToolMaterial;
 import net.neoforged.neoforge.common.IShearable;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 
 /** The kama on NeoForge: the shears item abilities, and every IShearable mob (modded ones too). */
 public class NeoForgeKamaItem extends KamaItem {
-    public NeoForgeKamaItem(Tier tier, Properties properties) {
+    public NeoForgeKamaItem(ToolMaterial tier, Properties properties) {
         super(tier, properties);
     }
 
     @Override
-    public boolean canPerformAction(ItemStack stack, ItemAbility ability) {
+    public boolean canPerformAction(net.minecraft.world.item.ItemInstance stack, ItemAbility ability) {
         return ItemAbilities.DEFAULT_SHEARS_ACTIONS.contains(ability) || super.canPerformAction(stack, ability);
     }
 
@@ -32,13 +32,13 @@ public class NeoForgeKamaItem extends KamaItem {
             BlockPos pos = entity.blockPosition();
             if (target.isShearable(player, stack, entity.level(), pos)) {
                 List<ItemStack> drops = target.onSheared(player, stack, entity.level(), pos);
-                if (!entity.level().isClientSide) {
+                if (entity.level() instanceof net.minecraft.server.level.ServerLevel level) {
                     for (ItemStack drop : drops) {
-                        target.spawnShearedDrop(entity.level(), pos, drop);
+                        target.spawnShearedDrop(level, pos, drop);
                     }
-                    stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+                    stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
                 }
-                return InteractionResult.sidedSuccess(entity.level().isClientSide);
+                return InteractionResult.SUCCESS;
             }
         }
         return InteractionResult.PASS;

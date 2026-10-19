@@ -5,9 +5,7 @@
     "A"
   ],
   "key": {
-    "A": {
-      "item": "natura:darkwood_planks"
-    }
+    "A": "natura:darkwood_planks"
   },
   "result": {
     "id": "natura:darkwood_button"

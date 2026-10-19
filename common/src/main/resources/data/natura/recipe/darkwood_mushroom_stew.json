@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "natura:darkwood_bowl"
-    },
-    {
-      "item": "minecraft:brown_mushroom"
-    },
-    {
-      "item": "minecraft:red_mushroom"
-    }
+    "natura:darkwood_bowl",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom"
   ],
   "result": {
     "id": "natura:darkwood_mushroom_stew"

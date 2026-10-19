@@ -6,9 +6,7 @@
     " A "
   ],
   "key": {
-    "A": {
-      "item": "natura:ghostwood_planks"
-    }
+    "A": "natura:ghostwood_planks"
   },
   "result": {
     "id": "natura:ghostwood_bowl",

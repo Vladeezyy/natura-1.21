@@ -1,9 +1,7 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "ingredient": {
-    "item": "natura:amaranth_log"
-  },
+  "ingredient": "natura:amaranth_log",
   "result": {
     "id": "minecraft:charcoal"
   },

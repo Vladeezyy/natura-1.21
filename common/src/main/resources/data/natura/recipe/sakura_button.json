@@ -5,9 +5,7 @@
     "A"
   ],
   "key": {
-    "A": {
-      "item": "natura:sakura_planks"
-    }
+    "A": "natura:sakura_planks"
   },
   "result": {
     "id": "natura:sakura_button"

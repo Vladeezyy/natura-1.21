@@ -6,12 +6,8 @@
     "BAB"
   ],
   "key": {
-    "A": {
-      "item": "natura:silverbell_stick"
-    },
-    "B": {
-      "item": "natura:silverbell_planks"
-    }
+    "A": "natura:silverbell_stick",
+    "B": "natura:silverbell_planks"
   },
   "result": {
     "id": "natura:silverbell_fence",

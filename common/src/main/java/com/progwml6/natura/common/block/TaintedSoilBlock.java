@@ -4,9 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.FungusBlock;
+import net.minecraft.world.level.block.NetherFungusBlock;
 import net.minecraft.world.level.block.NetherWartBlock;
-import net.minecraft.world.level.block.RootsBlock;
+import net.minecraft.world.level.block.NetherRootsBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -26,6 +26,6 @@ public class TaintedSoilBlock extends Block {
     /** The plants tainted soil sustains: nether wart, glowshrooms, fungi and roots. */
     public static boolean sustains(BlockState plant) {
         return plant.getBlock() instanceof NetherWartBlock || plant.getBlock() instanceof NaturaGlowshroomBlock
-                || plant.getBlock() instanceof FungusBlock || plant.getBlock() instanceof RootsBlock;
+                || plant.getBlock() instanceof NetherFungusBlock || plant.getBlock() instanceof NetherRootsBlock;
     }
 }

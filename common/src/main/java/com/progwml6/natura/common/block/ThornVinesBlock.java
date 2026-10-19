@@ -1,5 +1,9 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.server.level.ServerLevel;
+
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+
 import java.util.Random;
 
 import net.minecraft.core.BlockPos;
@@ -32,10 +36,10 @@ public class ThornVinesBlock extends VineBlock {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (PRICKS && !(entity instanceof ItemEntity) && !(entity instanceof Ghast)) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
+        if (PRICKS && level instanceof ServerLevel server && !(entity instanceof ItemEntity) && !(entity instanceof Ghast)) {
             DamageSource source = CACTUS ? level.damageSources().cactus() : level.damageSources().lava();
-            entity.hurt(source, 1);
+            entity.hurtServer(server, source, 1);
         }
     }
 }

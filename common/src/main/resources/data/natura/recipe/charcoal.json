@@ -7,9 +7,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "natura:ash_cloud"
-    }
+    "A": "natura:ash_cloud"
   },
   "result": {
     "id": "minecraft:charcoal"

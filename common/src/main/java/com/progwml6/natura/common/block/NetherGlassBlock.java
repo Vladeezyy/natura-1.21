@@ -1,5 +1,7 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
@@ -44,10 +46,10 @@ public class NetherGlassBlock extends HalfTransparentBlock {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
         if (entity instanceof LivingEntity living) {
             if (this.soul) {
-                living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 1));
+                living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 20, 1));
             } else {
                 HeatSandBlock.burn(level, entity);
             }

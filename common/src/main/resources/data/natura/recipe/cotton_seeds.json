@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "natura:cotton_seed_bag"
-    }
+    "natura:cotton_seed_bag"
   ],
   "result": {
     "id": "natura:cotton_seeds",

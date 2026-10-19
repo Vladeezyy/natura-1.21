@@ -6,12 +6,8 @@
     "B"
   ],
   "key": {
-    "A": {
-      "tag": "c:rods/wooden"
-    },
-    "B": {
-      "item": "minecraft:netherrack"
-    }
+    "A": "#c:rods/wooden",
+    "B": "minecraft:netherrack"
   },
   "result": {
     "id": "natura:nether_lever"

@@ -36,7 +36,7 @@ public class NaturaBoneBagItem extends NaturaItem {
                 // one bone meal for each block (the vanilla call uses up the stack it is given)
                 if (com.progwml6.natura.platform.Services.PLATFORM.applyBonemeal(new ItemStack(Items.BONE_MEAL), level, position, player)) {
                     planted = true;
-                    if (!level.isClientSide) {
+                    if (!level.isClientSide()) {
                         level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, position, 15);
                     }
                 }
@@ -46,7 +46,7 @@ public class NaturaBoneBagItem extends NaturaItem {
             if (player == null || !player.getAbilities().instabuild) {
                 stack.shrink(1);
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }

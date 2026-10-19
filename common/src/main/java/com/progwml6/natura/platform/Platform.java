@@ -1,5 +1,13 @@
 package com.progwml6.natura.platform;
 
+import net.minecraft.network.chat.Component;
+
+import net.minecraft.core.HolderLookup;
+
+import java.util.function.Consumer;
+
+import java.util.function.BiConsumer;
+
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -14,7 +22,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -34,13 +42,14 @@ public interface Platform {
     /** Registers an entry (NeoForge: through a deferred register, Fabric: right away). */
     <R, T extends R> Holder<R> register(ResourceKey<? extends Registry<R>> registry, String name, Supplier<T> factory);
 
-    CreativeModeTab.Builder creativeTabBuilder();
+    /** A creative tab; the contents go to the consumer (CreativeModeTab.Output is not public in vanilla). */
+    CreativeModeTab creativeTab(Component title, Supplier<ItemStack> icon, BiConsumer<HolderLookup.Provider, Consumer<ItemStack>> contents);
 
     /** A spawn egg for an entity type that may not exist yet when the item is made. */
     Item spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties);
 
     /** The 1.12 kama: a sword that is also shears (NeoForge: the shears item abilities). */
-    Item kama(Tier tier, Item.Properties properties);
+    Item kama(ToolMaterial tier, Item.Properties properties);
 
     /** The 1.12 tainted soil (NeoForge: nether plants are sustained by it). */
     Block taintedSoil(BlockBehaviour.Properties properties);

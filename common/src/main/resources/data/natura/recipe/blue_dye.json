@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "natura:bluebells"
-    }
+    "natura:bluebells"
   ],
   "result": {
     "id": "natura:blue_dye"

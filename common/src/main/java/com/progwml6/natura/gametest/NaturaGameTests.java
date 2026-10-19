@@ -16,9 +16,7 @@ import com.progwml6.natura.library.NaturaWood;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.item.ItemStack;
@@ -89,18 +87,32 @@ public final class NaturaGameTests {
     /** Public: Fabric makes an instance of the fabric-gametest entrypoint. */
     public NaturaGameTests() {}
 
-    @GameTestGenerator
-    public static Collection<TestFunction> generate() {
-        List<TestFunction> functions = new ArrayList<>();
-        TESTS.forEach((name, body) -> functions.add(new TestFunction(Natura.MODID, Natura.MODID + "." + name, STRUCTURE, Rotation.NONE, 100, 0,
-                true, false, 1, 1, false, body)));
-        // every tree in a batch of its own: the bigger ones reach into the neighbouring test areas
-        for (String tree : new String[] {"maple", "silverbell", "amaranth", "tiger", "willow", "eucalyptus", "hopseed", "sakura", "redwood",
-                "ghostwood", "fusewood", "darkwood", "bloodwood"}) {
-            functions.add(new TestFunction(Natura.MODID + "_tree_" + tree, Natura.MODID + ".tree_" + tree, STRUCTURE, Rotation.NONE, 100, 0,
-                    true, false, 1, 1, true, helper -> saplingGrows(helper, tree)));
+    /** The trees: every one in a batch of its own (26.x: its own test environment), the bigger ones reach into the neighbouring test areas. */
+    public static final List<String> TREES = List.of("maple", "silverbell", "amaranth", "tiger", "willow", "eucalyptus", "hopseed", "sakura", "redwood",
+            "ghostwood", "fusewood", "darkwood", "bloodwood");
+
+    /** The tests by name (the trees are "tree_<name>"); the loaders register them (26.x: a test function registry and test instances). */
+    public static Map<String, Consumer<GameTestHelper>> tests() {
+        Map<String, Consumer<GameTestHelper>> all = new LinkedHashMap<>(TESTS);
+        for (String tree : TREES) {
+            all.put("tree_" + tree, helper -> saplingGrows(helper, tree));
         }
-        return functions;
+        return java.util.Collections.unmodifiableMap(all);
+    }
+
+    /** The test's batch: the trees each their own one, the others "default". */
+    public static String batch(String name) {
+        return name.startsWith("tree_") ? name : "default";
+    }
+
+    /** The structure every test runs in. */
+    public static net.minecraft.resources.Identifier structure() {
+        return net.minecraft.resources.Identifier.parse(STRUCTURE);
+    }
+
+    /** Runs one test by name (the Fabric @GameTest methods). */
+    public static void run(String name, GameTestHelper helper) {
+        tests().get(name).accept(helper);
     }
 
     // --- helpers --------------------------------------------------------------------------------------------------
@@ -109,19 +121,20 @@ public final class NaturaGameTests {
     static ServerPlayer player(GameTestHelper helper) {
         var cookie = net.minecraft.server.network.CommonListenerCookie.createInitial(
                 new com.mojang.authlib.GameProfile(UUID.randomUUID(), "test-player"), false);
-        ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation());
+        // a subclass: NeoForge 26.x config sync skips those (a plain ServerPlayer without a configuration phase crashes it)
+        ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {};
         var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         new io.netty.channel.embedded.EmbeddedChannel(connection);
         com.progwml6.natura.platform.Services.PLATFORM.configureMockConnection(connection);
         helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         Vec3 pos = helper.absolutePos(new BlockPos(2, 1, 2)).getBottomCenter();
-        player.moveTo(pos.x, pos.y, pos.z, 0, 0);
+        player.snapTo(pos.x, pos.y, pos.z, 0, 0);
         return player;
     }
 
     private static Block block(String id) {
-        return BuiltInRegistries.BLOCK.get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Natura.MODID, id));
+        return BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.fromNamespaceAndPath(Natura.MODID, id));
     }
 
     private static List<ItemStack> drops(GameTestHelper helper, BlockState state, ItemStack tool) {
@@ -142,7 +155,7 @@ public final class NaturaGameTests {
         List<String> missing = new ArrayList<>();
         for (var holder : NaturaBlocks.BLOCKS.getEntries()) {
             Block block = holder.get();
-            LootTable table = helper.getLevel().getServer().reloadableRegistries().getLootTable(block.getLootTable());
+            LootTable table = block.getLootTable().map(key -> helper.getLevel().getServer().reloadableRegistries().getLootTable(key)).orElse(LootTable.EMPTY);
             if (table == LootTable.EMPTY) {
                 missing.add(holder.getId().getPath());
             }
@@ -224,12 +237,12 @@ public final class NaturaGameTests {
         BlockState after = helper.getBlockState(leafPos);
         helper.assertTrue(after.getValue(RedwoodLeavesBlock.CHECK_DECAY) && after.isRandomlyTicking(), "a broken log starts the check");
         // the heart 3 blocks away keeps it
-        after.randomTick(helper.getLevel(), helper.absolutePos(leafPos), helper.getLevel().random);
+        after.randomTick(helper.getLevel(), helper.absolutePos(leafPos), helper.getLevel().getRandom());
         helper.assertTrue(helper.getBlockState(leafPos).is(leaf.getBlock()) && !helper.getBlockState(leafPos).getValue(RedwoodLeavesBlock.CHECK_DECAY),
                 "a log in the cube keeps the leaf");
         helper.setBlock(new BlockPos(6, 1, 6), Blocks.AIR);
         BlockState checking = helper.getBlockState(leafPos);
-        checking.randomTick(helper.getLevel(), helper.absolutePos(leafPos), helper.getLevel().random);
+        checking.randomTick(helper.getLevel(), helper.absolutePos(leafPos), helper.getLevel().getRandom());
         helper.assertTrue(helper.getBlockState(leafPos).isAir(), "no log left: the leaf decays");
         BlockState persistent = leaf.setValue(BlockStateProperties.PERSISTENT, true).setValue(RedwoodLeavesBlock.CHECK_DECAY, true);
         helper.assertTrue(!persistent.isRandomlyTicking(), "placed leaves never decay");
@@ -260,7 +273,7 @@ public final class NaturaGameTests {
     private static ItemStack craft(GameTestHelper helper, int width, int height, ItemStack... grid) {
         CraftingInput input = CraftingInput.of(width, height, List.of(grid));
         var level = helper.getLevel();
-        return level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level).map(r -> r.value().assemble(input, level.registryAccess()))
+        return level.recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, level).map(r -> r.value().assemble(input))
                 .orElse(ItemStack.EMPTY);
     }
 
@@ -274,11 +287,17 @@ public final class NaturaGameTests {
         out = craft(helper, 2, 3, planks, planks, planks, planks, planks, planks);
         helper.assertTrue(out.is(block("maple_door").asItem()) && out.getCount() == 3, "6 planks -> 3 doors: " + out);
         var level = helper.getLevel();
-        var smelt = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(new ItemStack(block("redwood_heart"))), level);
-        helper.assertTrue(smelt.isPresent() && smelt.get().value().getResultItem(level.registryAccess()).is(Items.CHARCOAL), "redwood heart -> charcoal");
+        var heart = new SingleRecipeInput(new ItemStack(block("redwood_heart")));
+        var smelt = level.recipeAccess().getRecipeFor(RecipeType.SMELTING, heart, level);
+        helper.assertTrue(smelt.isPresent() && smelt.get().value().assemble(heart).is(Items.CHARCOAL), "redwood heart -> charcoal");
         // vanilla recipes take the Natura wood through the tags
         out = craft(helper, 1, 2, planks, planks);
         helper.assertTrue(out.is(Items.STICK), "two planks -> vanilla sticks: " + out);
+        // a choice of berry tags per slot (26.x: item tags of their own)
+        var berries = com.progwml6.natura.common.NaturaItems.BERRIES;
+        out = craft(helper, 2, 2, new ItemStack(com.progwml6.natura.common.NaturaItems.BOWLS.get("ghostwood").get()), new ItemStack(berries.get("raspberry").get()),
+                new ItemStack(berries.get("blueberry").get()), new ItemStack(berries.get("blackberry").get()));
+        helper.assertTrue(out.is(com.progwml6.natura.common.NaturaItems.SOUPS.get("berry_medley").get()), "bowl and three berries -> berry medley: " + out);
         helper.succeed();
     }
 
@@ -305,7 +324,7 @@ public final class NaturaGameTests {
             // 39 saplings are not enough
             helper.setBlock(pos.offset(3, 0, 3), Blocks.AIR);
             for (int i = 0; i < 9; i++) helper.setBlock(pos.offset(-3 + i % 7, 0, i < 7 ? -3 : -2), Blocks.AIR);
-            sapling.advanceTree(helper.getLevel(), helper.absolutePos(pos), grown, helper.getLevel().random);
+            sapling.advanceTree(helper.getLevel(), helper.absolutePos(pos), grown, helper.getLevel().getRandom());
             helper.assertTrue(helper.getBlockState(pos).is(sapling) && helper.getBlockState(pos.offset(3, 0, 2)).is(sapling), "39 redwood saplings stay saplings");
             for (int x = -3; x <= 3; x++) {
                 for (int z = -3; z <= 3; z++) {
@@ -317,7 +336,7 @@ public final class NaturaGameTests {
         }
         helper.setBlock(pos, grown);
         BlockState here = helper.getBlockState(pos);
-        sapling.advanceTree(helper.getLevel(), helper.absolutePos(pos), here, helper.getLevel().random);
+        sapling.advanceTree(helper.getLevel(), helper.absolutePos(pos), here, helper.getLevel().getRandom());
         String log = switch (tree) {
             case "redwood" -> "redwood_heart";
             case "bloodwood" -> "bloodwood_log";
@@ -361,7 +380,7 @@ public final class NaturaGameTests {
         player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
         var crop = (com.progwml6.natura.common.block.NaturaCropBlock) block("barley_crop");
         helper.assertTrue(helper.getBlockState(pos).is(crop) && player.getMainHandItem().getCount() == 1, "barley seeds plant barley on farmland");
-        crop.performBonemeal(helper.getLevel(), helper.getLevel().random, helper.absolutePos(pos), helper.getBlockState(pos));
+        crop.performBonemeal(helper.getLevel(), helper.getLevel().getRandom(), helper.absolutePos(pos), helper.getBlockState(pos));
         int age = helper.getBlockState(pos).getValue(crop.getAgeProperty());
         helper.assertTrue(age >= 2, "bone meal grows at least two stages: " + age);
         helper.setBlock(pos, crop.defaultBlockState().setValue(crop.getAgeProperty(), 3));
@@ -381,7 +400,7 @@ public final class NaturaGameTests {
         var bush = (com.progwml6.natura.common.block.NaturaBerryBushBlock) block("raspberry_bush");
         helper.setBlock(pos, bush.defaultBlockState().setValue(com.progwml6.natura.common.block.NaturaBerryBushBlock.AGE, 2));
         for (int i = 0; i < 20; i++) {
-            bush.performBonemeal(helper.getLevel(), helper.getLevel().random, helper.absolutePos(pos), helper.getBlockState(pos));
+            bush.performBonemeal(helper.getLevel(), helper.getLevel().getRandom(), helper.absolutePos(pos), helper.getBlockState(pos));
         }
         helper.assertTrue(helper.getBlockState(pos).getValue(com.progwml6.natura.common.block.NaturaBerryBushBlock.AGE) == 2, "bone meal never ripens a bush");
         helper.assertTrue(helper.getBlockState(pos.above()).is(bush), "bone meal on a grown bush starts one above");
@@ -420,9 +439,11 @@ public final class NaturaGameTests {
         Object[][] expected = {{"raspberry", 1, 16}, {"impmeat_cooked", 8, 32}, {"potash_apple", 4, 1}, {"cactus_juice", 1, 12}, {"berry_medley", 5, 32},
                 {"bloodwood_glowshroom_stew", 3, 32}, {"ghostwood_glowshroom_stew", 6, 32}};
         for (Object[] e : expected) {
-            var item = BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Natura.MODID, (String) e[0]));
-            var food = new ItemStack(item).get(net.minecraft.core.component.DataComponents.FOOD);
-            helper.assertTrue(food != null && food.nutrition() == (int) e[1] && food.eatDurationTicks() == (int) e[2], e[0] + ": " + food);
+            var item = BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.fromNamespaceAndPath(Natura.MODID, (String) e[0]));
+            var stack = new ItemStack(item);
+            var food = stack.get(net.minecraft.core.component.DataComponents.FOOD);
+            var consumable = stack.get(net.minecraft.core.component.DataComponents.CONSUMABLE);
+            helper.assertTrue(food != null && consumable != null && food.nutrition() == (int) e[1] && consumable.consumeTicks() == (int) e[2], e[0] + ": " + food);
         }
         ServerPlayer player = player(helper);
         player.getFoodData().setFoodLevel(10);
@@ -480,12 +501,12 @@ public final class NaturaGameTests {
         helper.setBlock(new BlockPos(2, 1, 2), block("heat_sand"));
         var pig = helper.spawn(net.minecraft.world.entity.EntityType.PIG, new BlockPos(2, 2, 2));
         float health = pig.getHealth();
-        helper.getBlockState(new BlockPos(2, 1, 2)).entityInside(helper.getLevel(), helper.absolutePos(new BlockPos(2, 1, 2)), pig);
+        helper.getBlockState(new BlockPos(2, 1, 2)).entityInside(helper.getLevel(), helper.absolutePos(new BlockPos(2, 1, 2)), pig, net.minecraft.world.entity.InsideBlockEffectApplier.NOOP, true);
         helper.assertTrue(pig.getHealth() < health, "heat sand burns a pig");
         BlockState soul = block("soul_glass").defaultBlockState();
         helper.assertTrue(soul.getCollisionShape(helper.getLevel(), BlockPos.ZERO).isEmpty(), "soul glass has no collision");
-        soul.entityInside(helper.getLevel(), helper.absolutePos(new BlockPos(4, 1, 4)), pig);
-        helper.assertTrue(pig.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN), "soul glass slows");
+        soul.entityInside(helper.getLevel(), helper.absolutePos(new BlockPos(4, 1, 4)), pig, net.minecraft.world.entity.InsideBlockEffectApplier.NOOP, true);
+        helper.assertTrue(pig.hasEffect(net.minecraft.world.effect.MobEffects.SLOWNESS), "soul glass slows");
         helper.assertTrue(drops(helper, soul, ItemStack.EMPTY).isEmpty()
                 && drops(helper, soul, enchanted(helper, new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.SILK_TOUCH, 1)).size() == 1, "glass only with silk touch");
         helper.assertTrue(block("heat_glass").getExplosionResistance() == 1800.0F, "nether glass resists 1800");
@@ -509,7 +530,7 @@ public final class NaturaGameTests {
         // a tall one (stem 5-6) reaches the test area's barrier ceiling and does not grow: try a few times
         for (int i = 0; i < 20 && !helper.getBlockState(pos).is(block("blue_large_glowshroom")); i++) {
             helper.setBlock(pos, small);
-            small.performBonemeal(helper.getLevel(), helper.getLevel().random, helper.absolutePos(pos), helper.getBlockState(pos));
+            small.performBonemeal(helper.getLevel(), helper.getLevel().getRandom(), helper.absolutePos(pos), helper.getBlockState(pos));
         }
         helper.assertTrue(helper.getBlockState(pos).is(block("blue_large_glowshroom"))
                 && helper.getBlockState(pos).getValue(com.progwml6.natura.common.block.LargeGlowshroomBlock.VARIANT) == com.progwml6.natura.common.block.LargeGlowshroomBlock.Variant.STEM,
@@ -525,7 +546,7 @@ public final class NaturaGameTests {
                 net.minecraft.core.Direction.UP, helper.absolutePos(pos), false));
         BlockState active = helper.getBlockState(pos);
         helper.assertTrue(active.getValue(com.progwml6.natura.common.block.RespawnObeliskBlock.ACTIVE) && active.getLightEmission() == 7, "the obelisk lights up");
-        helper.assertTrue(helper.absolutePos(pos).equals(player.getRespawnPosition()), "the respawn point is the obelisk");
+        helper.assertTrue(player.getRespawnConfig() != null && helper.absolutePos(pos).equals(player.getRespawnConfig().respawnData().pos()), "the respawn point is the obelisk");
         var spawn = ((com.progwml6.natura.common.block.RespawnObeliskBlock) active.getBlock()).getRespawnPosition(active, net.minecraft.world.entity.EntityType.PLAYER,
                 helper.getLevel(), helper.absolutePos(pos), 0);
         helper.assertTrue(spawn.isPresent() && spawn.get().position().y > helper.absolutePos(pos).getY() + 1, "the player respawns on top");
@@ -536,14 +557,14 @@ public final class NaturaGameTests {
     private static void furnace(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, block("netherrack_furnace"));
-        var be = (com.progwml6.natura.common.block.NetherrackFurnaceBlockEntity) helper.getBlockEntity(pos);
+        var be = helper.getBlockEntity(pos, com.progwml6.natura.common.block.NetherrackFurnaceBlockEntity.class);
         be.setItem(0, new ItemStack(Items.RAW_IRON, 2));
         be.setItem(1, new ItemStack(Items.COAL));
         BlockState state = helper.getBlockState(pos);
         net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity.serverTick(helper.getLevel(), helper.absolutePos(pos), state, be);
         var data = new net.minecraft.nbt.CompoundTag();
         var saved = be.saveWithoutMetadata(helper.getLevel().registryAccess());
-        helper.assertTrue(saved.getShort("BurnTime") >= 3199, "coal burns 3200 ticks (twice the vanilla 1600): " + saved.getShort("BurnTime"));
+        helper.assertTrue(saved.getShortOr("lit_time_remaining", (short) 0) >= 3199, "coal burns 3200 ticks (twice the vanilla 1600): " + saved);
         helper.succeed();
     }
 
@@ -552,7 +573,7 @@ public final class NaturaGameTests {
         helper.assertTrue(rail.getRailMaxSpeed(rail.defaultBlockState(), helper.getLevel(), BlockPos.ZERO, null) == 0.65F, "blaze rails allow 0.65");
         BlockPos pos = new BlockPos(2, 1, 2);
         helper.setBlock(pos, block("blaze_hopper"));
-        helper.assertTrue(helper.getBlockEntity(pos) instanceof net.minecraft.world.level.block.entity.HopperBlockEntity, "the blaze hopper is a hopper");
+        helper.assertTrue(helper.getLevel().getBlockEntity(helper.absolutePos(pos)) instanceof net.minecraft.world.level.block.entity.HopperBlockEntity, "the blaze hopper is a hopper");
         helper.succeed();
     }
 
@@ -590,7 +611,7 @@ public final class NaturaGameTests {
         var pig = helper.spawn(net.minecraft.world.entity.EntityType.PIG, pos);
         pig.fallDistance = 10;
         pig.setDeltaMovement(0, -1, 0);
-        helper.getBlockState(pos).entityInside(helper.getLevel(), helper.absolutePos(pos), pig);
+        helper.getBlockState(pos).entityInside(helper.getLevel(), helper.absolutePos(pos), pig, net.minecraft.world.entity.InsideBlockEffectApplier.NOOP, true);
         helper.assertTrue(pig.fallDistance == 0 && pig.getDeltaMovement().y > -0.01, "clouds stop the fall");
         BlockPos sulfur = new BlockPos(5, 3, 5);
         helper.setBlock(sulfur, block("sulfur_cloud"));
@@ -656,8 +677,12 @@ public final class NaturaGameTests {
         int[] defense = {1, 2, 3, 1};
         String[] pieces = {"imp_armor_helmet", "imp_armor_chestplate", "imp_armor_leggings", "imp_armor_boots"};
         for (int i = 0; i < 4; i++) {
-            var armor = (net.minecraft.world.item.ArmorItem) com.progwml6.natura.tools.NaturaTools.TOOLS.get(pieces[i]).get();
-            helper.assertTrue(armor.getDefense() == defense[i] && armor.getEnchantmentValue() == 15, pieces[i] + " defense " + armor.getDefense());
+            ItemStack armor = new ItemStack(com.progwml6.natura.tools.NaturaTools.TOOLS.get(pieces[i]).get());
+            double value = armor.getOrDefault(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS,
+                    net.minecraft.world.item.component.ItemAttributeModifiers.EMPTY).modifiers().stream()
+                    .filter(e -> e.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)).mapToDouble(e -> e.modifier().amount()).sum();
+            var enchantable = armor.get(net.minecraft.core.component.DataComponents.ENCHANTABLE);
+            helper.assertTrue(value == defense[i] && enchantable != null && enchantable.value() == 15, pieces[i] + " defense " + value);
         }
         helper.assertTrue(tool("imp_armor_chestplate").getMaxDamage() == 16 * 33, "imp armor durability factor 33");
         helper.succeed();
@@ -673,7 +698,7 @@ public final class NaturaGameTests {
         helper.assertTrue(creeper.fireImmune(), "nitro creepers are fire proof");
         float health = creeper.getHealth();
         var golem = helper.spawn(net.minecraft.world.entity.EntityType.IRON_GOLEM, new BlockPos(6, 1, 2));
-        creeper.hurt(helper.getLevel().damageSources().mobAttack(golem), 1.0F);
+        creeper.hurtServer(helper.getLevel(), helper.getLevel().damageSources().mobAttack(golem), 1.0F);
         helper.assertTrue(!creeper.isAlive() || creeper.getHealth() <= 0, "an iron golem kills a nitro creeper in one hit");
         imp.discard();
         spider.discard();
@@ -687,7 +712,7 @@ public final class NaturaGameTests {
         Difficulty before = server.getWorldData().getDifficulty();
         server.setDifficulty(Difficulty.NORMAL, true);
         var spider = helper.spawn(com.progwml6.natura.entities.NaturaEntities.HEATSCAR_SPIDER.get(), new BlockPos(4, 1, 4));
-        spider.kill();
+        spider.kill(helper.getLevel());
         // the babies come when the body goes, after the 20 tick death animation (1.12 setDead)
         helper.runAfterDelay(25, () -> {
             var found = helper.getLevel().getEntities(com.progwml6.natura.entities.NaturaEntities.BABY_HEATSCAR_SPIDER.get(), helper.getBounds().inflate(2), e -> true);
@@ -726,15 +751,15 @@ public final class NaturaGameTests {
 
     /** Imps and nitro creepers spawn in the nether; heatscar spiders only with the config option (off). */
     private static void mobSpawns(GameTestHelper helper) {
-        var settings = helper.getLevel().registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(net.minecraft.world.level.biome.Biomes.NETHER_WASTES)
+        var settings = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(net.minecraft.world.level.biome.Biomes.NETHER_WASTES)
                 .value().getMobSettings();
         var creatures = settings.getMobs(net.minecraft.world.entity.MobCategory.CREATURE).unwrap();
         var monsters = settings.getMobs(net.minecraft.world.entity.MobCategory.MONSTER).unwrap();
-        helper.assertTrue(creatures.stream().anyMatch(s -> s.type == com.progwml6.natura.entities.NaturaEntities.IMP.get()), "imps spawn in the nether wastes");
-        helper.assertTrue(monsters.stream().anyMatch(s -> s.type == com.progwml6.natura.entities.NaturaEntities.NITRO_CREEPER.get()),
+        helper.assertTrue(creatures.stream().anyMatch(s -> s.value().type() == com.progwml6.natura.entities.NaturaEntities.IMP.get()), "imps spawn in the nether wastes");
+        helper.assertTrue(monsters.stream().anyMatch(s -> s.value().type() == com.progwml6.natura.entities.NaturaEntities.NITRO_CREEPER.get()),
                 "nitro creepers spawn in the nether wastes");
-        helper.assertTrue(monsters.stream().noneMatch(s -> s.type == com.progwml6.natura.entities.NaturaEntities.HEATSCAR_SPIDER.get()
-                || s.type == com.progwml6.natura.entities.NaturaEntities.BABY_HEATSCAR_SPIDER.get()), "no heatscar spiders by default");
+        helper.assertTrue(monsters.stream().noneMatch(s -> s.value().type() == com.progwml6.natura.entities.NaturaEntities.HEATSCAR_SPIDER.get()
+                || s.value().type() == com.progwml6.natura.entities.NaturaEntities.BABY_HEATSCAR_SPIDER.get()), "no heatscar spiders by default");
         helper.succeed();
     }
 
@@ -754,14 +779,14 @@ public final class NaturaGameTests {
     /** The nine 1.12 world generators are features added to every biome (NeoForge biome modifiers, Fabric BiomeModifications). */
     private static void worldgenFeatures(GameTestHelper helper) {
         var access = helper.getLevel().registryAccess();
-        var biomes = access.registryOrThrow(Registries.BIOME);
+        var biomes = access.lookupOrThrow(Registries.BIOME);
         for (var kind : com.progwml6.natura.world.gen.NaturaWorldFeature.Kind.values()) {
-            var id = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Natura.MODID, kind.getSerializedName());
+            var id = net.minecraft.resources.Identifier.fromNamespaceAndPath(Natura.MODID, kind.getSerializedName());
             for (var biome : List.of(net.minecraft.world.level.biome.Biomes.FOREST, net.minecraft.world.level.biome.Biomes.NETHER_WASTES,
                     net.minecraft.world.level.biome.Biomes.THE_END)) {
-                boolean has = biomes.getHolderOrThrow(biome).value().getGenerationSettings().features().stream()
-                        .anyMatch(set -> set.stream().anyMatch(f -> f.unwrapKey().map(k -> k.location().equals(id)).orElse(false)));
-                helper.assertTrue(has, id + " in " + biome.location());
+                boolean has = biomes.getOrThrow(biome).value().getGenerationSettings().features().stream()
+                        .anyMatch(set -> set.stream().anyMatch(f -> f.unwrapKey().map(k -> k.identifier().equals(id)).orElse(false)));
+                helper.assertTrue(has, id + " in " + biome.identifier());
             }
         }
         helper.succeed();

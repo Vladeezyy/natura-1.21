@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "natura:fusewood_bowl"
-    },
-    {
-      "item": "minecraft:brown_mushroom"
-    },
-    {
-      "item": "minecraft:red_mushroom"
-    }
+    "natura:fusewood_bowl",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom"
   ],
   "result": {
     "id": "natura:fusewood_mushroom_stew"

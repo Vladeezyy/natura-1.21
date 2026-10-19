@@ -6,12 +6,8 @@
     "BAB"
   ],
   "key": {
-    "A": {
-      "item": "natura:redwood_stick"
-    },
-    "B": {
-      "item": "natura:redwood_planks"
-    }
+    "A": "natura:redwood_stick",
+    "B": "natura:redwood_planks"
   },
   "result": {
     "id": "natura:redwood_fence",

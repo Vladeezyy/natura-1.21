@@ -1,8 +1,7 @@
 package com.progwml6.natura.client.entity;
 
-import com.progwml6.natura.entities.ImpEntity;
-
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -12,12 +11,11 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
 /** 1.12 RenderNaturaImp.ModelImp: body, head, two legs and two arms, with the 1.12 boxes and swing. */
-public class ImpModel extends HierarchicalModel<ImpEntity> {
-    private final ModelPart root;
+public class ImpModel extends EntityModel<LivingEntityRenderState> {
     private final ModelPart body, head, leftLeg, rightLeg, leftArm, rightArm;
 
     public ImpModel(ModelPart root) {
-        this.root = root;
+        super(root);
         this.body = root.getChild("body");
         this.head = root.getChild("head");
         this.leftLeg = root.getChild("leg0");
@@ -39,12 +37,12 @@ public class ImpModel extends HierarchicalModel<ImpEntity> {
     }
 
     @Override
-    public ModelPart root() {
-        return this.root;
-    }
-
-    @Override
-    public void setupAnim(ImpEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(LivingEntityRenderState state) {
+        super.setupAnim(state);
+        float limbSwing = state.walkAnimationPos;
+        float limbSwingAmount = state.walkAnimationSpeed;
+        float netHeadYaw = state.yRot;
+        float headPitch = state.xRot;
         this.body.xRot = 1.570796F;
         this.head.xRot = headPitch / -57.29578F;
         this.head.yRot = netHeadYaw / 57.29578F;

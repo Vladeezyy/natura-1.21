@@ -6,9 +6,7 @@
     "A A"
   ],
   "key": {
-    "A": {
-      "item": "natura:imp_leather"
-    }
+    "A": "natura:imp_leather"
   },
   "result": {
     "id": "natura:imp_armor_helmet"

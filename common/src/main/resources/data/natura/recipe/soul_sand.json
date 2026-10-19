@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "natura:heat_sand"
-    },
-    {
-      "item": "natura:tainted_soil"
-    }
+    "natura:heat_sand",
+    "natura:tainted_soil"
   ],
   "result": {
     "id": "minecraft:soul_sand"

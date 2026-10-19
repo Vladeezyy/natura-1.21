@@ -6,9 +6,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "natura:tiger_planks"
-    }
+    "A": "natura:tiger_planks"
   },
   "result": {
     "id": "natura:tiger_trapdoor",

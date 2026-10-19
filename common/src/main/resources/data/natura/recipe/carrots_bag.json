@@ -7,9 +7,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "tag": "c:crops/carrot"
-    }
+    "A": "#c:crops/carrot"
   },
   "result": {
     "id": "natura:carrots_seed_bag"

@@ -1,7 +1,7 @@
 package com.progwml6.natura.common.block;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DetectorRailBlock;
 import net.minecraft.world.level.block.PoweredRailBlock;

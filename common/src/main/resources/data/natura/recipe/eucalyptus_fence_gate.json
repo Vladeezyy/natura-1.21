@@ -6,12 +6,8 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "item": "natura:eucalyptus_stick"
-    },
-    "B": {
-      "item": "natura:eucalyptus_planks"
-    }
+    "A": "natura:eucalyptus_stick",
+    "B": "natura:eucalyptus_planks"
   },
   "result": {
     "id": "natura:eucalyptus_fence_gate"

@@ -18,7 +18,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.block.VegetationBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -33,7 +33,7 @@ import com.mojang.serialization.MapCodec;
  * 2 (cotton). Placed only on farmland; once planted it also stays on grass and dirt (1.12 canBlockStay used the plains
  * soil). Its drops (loot table) never get fortune: 1.12 dropped crop blocks with fortune 0.
  */
-public abstract class NaturaCropBlock extends BushBlock implements BonemealableBlock {
+public abstract class NaturaCropBlock extends VegetationBlock implements BonemealableBlock {
     private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 4, 16);
     private final IntegerProperty age;
     private final int maxAge;
@@ -69,7 +69,7 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
     public static final IntegerProperty AGE_4 = IntegerProperty.create("age", 0, 4);
 
     @Override
-    protected MapCodec<? extends BushBlock> codec() {
+    protected MapCodec<? extends VegetationBlock> codec() {
         throw new UnsupportedOperationException();
     }
 
@@ -152,7 +152,7 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
                 BlockState soil = level.getBlockState(below.offset(i, 0, j));
                 if (soil.is(Blocks.FARMLAND) || soil.is(Blocks.DIRT) || soil.is(Blocks.GRASS_BLOCK)) {
                     f1 = 1.0F;
-                    if (soil.is(Blocks.FARMLAND) && soil.getValue(net.minecraft.world.level.block.FarmBlock.MOISTURE) > 0) {
+                    if (soil.is(Blocks.FARMLAND) && soil.getValue(net.minecraft.world.level.block.FarmlandBlock.MOISTURE) > 0) {
                         f1 = 3.0F;
                     }
                 }
@@ -194,7 +194,7 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
         if (state.getValue(this.age) != this.maxAge) {
             return false;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.setBlock(pos, this.defaultBlockState().setValue(this.age, this.pickedAge), Block.UPDATE_ALL);
             NaturaBerryBushBlock.giveAtFeet(level, player, new ItemStack(this.crop.get()));
         }
@@ -203,7 +203,7 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        return this.pick(state, level, pos, player) ? InteractionResult.sidedSuccess(level.isClientSide) : InteractionResult.PASS;
+        return this.pick(state, level, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
     }
 
     @Override
@@ -212,7 +212,7 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return new ItemStack(this.seed.get());
     }
 

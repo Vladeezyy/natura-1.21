@@ -5,9 +5,7 @@
     "A"
   ],
   "key": {
-    "A": {
-      "item": "natura:redwood_heart"
-    }
+    "A": "natura:redwood_heart"
   },
   "result": {
     "id": "natura:redwood_planks",

@@ -1,5 +1,15 @@
 package com.progwml6.natura.neoforge;
 
+import net.minecraft.world.item.ToolMaterial;
+
+import net.minecraft.network.chat.Component;
+
+import net.minecraft.core.HolderLookup;
+
+import java.util.function.Consumer;
+
+import java.util.function.BiConsumer;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -20,19 +30,16 @@ import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.network.registration.NetworkRegistry;
@@ -68,18 +75,20 @@ public class NeoForgePlatform implements Platform {
     }
 
     @Override
-    public CreativeModeTab.Builder creativeTabBuilder() {
-        return CreativeModeTab.builder();
+    public CreativeModeTab creativeTab(Component title, Supplier<ItemStack> icon, BiConsumer<HolderLookup.Provider, Consumer<ItemStack>> contents) {
+        // NeoForge makes CreativeModeTab.Output public
+        return CreativeModeTab.builder().title(title).icon(icon).displayItems((params, output) -> contents.accept(params.holders(), output::accept)).build();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Item spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties) {
-        return new DeferredSpawnEggItem((Supplier<? extends EntityType<? extends Mob>>) type, background, highlight, properties);
+        // 26.x: entity types are registered before items; the egg colours are textures now (tools/convert_26.py)
+        return new Item(properties.spawnEgg(type.get()));
     }
 
     @Override
-    public Item kama(Tier tier, Item.Properties properties) {
+    public Item kama(ToolMaterial tier, Item.Properties properties) {
         return new NeoForgeKamaItem(tier, properties);
     }
 
@@ -90,12 +99,12 @@ public class NeoForgePlatform implements Platform {
 
     @Override
     public <T extends BlockEntity> BlockEntityType<T> blockEntityType(BiFunction<BlockPos, BlockState, T> factory, Block... blocks) {
-        return BlockEntityType.Builder.of(factory::apply, blocks).build(null);
+        return new BlockEntityType<>(factory::apply, blocks);
     }
 
     @Override
     public void setFlammable(Block block, int encouragement, int flammability) {
-        ((FireBlock) Blocks.FIRE).setFlammable(block, encouragement, flammability);
+        ((com.progwml6.natura.mixin.FireBlockInvoker) Blocks.FIRE).natura$setFlammable(block, encouragement, flammability);
     }
 
     @Override

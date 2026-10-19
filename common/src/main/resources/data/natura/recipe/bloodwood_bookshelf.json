@@ -7,12 +7,8 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "natura:bloodwood_planks"
-    },
-    "B": {
-      "item": "minecraft:book"
-    }
+    "A": "natura:bloodwood_planks",
+    "B": "minecraft:book"
   },
   "result": {
     "id": "natura:bloodwood_bookshelf"

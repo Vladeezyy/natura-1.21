@@ -1,7 +1,7 @@
 package com.progwml6.natura.world.gen;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
@@ -22,6 +22,6 @@ public final class NaturaBiomeTags {
     private NaturaBiomeTags() {}
 
     private static TagKey<Biome> tag(String name) {
-        return TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("c", name));
+        return TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("c", name));
     }
 }

@@ -7,15 +7,9 @@
     "ACA"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:blaze_rod"
-    },
-    "B": {
-      "item": "natura:fusewood_log"
-    },
-    "C": {
-      "tag": "c:dusts/redstone"
-    }
+    "A": "minecraft:blaze_rod",
+    "B": "natura:fusewood_log",
+    "C": "#c:dusts/redstone"
   },
   "result": {
     "id": "natura:blaze_powered_rail",

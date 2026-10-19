@@ -5,9 +5,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "tag": "c:crops/barley"
-    }
+    "A": "#c:crops/barley"
   },
   "result": {
     "id": "minecraft:bread"

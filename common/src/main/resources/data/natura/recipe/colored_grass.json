@@ -7,12 +7,8 @@
     " A "
   ],
   "key": {
-    "A": {
-      "item": "minecraft:wheat_seeds"
-    },
-    "B": {
-      "item": "minecraft:dirt"
-    }
+    "A": "minecraft:wheat_seeds",
+    "B": "minecraft:dirt"
   },
   "result": {
     "id": "natura:topiary_grass"

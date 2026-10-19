@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "natura:nether_wart_seed_bag"
-    }
+    "natura:nether_wart_seed_bag"
   ],
   "result": {
     "id": "minecraft:nether_wart",

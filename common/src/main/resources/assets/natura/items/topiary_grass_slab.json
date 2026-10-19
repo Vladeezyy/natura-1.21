@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "natura:item/topiary_grass_slab",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -8602261
+      }
+    ]
+  }
+}

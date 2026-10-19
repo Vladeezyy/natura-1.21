@@ -28,7 +28,7 @@ public class NaturaSoupItem extends NaturaFoodItem {
         if (entity instanceof Player player) {
             ItemStack bowl = new ItemStack(this.bowl.get());
             if (!player.getInventory().add(bowl)) {
-                player.drop(bowl, false, false);
+                player.drop(bowl, false);
             }
         }
         return result;

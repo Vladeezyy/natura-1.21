@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.util.TriState;
+import net.minecraft.util.TriState;
 
 /** Tainted soil on NeoForge: it sustains the nether plants through IBlockExtension.canSustainPlant. */
 public class NeoForgeTaintedSoilBlock extends TaintedSoilBlock {

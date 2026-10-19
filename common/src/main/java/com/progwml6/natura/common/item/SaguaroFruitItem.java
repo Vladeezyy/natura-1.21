@@ -34,11 +34,11 @@ public class SaguaroFruitItem extends NaturaFoodItem {
         }
         BlockState soil = level.getBlockState(pos);
         if ((soil.is(Blocks.SAND) || soil.is(Blocks.RED_SAND) || soil.is(BlockTags.TERRACOTTA)) && level.isEmptyBlock(pos.above())) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 level.setBlock(pos.above(), this.baby.get().defaultBlockState(), Block.UPDATE_ALL);
             }
             context.getItemInHand().consume(1, player);
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
     }

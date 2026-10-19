@@ -16,14 +16,14 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelSettings;
@@ -72,12 +72,12 @@ public final class WorldgenScene {
             p.getAbilities().flying = true;
             p.onUpdateAbilities();
             p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 1000000, 0, false, false));
-            MinecraftServer server = p.getServer();
-            server.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(false, server);
-            server.getGameRules().getRule(GameRules.RULE_WEATHER_CYCLE).set(false, server);
-            server.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false, server);
-            server.overworld().setDayTime(6000);
-            server.overworld().setWeatherParameters(6000, 0, false, false);
+            MinecraftServer server = p.level().getServer();
+            server.getGameRules().set(GameRules.ADVANCE_TIME, false, server);
+            server.getGameRules().set(GameRules.ADVANCE_WEATHER, false, server);
+            server.getGameRules().set(GameRules.SPAWN_MOBS, false, server);
+            command(server.overworld(), "time set noon");
+            command(server.overworld(), "weather clear");
         }));
         at(45, mc -> mc.options.hideGui = true);
         int t = 50;
@@ -98,13 +98,19 @@ public final class WorldgenScene {
     public static void onTick() {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
-        if (!opened && mc.screen instanceof TitleScreen) {
+        if (!opened && mc.options.onboardAccessibility) {
+            mc.options.onboardAccessibility = false;
+            mc.options.save();
+            mc.setScreen(new TitleScreen());
+            return;
+        }
+        if (!opened && mc.getOverlay() == null && mc.screen instanceof TitleScreen) {
             opened = true;
             if (mc.getLevelSource().levelExists(WORLD)) {
                 mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.setScreen(new TitleScreen()));
             } else {
-                LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, false, Difficulty.PEACEFUL, true, new GameRules(),
-                        WorldDataConfiguration.DEFAULT);
+                LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, new LevelSettings.DifficultySettings(Difficulty.PEACEFUL, false, false),
+                        true, WorldDataConfiguration.DEFAULT);
                 mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(1234L, true, false), WorldPresets::createNormalWorldDimensions,
                         new TitleScreen());
             }
@@ -131,19 +137,19 @@ public final class WorldgenScene {
 
     /** Goes to the closest biome of the shot (the chunks around generate while the next steps wait). */
     private static void go(ServerPlayer player, Shot shot) {
-        ServerLevel level = player.getServer().getLevel(shot.dimension());
-        ResourceKey<Biome> biome = ResourceKey.create(Registries.BIOME, ResourceLocation.parse(shot.biome()));
+        ServerLevel level = player.level().getServer().getLevel(shot.dimension());
+        ResourceKey<Biome> biome = ResourceKey.create(Registries.BIOME, Identifier.parse(shot.biome()));
         BlockPos from = player.level() == level ? player.blockPosition() : new BlockPos(0, 64, 0);
         Pair<BlockPos, Holder<Biome>> found = level.findClosestBiome3d(h -> h.is(biome), from.offset(600, 0, 0), 6400, 32, 64);
         target = found == null ? from : found.getFirst();
         int y = shot.dimension() == Level.NETHER ? 70 : 200;
-        player.teleportTo(level, target.getX() + 0.5, y, target.getZ() + 0.5, 0.0F, 30.0F);
+        tp(player, level, target.getX() + 0.5, y, target.getZ() + 0.5, 0.0F, 30.0F);
         Natura.LOG.info("[worldgen scene] {}: {} at {}", shot.name(), shot.biome(), target);
     }
 
     /** Finds the generated Natura block of the shot closest to the biome spot and looks at it from a free spot. */
     private static void look(ServerPlayer player, Shot shot) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos best = null;
         double bestDistance = Double.MAX_VALUE;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
@@ -156,7 +162,7 @@ public final class WorldgenScene {
                 int top = nether ? 127 : level.getHeight(Heightmap.Types.WORLD_SURFACE, cx, cz);
                 int bottom = nether ? 1 : top - 40;
                 for (int y = top; y >= bottom; y--) {
-                    ResourceLocation id = BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos.set(cx, y, cz)).getBlock());
+                    Identifier id = BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos.set(cx, y, cz)).getBlock());
                     if (id.getNamespace().equals(Natura.MODID) && shot.blocks().contains(id.getPath())) {
                         double d = x * x + z * z + (nether ? (y - 64) * (y - 64) : 0);
                         if (d < bestDistance) {
@@ -170,7 +176,7 @@ public final class WorldgenScene {
         }
         if (best == null) {
             Natura.LOG.info("[worldgen scene] {}: nothing found around {}", shot.name(), target);
-            player.teleportTo(level, target.getX() + 0.5, nether ? 70 : level.getHeight(Heightmap.Types.MOTION_BLOCKING, target.getX(), target.getZ()) + 20,
+            tp(player, level, target.getX() + 0.5, nether ? 70 : level.getHeight(Heightmap.Types.MOTION_BLOCKING, target.getX(), target.getZ()) + 20,
                     target.getZ() + 0.5, 0.0F, 40.0F);
             return;
         }
@@ -198,7 +204,7 @@ public final class WorldgenScene {
         Vec3 dir = aim.subtract(eye);
         float yaw = (float) (Mth.atan2(-dir.x, dir.z) * Mth.RAD_TO_DEG);
         float pitch = (float) (-Mth.atan2(dir.y, Math.sqrt(dir.x * dir.x + dir.z * dir.z)) * Mth.RAD_TO_DEG);
-        player.teleportTo(level, eye.x, eye.y - player.getEyeHeight(), eye.z, yaw, pitch);
+        tp(player, level, eye.x, eye.y - player.getEyeHeight(), eye.z, yaw, pitch);
     }
 
     /** Air all around the camera, so no leaves or rock fill the view. */
@@ -210,8 +216,19 @@ public final class WorldgenScene {
     }
 
     private static void shot(Minecraft mc, String name) {
-        Screenshot.grab(mc.gameDirectory, "worldgen_" + name + ".png", mc.getMainRenderTarget(), msg -> Natura.LOG.info("[worldgen scene] {}", msg.getString()));
+        Screenshot.grab(mc.gameDirectory, "worldgen_" + name + ".png", mc.getMainRenderTarget(), 1, msg -> Natura.LOG.info("[worldgen scene] {}", msg.getString()));
     }
 
     private WorldgenScene() {}
+
+    /** 26.x teleportTo: absolute position, the camera follows. */
+    private static void tp(ServerPlayer player, ServerLevel level, double x, double y, double z, float yRot, float xRot) {
+        player.teleportTo(level, x, y, z, java.util.Set.of(), yRot, xRot, true);
+    }
+
+    /** 26.x: time and weather by command (the time API moved to clocks). */
+    static void command(ServerLevel level, String command) {
+        MinecraftServer server = level.getServer();
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), command);
+    }
 }

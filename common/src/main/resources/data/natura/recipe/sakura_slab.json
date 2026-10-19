@@ -5,9 +5,7 @@
     "AAA"
   ],
   "key": {
-    "A": {
-      "item": "natura:sakura_planks"
-    }
+    "A": "natura:sakura_planks"
   },
   "result": {
     "id": "natura:hopseed_slab",

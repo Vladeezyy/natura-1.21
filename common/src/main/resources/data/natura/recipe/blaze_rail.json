@@ -7,12 +7,8 @@
     "A A"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:blaze_rod"
-    },
-    "B": {
-      "tag": "c:rods/wooden"
-    }
+    "A": "minecraft:blaze_rod",
+    "B": "#c:rods/wooden"
   },
   "result": {
     "id": "natura:blaze_rail",

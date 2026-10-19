@@ -1,5 +1,7 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+
 import java.util.Locale;
 import java.util.function.Supplier;
 
@@ -86,7 +88,7 @@ public class LargeGlowshroomBlock extends Block {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
         Vec3 motion = entity.getDeltaMovement();
         if (motion.y < 0) {
             motion = new Vec3(motion.x, motion.y * 0.25F, motion.z);
@@ -97,12 +99,12 @@ public class LargeGlowshroomBlock extends Block {
         }
         entity.setDeltaMovement(motion);
         if (entity instanceof Mob mob) {
-            mob.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0));
+            mob.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 100, 0));
         }
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return new ItemStack(this.small.get());
     }
 }
