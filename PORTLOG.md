@@ -357,3 +357,23 @@ interface (`common/.../platform`), found with `ServiceLoader`.
   powered blaze activator rail turns a hopper cart off; it checks the Fabric minecart mixin) (`:neoforge:runGameTestServer`, `:fabric:runGametest`, `:fabric:prodGametest`
   on the release jar). The two biome modifier tests check the biomes (features, nether spawns) instead of the NeoForge
   biome modifier registry.
+
+## Performance on both loaders (2026-10-20)
+
+`tools/bench.sh` (`LOADER=neoforge|fabric`, every run stopped after 3 minutes): a dev server, a fixed seed, the
+crops and carts cases on a flat world (on a normal world the terrain's own vegetation dropped thousands of items under
+the sped-up random ticks and drowned the difference). One run per case on an Apple laptop, so differences of ~10 %
+are noise. Server tick in ms, generation in chunks per second (24x24 chunks).
+
+| | 1.21.1 NeoForge | 1.21.1 Fabric | 26.3 NeoForge | 26.3 Fabric |
+|---|---|---|---|---|
+| overworld generation, Natura on / off | 57.5 / 58.1 | 54.2 / 50.4 | 113.0 / 114.6 | 116.3 / 114.2 |
+| nether generation, Natura on / off | 90.2 / 97.1 | 75.0 / 96.8 | 254.8 / 290.6 | 263.2 / 287.4 |
+| 16384 grown barley / wheat, random tick speed 300 | 0.35 / 0.30 | 0.66 / 0.47 | 4.77 / 5.16 | 5.10 / 4.71 |
+| 1024 minecarts on blaze / vanilla rails | 2.06 / 2.13 | 1.72 / 2.88 | 5.52 / 6.05 | 7.70 / 8.72 |
+
+- The overworld generation, the crops and the blaze rails (the rail mixins) cost the same as vanilla.
+- The nether is 5-20 % slower to generate with Natura: it really places more there (nether trees, bushes, glowshrooms,
+  thorn vines, soil veins); 0.2-0.3 s more for 576 chunks on 26.3.
+- 26.3 random ticks cost ten times more on a flat world for both crops (vanilla wheat too): not Natura.
+- The client draws nothing per frame (tints are computed when a chunk section is built); not measured.

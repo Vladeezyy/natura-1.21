@@ -1,0 +1,18 @@
+== fabric gen-natura (31 s)
+[bench] gen overworld 24x24 chunks in 10.64 s: 54.2 chunks/s
+[bench] gen nether 24x24 chunks in 7.68 s: 75.0 chunks/s
+== fabric gen-off (31 s)
+[bench] gen overworld 24x24 chunks in 11.43 s: 50.4 chunks/s
+[bench] gen nether 24x24 chunks in 5.95 s: 96.8 chunks/s
+== fabric crops-natura (71 s)
+[bench] item entities: {}
+[bench] crops natura 16384 plants: 0.663 ms per tick (average of 1200 ticks, random tick speed 300)
+== fabric crops-wheat (74 s)
+[bench] item entities: {}
+[bench] crops wheat 16384 plants: 0.470 ms per tick (average of 1200 ticks, random tick speed 300)
+== fabric carts-blaze (74 s)
+[bench] item entities: {}
+[bench] carts blaze 1024 carts: 1.724 ms per tick (average of 1200 ticks)
+== fabric carts-vanilla (71 s)
+[bench] item entities: {}
+[bench] carts vanilla 1024 carts: 2.884 ms per tick (average of 1200 ticks)

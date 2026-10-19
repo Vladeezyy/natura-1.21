@@ -1,0 +1,18 @@
+== neoforge gen-natura (28 s)
+[bench] gen overworld 24x24 chunks in 10.02 s: 57.5 chunks/s
+[bench] gen nether 24x24 chunks in 6.38 s: 90.2 chunks/s
+== neoforge gen-off (27 s)
+[bench] gen overworld 24x24 chunks in 9.92 s: 58.1 chunks/s
+[bench] gen nether 24x24 chunks in 5.93 s: 97.1 chunks/s
+== neoforge crops-natura (72 s)
+[bench] item entities: {}
+[bench] crops natura 16384 plants: 0.352 ms per tick (average of 1200 ticks, random tick speed 300)
+== neoforge crops-wheat (73 s)
+[bench] item entities: {}
+[bench] crops wheat 16384 plants: 0.298 ms per tick (average of 1200 ticks, random tick speed 300)
+== neoforge carts-blaze (71 s)
+[bench] item entities: {}
+[bench] carts blaze 1024 carts: 2.057 ms per tick (average of 1200 ticks)
+== neoforge carts-vanilla (71 s)
+[bench] item entities: {}
+[bench] carts vanilla 1024 carts: 2.134 ms per tick (average of 1200 ticks)
