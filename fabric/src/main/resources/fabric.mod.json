@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "Heyo, Redwood trees! Chop them all day long!\nUnofficial port of Natura (progwml6 / Slime Knights; code CC0, textures CC-BY 3.0) to Minecraft ${minecraft_version} / Fabric.",
+  "authors": ["mDiyo", "progwml6", "the Slime Knights (original)", "port contributors"],
+  "contributors": ["Samtrion", "tterrag"],
+  "contact": {
+    "homepage": "https://github.com/progwml6/Natura",
+    "sources": "https://github.com/Vladeezyy/natura-1.21",
+    "issues": "https://github.com/Vladeezyy/natura-1.21/issues"
+  },
+  "license": "${license}",
+  "icon": "natura_logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.progwml6.natura.fabric.NaturaFabric"],
+    "client": ["com.progwml6.natura.fabric.NaturaFabricClient"],
+    "jade": ["com.progwml6.natura.plugin.NaturaJadePlugin"],
+    "fabric-gametest": ["com.progwml6.natura.gametest.NaturaGameTests"]
+  },
+  "mixins": ["natura.fabric.mixins.json"],
+  "accessWidener": "natura.accesswidener",
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}",
+    "java": ">=${java_version}"
+  },
+  "suggests": {
+    "jade": "*"
+  }
+}

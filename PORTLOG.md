@@ -310,3 +310,50 @@ fresh dev server world per case, NeoForge 21.1.256 on an Apple laptop (noisy: ca
   (same work as vanilla bushes and mushrooms), the tree generators (they read and write only the chunks the
   decoration may touch and set the leaves distance once per tree).
 - 48 game tests pass.
+
+## NeoForge + Fabric (2026-10-19)
+
+The project is a MultiLoader build now (after the Iron Backpacks one): `common` (all game code and resources, compiled
+against vanilla through NeoForm), `neoforge` and `fabric` (each compiles the common sources and resources into its own
+jar: `natura-neoforge-*.jar`, `natura-fabric-*.jar`). What the common code needs from the loader is the `Platform`
+interface (`common/.../platform`), found with `ServiceLoader`.
+
+- Registration: `Registration.block / item / register` return `BlockEntry` / `ItemEntry` / `Entry` (a holder). NeoForge:
+  deferred registers on the mod bus; Fabric: registered right away. Same order as before.
+- Config: the options are described once (`platform/ConfigSpec`, the ModConfigSpec calls `NaturaConfig` had). NeoForge
+  builds its ModConfigSpec from it; Fabric reads and writes the same `config/natura-common.toml` itself (same sections
+  and keys, so the file works on both). Fabric reads it once at start: a change needs a restart there.
+- Conditions: `natura:config_option_enabled` is a NeoForge condition and a Fabric resource condition; the wheat flour
+  recipe has both `neoforge:conditions` and `fabric:load_conditions`.
+- Biome modifiers: NeoForge reads `data/natura/neoforge/biome_modifier` as before; Fabric reads the same files from the
+  jar and applies them with `BiomeModifications` (features in every biome, nether spawns, the heatscar spider only with
+  the config option, checked when a world loads).
+- Biome types: the `Tags.Biomes` checks use the `c:` biome tags by id (`NaturaBiomeTags`); Fabric API has all of them.
+- Leaves, thorn vines: the "sheared" drop used NeoForge's `can_item_perform_ability shears_dig`, which Fabric cannot
+  read; it is `match_tool` with the `c:tools/shear` tag now (shears and the kamas are in it on both loaders).
+  **Fabric only:** vanilla leaves, grass and vines check for `minecraft:shears` itself, so a kama does not shear those
+  there (NeoForge: the kama has the shears abilities, as before).
+- Kama on mobs: NeoForge shears every `IShearable` mob (as before); Fabric the vanilla `Shearable` ones (sheep,
+  mooshroom, snow golem, bogged).
+- Tainted soil: NeoForge `canSustainPlant` in a NeoForge subclass (as before); Fabric mixins into nether wart, fungi and
+  roots. It also is in `minecraft:infiniburn_overworld` now (Fabric has no `isFireSource`; same effect).
+- Respawn obelisk: NeoForge `getRespawnPosition` (as before); Fabric a mixin into `ServerPlayer.findRespawnAndUseSpawnBlock`
+  that asks the obelisk the same way NeoForge does (a non-forced spawn block that is no bed or anchor).
+- Blaze rails: NeoForge rail API (as before; the activator flag is `isActivatorRail()` now instead of the NeoForge
+  constructor). Fabric: a minecart mixin gives the 0.65 top speed, treats the golden blaze rail as a powered rail and the
+  blaze activator rail as an activator rail, and runs the golden rail's own push at the end of the track move.
+  **Fabric only:** NeoForge runs that push just before the powered rail boost, Fabric just after it (a difference of
+  under 0.005 blocks per tick).
+- Blaze hopper: NeoForge `BlockEntityTypeAddBlocksEvent`; Fabric adds it to the hopper block entity type at start.
+- Crop growth hooks (`CommonHooks.canCropGrow` / `fireCropGrowPost`), bone meal with its event, fake players, the
+  biome downfall after modifiers: NeoForge as before; Fabric the vanilla behaviour.
+- Block render layers: NeoForge reads `render_type` from the models; Fabric does not, so the Fabric client reads the same
+  `render_type` from the Natura block models at start and puts each block in that layer.
+- What the NeoForge access transformer opened (block constructors, `Mob.goalSelector`, `ItemProperties.register`, ...)
+  is in `common/accesstransformer.cfg` (compile only) and `fabric/.../natura.accesswidener`.
+- Heatscar spider fall sound: `getSoundType()` without the position (the NeoForge variant asked the block at the
+  spider's position; the same for every Natura and vanilla block).
+- Game tests: the same 49 on both loaders (new: `blaze_rail_carts`, a cart on blaze rails runs faster than 0.4 and a
+  powered blaze activator rail turns a hopper cart off; it checks the Fabric minecart mixin) (`:neoforge:runGameTestServer`, `:fabric:runGametest`, `:fabric:prodGametest`
+  on the release jar). The two biome modifier tests check the biomes (features, nether spawns) instead of the NeoForge
+  biome modifier registry.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generates the 1.21.1 resources of the Natura port from the 1.12 Natura resources.
 
-    python3 -I tools/gen_resources.py <1.12 src/main/resources/assets/natura> <src/main/resources>
+    python3 -I tools/gen_resources.py <1.12 src/main/resources/assets/natura> common/src/main/resources
 
 Never edit src/main/resources/{assets,data} by hand: delete them and run this again.
 
@@ -24,8 +24,8 @@ NS = "natura"
 ASSETS = os.path.join(OUT, "assets", NS)
 DATA = os.path.join(OUT, "data")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# the 1.21.1 vanilla assets (blockstates / models of the templates), unpacked by ModDevGradle on the first build
-VANILLA_JAR = os.path.join(ROOT, "build", "moddev", "artifacts", "neoforge-21.1.256-client-extra-aka-minecraft-resources.jar")
+# the 1.21.1 vanilla assets (blockstates / models of the templates), unpacked by ModDevGradle for the common project
+VANILLA_JAR = os.path.join(ROOT, "common", "build", "moddev", "artifacts", "vanilla-1.21.1-20240808.144430-client-extra-aka-minecraft-resources.jar")
 
 
 def w(path, obj):
@@ -320,7 +320,8 @@ def door_drop(name):
                                                          "conditions": [{"condition": "minecraft:survives_explosion"}]}]}
 
 
-SHEARS = {"condition": "neoforge:can_item_perform_ability", "ability": "shears_dig"}
+# shears and kamas (NeoForge's shears_dig ability is NeoForge only: the c:tools/shear tag works on both loaders)
+SHEARS = {"condition": "minecraft:match_tool", "predicate": {"items": "#c:tools/shear"}}
 SILK_OR_SHEARS = {"condition": "minecraft:any_of", "terms": [
     SHEARS,
     {"condition": "minecraft:match_tool", "predicate": {"predicates": {"minecraft:enchantments": [
@@ -640,6 +641,8 @@ def nether():
     for meta, soil in enumerate(["tainted_soil", "tainted_farmland_dry", "tainted_farmland_heated"]):
         simple_block(soil, "minecraft:block/cube_all", {"all": tex("nether_tainted_soil", "all", type=soil)})
         old("nether_tainted_soil", meta, soil, f"nether_tainted_soil.{soil}")
+        # 1.12 isFireSource: burns forever like netherrack (the nether and end tags include this one)
+        tag("block", "minecraft:infiniburn_overworld", nid(soil))
         self_drop(soil)
         tag("block", "minecraft:mineable/shovel", nid(soil))
         tag("block", "natura:nether_sapling_soil", nid(soil))
@@ -1014,7 +1017,9 @@ def recipes():
                 out["group"] = r["group"]
             config = [c for c in r.get("conditions", []) if c.get("type") == "natura:config_option_enabled"]
             if config:
-                out = {"neoforge:conditions": [{"type": "natura:config_option_enabled", "config_setting": c["config_setting"]} for c in config], **out}
+                out = {"neoforge:conditions": [{"type": "natura:config_option_enabled", "config_setting": c["config_setting"]} for c in config],
+                       "fabric:load_conditions": [{"condition": "natura:config_option_enabled", "config_setting": c["config_setting"]} for c in config],
+                       **out}
             w(os.path.join(DATA, NS, "recipe", name + ".json"), out)
 
 

@@ -1,0 +1,69 @@
+// Shared by common, neoforge and fabric (after the MultiLoader template by jaredlll08)
+plugins {
+    id 'java-library'
+}
+
+version = "${mod_version}+${minecraft_version}"
+
+base {
+    archivesName = project.name == 'common' ? "${mod_id}-common" : "${mod_id}-${project.name}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+}
+
+repositories {
+    mavenCentral()
+    exclusiveContent {
+        forRepositories(
+                maven {
+                    name = 'ParchmentMC'
+                    url = 'https://maven.parchmentmc.org/'
+                },
+                maven {
+                    name = 'NeoForge'
+                    url = 'https://maven.neoforged.net/releases'
+                }
+        )
+        filter { includeGroup('org.parchmentmc.data') }
+    }
+    // JEI
+    maven { url = 'https://maven.blamejared.com/' }
+    // Jade
+    maven {
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-Xmaxerrs', '100000']
+}
+
+// License texts inside the mod jar
+jar {
+    from(rootProject.file('LICENSE')) { rename { 'LICENSE_natura' } }
+    from(rootProject.file('licenses')) { into 'licenses/natura' }
+}
+
+processResources {
+    var expandProps = [
+            'version'                : version,
+            'mod_version'            : mod_version,
+            'minecraft_version'      : minecraft_version,
+            'minecraft_version_range': minecraft_version_range,
+            'neo_version_range'      : neo_version_range,
+            'fabric_loader_version'  : fabric_loader_version,
+            'mod_name'               : mod_name,
+            'mod_id'                 : mod_id,
+            'license'                : license,
+            'java_version'           : java_version,
+    ]
+    filesMatching(['fabric.mod.json', '*.mixins.json']) {
+        expand expandProps
+    }
+    inputs.properties(expandProps)
+}

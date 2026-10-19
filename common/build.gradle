@@ -1,0 +1,35 @@
+plugins {
+    id 'multiloader-common'
+    id 'net.neoforged.moddev'
+}
+
+neoForge {
+    neoFormVersion = neo_form_version
+    // what NeoForge opens and the common code uses (compile only; Fabric: the access widener)
+    accessTransformers.from(file('accesstransformer.cfg'))
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
+}
+
+dependencies {
+    // Jade (the 1.12 Waila plugin): the API is the same in the NeoForge and the Fabric jar
+    compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
+}
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}

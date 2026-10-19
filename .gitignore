@@ -46,3 +46,7 @@ _original/
 
 # local measurement and test logs
 build-*.log
+
+### MultiLoader ###
+run-gametest/
+run-prod/
