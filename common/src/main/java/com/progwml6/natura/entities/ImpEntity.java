@@ -83,7 +83,7 @@ public class ImpEntity extends Animal {
         if (stack.getItem() instanceof com.progwml6.natura.common.item.NaturaSoupItem soup) {
             ItemStack bowl = soup.bowl();
             if (!player.getInventory().add(bowl)) {
-                player.drop(bowl, false);
+                player.drop(bowl, false, net.minecraft.util.Prediction.SERVER_ONLY);
             }
         }
         if (!player.getAbilities().instabuild) {

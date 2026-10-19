@@ -1,5 +1,7 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.world.level.block.BonemealSource;
+
 import java.util.function.Supplier;
 
 import com.mojang.serialization.MapCodec;
@@ -45,10 +47,6 @@ public class NaturaBerryBushBlock extends Block implements BonemealableBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(AGE, 0));
     }
 
-    @Override
-    protected MapCodec<? extends Block> codec() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -91,17 +89,17 @@ public class NaturaBerryBushBlock extends Block implements BonemealableBlock {
     }
 
     @Override
-    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
         return state.getValue(AGE) < 3;
     }
 
     @Override
-    public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+    public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
         return true;
     }
 
     @Override
-    public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+    public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
         int age = state.getValue(AGE);
         if (age < 2) {
             level.setBlock(pos, this.defaultBlockState().setValue(AGE, random.nextInt(2) + 1 + age), Block.UPDATE_CLIENTS);

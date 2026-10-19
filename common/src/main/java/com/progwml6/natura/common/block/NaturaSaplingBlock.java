@@ -1,5 +1,7 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.util.random.WeightedList;
+
 import java.util.Optional;
 
 import net.minecraft.core.BlockPos;
@@ -30,7 +32,7 @@ public class NaturaSaplingBlock extends SaplingBlock {
     private final boolean hanging;
 
     public NaturaSaplingBlock(String name, Tree tree, TagKey<Block> soil, boolean hanging, Properties properties) {
-        super(new TreeGrower("natura_" + name, Optional.empty(), Optional.empty(), Optional.empty()), properties);
+        super(new TreeGrower("natura_" + name, WeightedList.of(), WeightedList.of(), WeightedList.of(), null), properties);
         this.tree = tree;
         this.soil = soil;
         this.hanging = hanging;

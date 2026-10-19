@@ -50,10 +50,6 @@ public class SaguaroBlock extends Block {
         this.registerDefaultState(state);
     }
 
-    @Override
-    protected MapCodec<? extends Block> codec() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

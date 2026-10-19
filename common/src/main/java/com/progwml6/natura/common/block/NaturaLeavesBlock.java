@@ -28,7 +28,7 @@ public class NaturaLeavesBlock extends LeavesBlock {
 
     public NaturaLeavesBlock(Properties properties, boolean dropsRedstone) {
         // 1.12 leaves had no falling leaf particles
-        super(0.0F, properties);
+        super(net.minecraft.world.level.block.sounds.AmbientLeavesBlockSoundPlayer.noAmbientSound(), properties);
         this.dropsRedstone = dropsRedstone;
     }
 
@@ -59,11 +59,5 @@ public class NaturaLeavesBlock extends LeavesBlock {
         super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 
-    @Override
-    protected void spawnFallingLeavesParticle(Level level, BlockPos pos, RandomSource random) {}
 
-    @Override
-    public com.mojang.serialization.MapCodec<? extends LeavesBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
 }

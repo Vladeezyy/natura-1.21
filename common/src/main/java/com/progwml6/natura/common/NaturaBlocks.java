@@ -133,7 +133,7 @@ public final class NaturaBlocks {
         for (String cloud : new String[] {"white", "dark", "ash", "sulfur"}) {
             CLOUDS.put(cloud, block(cloud + "_cloud", () -> new CloudBlock(cloud.equals("sulfur"), Registration.blockProps()
                     .mapColor(MapColor.SNOW).strength(0.3F).sound(SoundType.WOOL).noOcclusion().dynamicShape().isSuffocating((s, l, p) -> false)
-                    .isViewBlocking((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false).pushReaction(PushReaction.BLOCK)), TAB_WORLD));
+                    .isViewBlocking((s, l, p, box) -> false).isRedstoneConductor((s, l, p) -> false).pushReaction(PushReaction.IMMOVEABLE)), TAB_WORLD));
         }
 
         // NaturaOverworld: logs, leaves, saplings, planks, slabs, stairs, doors
@@ -185,7 +185,7 @@ public final class NaturaBlocks {
         for (String door : new String[] {"eucalyptus", "hopseed", "sakura", "redwood", "redwood_bark", "tiger", "maple", "silverbell",
                 "ghostwood", "bloodwood", "darkwood", "fusewood"}) {
             String id = door + "_door";
-            BlockEntry<DoorBlock> block = BLOCKS.register(id, () -> new DoorBlock(BlockSetType.OAK, wood(3.0F, 3.0F).noOcclusion().pushReaction(PushReaction.DESTROY)));
+            BlockEntry<DoorBlock> block = BLOCKS.register(id, () -> new DoorBlock(BlockSetType.OAK, wood(3.0F, 3.0F).noOcclusion().pushReaction(PushReaction.POPPED)));
             TAB_DECORATIVE.add(ITEMS.register(id, () -> new NaturaDoorItem(block.get(), Registration.itemProps())));
             DOORS.put(id, block);
         }
@@ -202,11 +202,11 @@ public final class NaturaBlocks {
                     .sound(SoundType.GRAVEL)), TAB_WORLD));
         }
         NETHER.put("thorn_vines", block("thorn_vines", () -> new ThornVinesBlock(Registration.blockProps().mapColor(MapColor.PLANT).replaceable()
-                .noCollision().randomTicks().strength(1.0F).sound(SoundType.VINE).ignitedByLava().pushReaction(PushReaction.DESTROY)), TAB_WORLD));
+                .noCollision().randomTicks().strength(1.0F).sound(SoundType.VINE).ignitedByLava().pushReaction(PushReaction.POPPED)), TAB_WORLD));
         for (String glass : new String[] {"soul", "heat"}) {
             NETHER.put(glass + "_glass", block(glass + "_glass", () -> new NetherGlassBlock(glass.equals("soul"), Registration.blockProps()
                     .mapColor(MapColor.NONE).strength(1.0F, 1800.0F).sound(SoundType.GLASS).noOcclusion().isValidSpawn((s, l, p, type) -> false)
-                    .isRedstoneConductor((s, l, p) -> false).isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p) -> false)), TAB_WORLD));
+                    .isRedstoneConductor((s, l, p) -> false).isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p, box) -> false)), TAB_WORLD));
         }
     }
 
@@ -218,7 +218,7 @@ public final class NaturaBlocks {
         for (String color : new String[] {"green", "blue", "purple"}) {
             GLOWSHROOMS.put(color, block(color + "_glowshroom", () -> new NaturaGlowshroomBlock(color, Registration.blockProps()
                     .mapColor(MapColor.PLANT).noCollision().randomTicks().instabreak().sound(SoundType.GRASS).lightLevel(s -> 9)
-                    .pushReaction(PushReaction.DESTROY)), TAB_WORLD));
+                    .pushReaction(PushReaction.POPPED)), TAB_WORLD));
         }
         for (String color : new String[] {"green", "blue", "purple"}) {
             BlockEntry<LargeGlowshroomBlock> large = BLOCKS.register(color + "_large_glowshroom", () -> new LargeGlowshroomBlock(
@@ -230,11 +230,11 @@ public final class NaturaBlocks {
         BLAZE_HOPPER = block("blaze_hopper", () -> new HopperBlock(Registration.blockProps().mapColor(MapColor.NETHER).requiresCorrectToolForDrops()
                 .strength(3.0F, 8.0F).sound(SoundType.METAL).noOcclusion()), TAB_WORLD);
         NETHER.put("nether_lever", block("nether_lever", () -> new LeverBlock(Registration.blockProps().noCollision().strength(0.5F)
-                .sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY)), TAB_WORLD));
+                .sound(SoundType.WOOD).pushReaction(PushReaction.POPPED)), TAB_WORLD));
         NETHER.put("nether_button", block("nether_button", () -> new ButtonBlock(NETHERRACK, 20, Registration.blockProps().noCollision()
-                .strength(0.5F).pushReaction(PushReaction.DESTROY)), TAB_WORLD));
+                .strength(0.5F).pushReaction(PushReaction.POPPED)), TAB_WORLD));
         NETHER.put("nether_pressure_plate", block("nether_pressure_plate", () -> new PressurePlateBlock(BlockSetType.STONE, Registration.blockProps()
-                .mapColor(MapColor.NETHER).forceSolidOn().requiresCorrectToolForDrops().noCollision().strength(0.5F).pushReaction(PushReaction.DESTROY)),
+                .mapColor(MapColor.NETHER).forceSolidOn().requiresCorrectToolForDrops().noCollision().strength(0.5F).pushReaction(PushReaction.POPPED)),
                 TAB_WORLD));
         NETHER.put("blaze_rail", block("blaze_rail", () -> new BlazeRailBlocks.Normal(rail()), TAB_WORLD));
         NETHER.put("blaze_powered_rail", block("blaze_powered_rail", () -> new BlazeRailBlocks.Powered(rail(), false), TAB_WORLD));
@@ -274,7 +274,7 @@ public final class NaturaBlocks {
                     Registration.blockProps().mapColor(MapColor.GRASS).strength(0.6F).sound(SoundType.GRASS)), TAB_DECORATIVE));
         }
         BLUEBELLS = block("bluebells", () -> new NaturaPlantBlock(Registration.blockProps().mapColor(MapColor.PLANT).noCollision().instabreak()
-                .sound(SoundType.GRASS).pushReaction(PushReaction.DESTROY)), TAB_WORLD);
+                .sound(SoundType.GRASS).pushReaction(PushReaction.POPPED)), TAB_WORLD);
         for (String berry : new String[] {"raspberry", "blueberry", "blackberry", "maloberry"}) {
             bush(berry, false);
         }
@@ -287,12 +287,12 @@ public final class NaturaBlocks {
 
     private static BlockBehaviour.Properties cropProps() {
         return Registration.blockProps().mapColor(MapColor.PLANT).noCollision().randomTicks().instabreak().sound(SoundType.CROP)
-                .pushReaction(PushReaction.DESTROY);
+                .pushReaction(PushReaction.POPPED);
     }
 
     private static BlockBehaviour.Properties cactus() {
         return Registration.blockProps().mapColor(MapColor.PLANT).strength(0.3F).sound(SoundType.WOOL).noOcclusion().randomTicks()
-                .pushReaction(PushReaction.DESTROY);
+                .pushReaction(PushReaction.POPPED);
     }
 
     /** 1.12 BlockOverworldBerryBush / BlockNetherBerryBush (leaves material, hardness 0.3); overworld ones burn (4 / 25). */
@@ -300,8 +300,8 @@ public final class NaturaBlocks {
         String id = berry + "_bush";
         BlockEntry<NaturaBerryBushBlock> holder = block(id, () -> new NaturaBerryBushBlock(nether, () -> NaturaItems.BERRIES.get(berry).get(),
                 Registration.blockProps().mapColor(MapColor.PLANT).strength(0.3F).randomTicks().sound(SoundType.GRASS).noOcclusion()
-                        .isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p) -> false).isRedstoneConductor((s, l, p) -> false)
-                        .pushReaction(PushReaction.DESTROY)), TAB_WORLD);
+                        .isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p, box) -> false).isRedstoneConductor((s, l, p) -> false)
+                        .pushReaction(PushReaction.POPPED)), TAB_WORLD);
         BUSHES.put(id, holder);
         if (!nether) {
             FLAMMABLE.put(holder, new int[] {4, 25});
@@ -339,7 +339,7 @@ public final class NaturaBlocks {
     private static <B extends Block> void leaves(String id, Function<BlockBehaviour.Properties, B> block, int encouragement, int flammability) {
         BlockEntry<B> holder = block(id, () -> block.apply(Registration.blockProps().mapColor(MapColor.PLANT).strength(0.2F).randomTicks()
                 .sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, l, p, type) -> type == net.minecraft.world.entity.EntityTypes.OCELOT || type == net.minecraft.world.entity.EntityTypes.PARROT)
-                .isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p) -> false).ignitedByLava().pushReaction(PushReaction.DESTROY).isRedstoneConductor((s, l, p) -> false)), TAB_WORLD);
+                .isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p, box) -> false).ignitedByLava().pushReaction(PushReaction.POPPED).isRedstoneConductor((s, l, p) -> false)), TAB_WORLD);
         LEAVES.put(id, holder);
         if (flammability > 0) {
             FLAMMABLE.put(holder, new int[] {encouragement, flammability});
@@ -350,7 +350,7 @@ public final class NaturaBlocks {
         String id = name + "_sapling";
         BlockEntry<NaturaSaplingBlock> holder = block(id, () -> new NaturaSaplingBlock(name, NaturaTrees.forSapling(name), soil, hanging,
                 Registration.blockProps().mapColor(MapColor.PLANT).noCollision().randomTicks().instabreak().sound(SoundType.GRASS)
-                        .pushReaction(PushReaction.DESTROY)), TAB_WORLD);
+                        .pushReaction(PushReaction.POPPED)), TAB_WORLD);
         SAPLINGS.put(id, holder);
     }
 
@@ -365,9 +365,9 @@ public final class NaturaBlocks {
         FLAMMABLE.put(slab, new int[] {5, 20});
         BlockEntry<StairBlock> stairs = block(name + "_stairs", () -> new StairBlock(planks.get().defaultBlockState(), wood(2.0F, 2.0F)), TAB_DECORATIVE);
         BlockEntry<ButtonBlock> button = block(name + "_button", () -> new ButtonBlock(BlockSetType.OAK, 30,
-                Registration.blockProps().noCollision().strength(0.5F).pushReaction(PushReaction.DESTROY)), TAB_DECORATIVE);
+                Registration.blockProps().noCollision().strength(0.5F).pushReaction(PushReaction.POPPED)), TAB_DECORATIVE);
         BlockEntry<PressurePlateBlock> plate = block(name + "_pressure_plate", () -> new PressurePlateBlock(BlockSetType.OAK,
-                wood(0.5F, 0.5F).forceSolidOn().noCollision().pushReaction(PushReaction.DESTROY)), TAB_DECORATIVE);
+                wood(0.5F, 0.5F).forceSolidOn().noCollision().pushReaction(PushReaction.POPPED)), TAB_DECORATIVE);
         BlockEntry<TrapDoorBlock> trapdoor = block(name + "_trapdoor", () -> new TrapDoorBlock(BlockSetType.OAK,
                 wood(3.0F, 3.0F).noOcclusion().isValidSpawn((s, l, p, type) -> false)), TAB_DECORATIVE);
         BlockEntry<FenceBlock> fence = block(name + "_fence", () -> new FenceBlock(wood(2.0F, 3.0F).forceSolidOn()), TAB_DECORATIVE);

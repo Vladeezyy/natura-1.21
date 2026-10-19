@@ -43,10 +43,6 @@ public class SaguaroBabyBlock extends Block {
         this.registerDefaultState(this.stateDefinition.any().setValue(AGE, 0));
     }
 
-    @Override
-    protected MapCodec<? extends Block> codec() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

@@ -30,10 +30,6 @@ public class NetherGlassBlock extends HalfTransparentBlock {
         this.soul = soul;
     }
 
-    @Override
-    protected MapCodec<? extends HalfTransparentBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {

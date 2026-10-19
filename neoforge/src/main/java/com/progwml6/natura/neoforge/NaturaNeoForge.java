@@ -59,7 +59,8 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 @Mod(Natura.MODID)
 public class NaturaNeoForge {
     public NaturaNeoForge(IEventBus modBus, ModContainer container) {
-        container.registerConfig(ModConfig.Type.COMMON, NaturaNeoForgeConfig.build());
+        // 26.3: no COMMON config type any more; LOCAL under the same file name as before (and as on Fabric)
+        container.registerConfig(ModConfig.Type.LOCAL, NaturaNeoForgeConfig.build(), Natura.MODID + "-common.toml");
         NeoForgePlatform.init(modBus);
         Natura.init();
         NeoForgePlatform.deferred(NeoForgeRegistries.Keys.CONDITION_CODECS).register(
@@ -106,7 +107,7 @@ public class NaturaNeoForge {
             String batch = NaturaGameTests.batch(name);
             var environment = environments.computeIfAbsent(batch, b -> event.registerEnvironment(id(b), new TestEnvironmentDefinition.AllOf(List.of())));
             event.registerTest(id(name), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(name)),
-                    new TestData<>(environment, NaturaGameTests.structure(), 100, 0, true, Rotation.NONE, false, 1, 1, !batch.equals("default"), 0)));
+                    new TestData<>(environment, net.minecraft.world.level.Level.OVERWORLD, NaturaGameTests.structure(), 100, 0, true, Rotation.NONE, false, 1, 1, !batch.equals("default"), 0)));
         });
     }
 

@@ -105,8 +105,17 @@ final class FabricBiomeModifiers {
 
     private static void addSpawn(BiomeModificationContext context, JsonObject spawner) {
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(spawner.get("type").getAsString()));
-        context.getMobSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type, spawner.get("minCount").getAsInt(),
-                spawner.get("maxCount").getAsInt()), spawner.get("weight").getAsInt());
+        context.getMobSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type, count(spawner.get("count"))),
+                spawner.get("weight").getAsInt());
+    }
+
+    /** 26.3 spawn counts: a number or {"type": "minecraft:uniform", "min_inclusive", "max_inclusive"}. */
+    private static net.minecraft.util.valueproviders.IntProvider count(JsonElement count) {
+        if (count.isJsonPrimitive()) {
+            return net.minecraft.util.valueproviders.ConstantInt.of(count.getAsInt());
+        }
+        JsonObject uniform = count.getAsJsonObject();
+        return net.minecraft.util.valueproviders.UniformInt.of(uniform.get("min_inclusive").getAsInt(), uniform.get("max_inclusive").getAsInt());
     }
 
     private static boolean enabled(List<String> conditions) {

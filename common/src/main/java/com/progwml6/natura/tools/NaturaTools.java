@@ -16,10 +16,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -80,11 +78,11 @@ public final class NaturaTools {
     private static void tools(String wood, ToolMaterial tier) {
         register(wood + "_sword", p -> new Item(p.sword(tier, 3.0F, -2.4F)));
         register(wood + "_pickaxe", p -> new Item(p.pickaxe(tier, 1.0F, -2.8F)));
-        register(wood + "_shovel", p -> new ShovelItem(tier, 1.5F, -3.0F, p));
+        register(wood + "_shovel", p -> new Item(p.shovel(tier, 1.5F, -3.0F)));
         // 1.12 ItemAxe damage / speed per vanilla material, bloodwood its own 3 / -3.0
         float damage = tier == ToolMaterial.WOOD ? 6.0F : tier == BLOODWOOD ? 3.0F : tier == ToolMaterial.STONE ? 7.0F : 6.0F;
         float speed = tier == ToolMaterial.WOOD ? -3.2F : tier == BLOODWOOD ? -3.0F : tier == ToolMaterial.STONE ? -3.2F : -3.1F;
-        register(wood + "_axe", p -> new AxeItem(tier, damage, speed, p));
+        register(wood + "_axe", p -> new Item(p.axe(tier, damage, speed)));
         register(wood + "_kama", p -> Services.PLATFORM.kama(tier, p));
     }
 

@@ -37,26 +37,26 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 
 /**
- * The 1.12 IWorldGenerators, one configured feature each, run once per chunk with the 1.12 per-chunk logic: biome
+ * The 1.12 IWorldGenerators, one feature each (26.3: a feature record with its kind), run once per chunk with the 1.12 per-chunk logic: biome
  * dictionary types become the c: biome tags, climates the biome's base temperature and downfall, the dimension checks
  * the dimension type (ultrawarm for 1.12 doesWaterVaporize) or the End. Positions are taken in the chunk itself instead
  * of 1.12's chunk + 8 (1.21 features may only write one chunk around theirs; see TreeWorld).
  */
-public class NaturaWorldFeature extends Feature<NaturaWorldFeature.Config> {
+public record NaturaWorldFeature(NaturaWorldFeature.Kind kind) implements Feature {
+    public static final MapCodec<NaturaWorldFeature> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+            Kind.CODEC.fieldOf("kind").forGetter(NaturaWorldFeature::kind)).apply(i, NaturaWorldFeature::new));
+
     /**
      * 1.12 kept one sakura and one ghostwood generator for the whole game, and their height limit was rolled once and
      * only lowered afterwards (validTreeLocation shortened it to what fitted); the shared value is kept.
      */
     static final AtomicInteger SAKURA_HEIGHT_LIMIT = new AtomicInteger();
     static final AtomicInteger GHOSTWOOD_HEIGHT_LIMIT = new AtomicInteger();
-
-    public NaturaWorldFeature() {
-        super(Config.CODEC);
-    }
 
     public enum Kind implements StringRepresentable {
         OVERWORLD_TREES, NETHER_TREES, OVERWORLD_BERRY_BUSHES, NETHER_BERRY_BUSHES, CROPS, CLOUDS, GLOWSHROOMS, THORN_VINES, NETHER_MINABLES;
@@ -69,21 +69,20 @@ public class NaturaWorldFeature extends Feature<NaturaWorldFeature.Config> {
         }
     }
 
-    public record Config(Kind kind) implements FeatureConfiguration {
-        public static final Codec<Config> CODEC = RecordCodecBuilder.create(i -> i.group(Kind.CODEC.fieldOf("kind").forGetter(Config::kind)).apply(i, Config::new));
+    @Override
+    public MapCodec<? extends Feature> codec() {
+        return CODEC;
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<Config> context) {
-        WorldGenLevel level = context.level();
-        BlockPos origin = context.origin();
+    public boolean place(WorldGenLevel level, ChunkGenerator generator, RandomSource randomSource, BlockPos origin) {
         int xPos = origin.getX() & ~15;
         int zPos = origin.getZ() & ~15;
-        Random random = new Random(context.random().nextLong());
+        Random random = new Random(randomSource.nextLong());
         int biomeY = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, xPos + 8, zPos + 8);
         Holder<Biome> biome = level.getBiome(new BlockPos(xPos + 8, biomeY, zPos + 8));
         TreeWorld world = new TreeWorld(level);
-        switch (context.config().kind()) {
+        switch (this.kind) {
             case OVERWORLD_TREES -> overworldTrees(random, xPos, zPos, world, biome);
             case NETHER_TREES -> netherTrees(random, xPos, zPos, world, biome);
             case OVERWORLD_BERRY_BUSHES -> overworldBerryBushes(random, xPos, zPos, world, biome);

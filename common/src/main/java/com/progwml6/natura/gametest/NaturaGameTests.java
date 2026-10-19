@@ -380,7 +380,7 @@ public final class NaturaGameTests {
         player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, net.minecraft.world.InteractionHand.MAIN_HAND, hit));
         var crop = (com.progwml6.natura.common.block.NaturaCropBlock) block("barley_crop");
         helper.assertTrue(helper.getBlockState(pos).is(crop) && player.getMainHandItem().getCount() == 1, "barley seeds plant barley on farmland");
-        crop.performBonemeal(helper.getLevel(), helper.getLevel().getRandom(), helper.absolutePos(pos), helper.getBlockState(pos));
+        crop.performBonemeal(helper.getLevel(), helper.getLevel().getRandom(), helper.absolutePos(pos), helper.getBlockState(pos), net.minecraft.world.level.block.BonemealSource.INTERACTION);
         int age = helper.getBlockState(pos).getValue(crop.getAgeProperty());
         helper.assertTrue(age >= 2, "bone meal grows at least two stages: " + age);
         helper.setBlock(pos, crop.defaultBlockState().setValue(crop.getAgeProperty(), 3));
@@ -400,7 +400,7 @@ public final class NaturaGameTests {
         var bush = (com.progwml6.natura.common.block.NaturaBerryBushBlock) block("raspberry_bush");
         helper.setBlock(pos, bush.defaultBlockState().setValue(com.progwml6.natura.common.block.NaturaBerryBushBlock.AGE, 2));
         for (int i = 0; i < 20; i++) {
-            bush.performBonemeal(helper.getLevel(), helper.getLevel().getRandom(), helper.absolutePos(pos), helper.getBlockState(pos));
+            bush.performBonemeal(helper.getLevel(), helper.getLevel().getRandom(), helper.absolutePos(pos), helper.getBlockState(pos), net.minecraft.world.level.block.BonemealSource.INTERACTION);
         }
         helper.assertTrue(helper.getBlockState(pos).getValue(com.progwml6.natura.common.block.NaturaBerryBushBlock.AGE) == 2, "bone meal never ripens a bush");
         helper.assertTrue(helper.getBlockState(pos.above()).is(bush), "bone meal on a grown bush starts one above");
@@ -530,7 +530,7 @@ public final class NaturaGameTests {
         // a tall one (stem 5-6) reaches the test area's barrier ceiling and does not grow: try a few times
         for (int i = 0; i < 20 && !helper.getBlockState(pos).is(block("blue_large_glowshroom")); i++) {
             helper.setBlock(pos, small);
-            small.performBonemeal(helper.getLevel(), helper.getLevel().getRandom(), helper.absolutePos(pos), helper.getBlockState(pos));
+            small.performBonemeal(helper.getLevel(), helper.getLevel().getRandom(), helper.absolutePos(pos), helper.getBlockState(pos), net.minecraft.world.level.block.BonemealSource.INTERACTION);
         }
         helper.assertTrue(helper.getBlockState(pos).is(block("blue_large_glowshroom"))
                 && helper.getBlockState(pos).getValue(com.progwml6.natura.common.block.LargeGlowshroomBlock.VARIANT) == com.progwml6.natura.common.block.LargeGlowshroomBlock.Variant.STEM,
@@ -752,9 +752,13 @@ public final class NaturaGameTests {
     /** Imps and nitro creepers spawn in the nether; heatscar spiders only with the config option (off). */
     private static void mobSpawns(GameTestHelper helper) {
         var settings = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(net.minecraft.world.level.biome.Biomes.NETHER_WASTES)
-                .value().getMobSettings();
-        var creatures = settings.getMobs(net.minecraft.world.entity.MobCategory.CREATURE).unwrap();
-        var monsters = settings.getMobs(net.minecraft.world.entity.MobCategory.MONSTER).unwrap();
+                .value().getAttributes().applyModifier(net.minecraft.world.attribute.EnvironmentAttributes.NATURAL_MOB_SPAWNS,
+                        net.minecraft.world.attribute.EnvironmentAttributes.NATURAL_MOB_SPAWNS.defaultValue());
+        // 26.3: the spawns are a biome attribute
+        var creatureList = settings.getMobsInCategory(net.minecraft.world.entity.MobCategory.CREATURE);
+        var monsterList = settings.getMobsInCategory(net.minecraft.world.entity.MobCategory.MONSTER);
+        var creatures = creatureList == null ? java.util.List.<net.minecraft.util.random.Weighted<net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData>>of() : creatureList.unwrap();
+        var monsters = monsterList == null ? java.util.List.<net.minecraft.util.random.Weighted<net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData>>of() : monsterList.unwrap();
         helper.assertTrue(creatures.stream().anyMatch(s -> s.value().type() == com.progwml6.natura.entities.NaturaEntities.IMP.get()), "imps spawn in the nether wastes");
         helper.assertTrue(monsters.stream().anyMatch(s -> s.value().type() == com.progwml6.natura.entities.NaturaEntities.NITRO_CREEPER.get()),
                 "nitro creepers spawn in the nether wastes");

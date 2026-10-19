@@ -396,3 +396,19 @@ NeoForge 26.2.0.93, Fabric API 0.161.0. Only renames: the entity type and block 
 `EntityTypes` / `BlockEntityTypes`; the sapling tag is gone (the redwood check asks for a sapling block); the screen,
 overlay and HUD toggle are in `Minecraft.gui`, the main render target in the game renderer (scenes); no
 `BlockPos.getBottomCenter`. NeoForge: `bannerFile` instead of the deprecated `logoFile`. Resources as on 26.1.2.
+
+## Minecraft 26.3 (branch mc/26.3, 2026-10-19)
+
+NeoForge 26.3.0.94, Fabric API 0.164.0 (the newest builds on that day).
+
+- World generation: features carry their configuration: `NaturaWorldFeature` is a record (`kind`) with a `MapCodec`
+  registered as the feature type `natura:world`; the nine features are data in `worldgen/feature` (no
+  `configured_feature`), the placed features and biome modifiers stay. Spawn counts are int providers (`count`).
+- Loot tables: typed conditions and modifiers, one `condition` per entry, `match_block` for the slab and crop states
+  (`tools/convert_26.py`). Furnace fuel: `getBurnDuration(level, stack)` (the netherrack furnace doubles it).
+- Blocks: no `codec()`; `PushReaction.DESTROY` / `BLOCK` are `POPPED` / `IMMOVEABLE`; bone meal methods take a
+  `BonemealSource`; leaves take an ambient sound player (none, as the 1.12 leaves); saplings a `TreeGrower` of feature
+  lists (unused: the 1.12 tree generators grow them). Shovels and axes are plain items with tool properties.
+- NeoForge config: no `COMMON` type; `LOCAL` under the same file name (`natura-common.toml`).
+- Game tests: biome spawns are the `natural_mob_spawns` attribute; test data names the dimension. 50 tests pass on
+  NeoForge, Fabric and the Fabric release jar.

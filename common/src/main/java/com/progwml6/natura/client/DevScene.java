@@ -362,7 +362,7 @@ public final class DevScene {
             BlockPos huge = base.offset(x * 4 - 2, 0, -2);
             for (int attempt = 0; attempt < 20 && !level.getBlockState(huge).is(NaturaBlocks.LARGE_GLOWSHROOMS.get(shroomColor(shroom.getId().getPath())).get()); attempt++) {
                 level.setBlock(huge, shroom.get().defaultBlockState(), 3);
-                shroom.get().performBonemeal(level, level.getRandom(), huge, shroom.get().defaultBlockState());
+                shroom.get().performBonemeal(level, level.getRandom(), huge, shroom.get().defaultBlockState(), net.minecraft.world.level.block.BonemealSource.INTERACTION);
             }
             x += 2;
         }

@@ -30,10 +30,6 @@ public class HeatSandBlock extends FallingBlock {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends FallingBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {

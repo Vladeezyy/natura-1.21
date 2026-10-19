@@ -24,10 +24,6 @@ public class NetherrackFurnaceBlock extends AbstractFurnaceBlock {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends AbstractFurnaceBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     protected void openContainer(Level level, BlockPos pos, Player player) {

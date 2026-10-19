@@ -3,8 +3,11 @@
   "biomes": "#minecraft:is_nether",
   "spawners": {
     "type": "natura:imp",
-    "weight": 10,
-    "minCount": 8,
-    "maxCount": 12
+    "count": {
+      "type": "minecraft:uniform",
+      "min_inclusive": 8,
+      "max_inclusive": 12
+    },
+    "weight": 10
   }
 }

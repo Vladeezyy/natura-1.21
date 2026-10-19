@@ -1,5 +1,7 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.world.level.block.BonemealSource;
+
 import java.util.function.Supplier;
 
 import net.minecraft.core.BlockPos;
@@ -68,10 +70,6 @@ public abstract class NaturaCropBlock extends VegetationBlock implements Bonemea
     public static final IntegerProperty AGE_3 = IntegerProperty.create("age", 0, 3);
     public static final IntegerProperty AGE_4 = IntegerProperty.create("age", 0, 4);
 
-    @Override
-    protected MapCodec<? extends VegetationBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
 
     /** Barley: stages 0-3, picked back to 1. */
     public static class Barley extends NaturaCropBlock {
@@ -174,17 +172,17 @@ public abstract class NaturaCropBlock extends VegetationBlock implements Bonemea
     }
 
     @Override
-    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
         return state.getValue(this.age) < this.maxAge;
     }
 
     @Override
-    public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+    public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
         return true;
     }
 
     @Override
-    public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+    public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
         int i = Math.min(state.getValue(this.age) + Mth.nextInt(random, 2, 5), this.maxAge);
         level.setBlock(pos, state.setValue(this.age, i), Block.UPDATE_CLIENTS);
     }

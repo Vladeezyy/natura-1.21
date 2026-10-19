@@ -10,8 +10,4 @@ public class NaturaPlantBlock extends VegetationBlock {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends VegetationBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
 }

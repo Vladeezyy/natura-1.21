@@ -12,7 +12,10 @@
   (the jar argument; default: the main worktree's ../natura-1.21 build);
 - imp armor: an equipment asset (assets/natura/equipment/imp.json) with the layer textures moved to
   textures/entity/equipment;
-- the repair tags of the bloodwood tools and the imp armor (empty: 1.12 had no repair item).
+- the repair tags of the bloodwood tools and the imp armor (empty: 1.12 had no repair item);
+- 26.3: the features are data (worldgen/feature, no configured_feature, no "config" wrapper), spawn counts are int
+  providers ("count"), and the loot tables use typed conditions and modifiers ("type", one "condition", "modifier"
+  lists, match_block for block state checks, whole numbers in set_count).
 Running it again changes nothing.
 """
 import io
@@ -172,3 +175,81 @@ dump(assets / "equipment" / "imp.json", {"layers": {"humanoid": [{"texture": f"{
 # repair tags (empty)
 for tag in ("bloodwood_tool_materials", "imp_armor_materials"):
     dump(data / "tags" / "item" / (tag + ".json"), {"values": []})
+
+
+# 26.3: features (worldgen/configured_feature -> worldgen/feature, the config inline)
+configured = data / "worldgen" / "configured_feature"
+if configured.exists():
+    for path in sorted(configured.glob("*.json")):
+        obj = json.loads(path.read_text(encoding="utf-8"))
+        dump(data / "worldgen" / "feature" / path.name, {"type": obj["type"], **obj.get("config", {})})
+        path.unlink()
+    configured.rmdir()
+
+# 26.3: spawn counts in the NeoForge biome modifiers (Fabric reads the same files)
+for path in sorted((data / "neoforge" / "biome_modifier").glob("*.json")):
+    obj = json.loads(path.read_text(encoding="utf-8"))
+    if obj.get("type") == "neoforge:add_spawns":
+        spawners = obj["spawners"] if isinstance(obj["spawners"], list) else [obj["spawners"]]
+        converted = []
+        for spawner in spawners:
+            if "minCount" in spawner:
+                low, high = spawner.pop("minCount"), spawner.pop("maxCount")
+                spawner = {"type": spawner["type"], "count": low if low == high else {"type": "minecraft:uniform", "min_inclusive": low, "max_inclusive": high},
+                           "weight": spawner["weight"]}
+            converted.append(spawner)
+        obj["spawners"] = converted if isinstance(obj["spawners"], list) else converted[0]
+        dump(path, obj)
+
+
+# 26.3: loot tables
+def whole(value):
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    if isinstance(value, dict):
+        return {k: whole(v) for k, v in value.items()}
+    return value
+
+
+def loot_condition(c):
+    if isinstance(c, str):
+        return c
+    c = dict(c)
+    kind = c.pop("condition", None) or c.pop("type")
+    if kind == "minecraft:block_state_property":
+        return {"type": "minecraft:match_block", "blocks": c["block"], "state": c.get("properties", {})}
+    if kind in ("minecraft:any_of", "minecraft:all_of"):
+        c["terms"] = [loot_condition(t) for t in c["terms"]]
+    if kind == "minecraft:inverted":
+        c["term"] = loot_condition(c["term"])
+    return {"type": kind, **c}
+
+
+def loot(node):
+    if isinstance(node, list):
+        return [loot(n) for n in node]
+    if not isinstance(node, dict):
+        return node
+    node = {k: (v if k in ("properties", "state", "predicate") else loot(v)) for k, v in node.items()}
+    if "conditions" in node:
+        terms = [loot_condition(c) for c in node.pop("conditions")]
+        node["condition"] = terms[0] if len(terms) == 1 else {"type": "minecraft:all_of", "terms": terms}
+    elif isinstance(node.get("condition"), dict) and "condition" in node["condition"]:
+        node["condition"] = loot_condition(node["condition"])
+    if "function" in node:
+        node = {"type": node.pop("function"), **node}
+        if node.get("add") is False:
+            node.pop("add")
+        if node["type"] == "minecraft:set_count":
+            node["count"] = whole(node["count"])
+    if "functions" in node:
+        node["modifier"] = node.pop("functions")
+    if node.get("bonus_rolls") in (0, 0.0):
+        node.pop("bonus_rolls")
+    if isinstance(node.get("rolls"), float) and node["rolls"].is_integer():
+        node["rolls"] = int(node["rolls"])
+    return node
+
+
+for path in sorted((data / "loot_table").rglob("*.json")):
+    dump(path, loot(json.loads(path.read_text(encoding="utf-8"))))

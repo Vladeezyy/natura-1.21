@@ -1,5 +1,7 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.world.level.block.BonemealSource;
+
 
 import com.mojang.serialization.MapCodec;
 import com.progwml6.natura.common.NaturaBlocks;
@@ -35,10 +37,6 @@ public class NaturaGlowshroomBlock extends VegetationBlock implements Bonemealab
         this.color = color;
     }
 
-    @Override
-    protected MapCodec<? extends VegetationBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
@@ -95,18 +93,18 @@ public class NaturaGlowshroomBlock extends VegetationBlock implements Bonemealab
     }
 
     @Override
-    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
         return true;
     }
 
     @Override
-    public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+    public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
         return random.nextFloat() < 0.4D;
     }
 
     /** 1.12 generateBigMushroom: removed, the huge one grown, put back if nothing grew. */
     @Override
-    public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+    public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
         level.removeBlock(pos, false);
         Block large = NaturaBlocks.LARGE_GLOWSHROOMS.get(this.color).get();
         new GlowshroomGenerator(this.color, large.defaultBlockState()).generateShroom(new java.util.Random(random.nextLong()), new TreeWorld(level), pos);
