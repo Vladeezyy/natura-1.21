@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " A ",
+    "BAB",
+    "BAB"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:ghostwood_stick"
+    },
+    "B": {
+      "item": "natura:ghostwood_leaves"
+    }
+  },
+  "result": {
+    "item": "natura:ghostwood_fletching"
+  }
+}

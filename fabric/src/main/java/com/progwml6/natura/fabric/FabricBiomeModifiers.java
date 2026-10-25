@@ -32,12 +32,12 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 /**
- * The NeoForge biome modifiers (data/natura/neoforge/biome_modifier) applied with the Fabric BiomeModifications: the
- * same files, read from the mod jar. Supports what Natura uses: neoforge:add_features and neoforge:add_spawns, biomes
- * neoforge:any or a tag, and natura:config_option_enabled conditions (checked when a world loads, like NeoForge).
+ * The Forge biome modifiers (data/natura/forge/biome_modifier) applied with the Fabric BiomeModifications: the
+ * same files, read from the mod jar. Supports what Natura uses: forge:add_features and forge:add_spawns, biomes
+ * forge:any or a tag, and natura:config_option_enabled conditions (checked when a world loads, like Forge).
  */
 final class FabricBiomeModifiers {
-    private static final String DIR = "data/" + Natura.MODID + "/neoforge/biome_modifier";
+    private static final String DIR = "data/" + Natura.MODID + "/forge/biome_modifier";
 
     private FabricBiomeModifiers() {}
 
@@ -63,8 +63,8 @@ final class FabricBiomeModifiers {
 
     private static void apply(ResourceLocation id, JsonObject json) {
         List<String> conditions = new ArrayList<>();
-        if (json.has("neoforge:conditions")) {
-            for (JsonElement condition : json.getAsJsonArray("neoforge:conditions")) {
+        if (json.has("forge:conditions")) {
+            for (JsonElement condition : json.getAsJsonArray("forge:conditions")) {
                 JsonObject object = condition.getAsJsonObject();
                 if (!object.get("type").getAsString().equals(Natura.MODID + ":" + ConfigOptionEnabledCondition.ID)) {
                     throw new IllegalStateException("Unsupported condition in " + id + ": " + object);
@@ -75,7 +75,7 @@ final class FabricBiomeModifiers {
         Predicate<BiomeSelectionContext> biomes = biomes(json.get("biomes"));
         String type = json.get("type").getAsString();
         switch (type) {
-            case "neoforge:add_features" -> {
+            case "forge:add_features" -> {
                 GenerationStep.Decoration step = GenerationStep.Decoration.valueOf(json.get("step").getAsString().toUpperCase(java.util.Locale.ROOT));
                 List<ResourceKey<net.minecraft.world.level.levelgen.placement.PlacedFeature>> features = strings(json.get("features")).stream()
                         .map(f -> ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(f))).toList();
@@ -85,7 +85,7 @@ final class FabricBiomeModifiers {
                     }
                 });
             }
-            case "neoforge:add_spawns" -> {
+            case "forge:add_spawns" -> {
                 List<JsonObject> spawners = new ArrayList<>();
                 JsonElement element = json.get("spawners");
                 if (element.isJsonArray()) {
@@ -114,7 +114,7 @@ final class FabricBiomeModifiers {
     }
 
     private static Predicate<BiomeSelectionContext> biomes(JsonElement biomes) {
-        if (biomes.isJsonObject() && biomes.getAsJsonObject().get("type").getAsString().equals("neoforge:any")) {
+        if (biomes.isJsonObject() && biomes.getAsJsonObject().get("type").getAsString().equals("forge:any")) {
             return BiomeSelectors.all();
         }
         if (biomes.isJsonPrimitive() && biomes.getAsString().startsWith("#")) {

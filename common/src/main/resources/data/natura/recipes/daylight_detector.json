@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "BBB",
+    "CCC"
+  ],
+  "key": {
+    "A": {
+      "tag": "c:glass_blocks"
+    },
+    "B": {
+      "tag": "minecraft:wooden_slabs"
+    },
+    "C": {
+      "tag": "c:gems/quartz"
+    }
+  },
+  "result": {
+    "item": "minecraft:daylight_detector"
+  }
+}

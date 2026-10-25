@@ -41,7 +41,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
 
-/** The client side on Fabric: the common client registrations, and the block render layers NeoForge reads from the models. */
+/** The client side on Fabric: the common client registrations, and the block render layers Forge reads from the models. */
 public class NaturaFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
@@ -64,7 +64,7 @@ public class NaturaFabricClient implements ClientModInitializer {
     }
 
     /**
-     * The "render_type" of the Natura block models (NeoForge reads it, Fabric does not): every block whose blockstate's
+     * The "render_type" of the Natura block models (Forge reads it, Fabric does not): every block whose blockstate's
      * first model asks for cutout, cutout_mipped or translucent is put in that layer.
      */
     private static void renderLayers() {

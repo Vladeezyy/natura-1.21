@@ -38,9 +38,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** The Fabric side of {@link Platform}: entries registered right away, Fabric API registries, vanilla behaviour for the NeoForge hooks. */
+/** The Fabric side of {@link Platform}: entries registered right away, Fabric API registries, vanilla behaviour for the Forge hooks. */
 public class FabricPlatform implements Platform {
-    /** c:tools/shear: shears and the kamas (NeoForge: the shears_dig item ability). */
+    /** c:tools/shear: shears and the kamas (Forge: the SHEARS_DIG tool action). */
     private static final TagKey<Item> SHEARS = TagKey.create(Registries.ITEM, new ResourceLocation("c", "tools/shear"));
 
     @Override

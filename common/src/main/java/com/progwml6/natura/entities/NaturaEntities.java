@@ -24,7 +24,7 @@ import com.progwml6.natura.platform.ItemEntry;
 
 /**
  * 1.12 NaturaEntities: the imp, the heatscar spider and its baby, the nitro creeper, with the 1.12 sizes and spawn egg
- * colours. They spawn in the nether biomes (data/natura/neoforge/biome_modifier, Fabric: read from there): imps 10 / 8-12 as creatures, heatscar
+ * colours. They spawn in the nether biomes (data/natura/forge/biome_modifier, Fabric: read from there): imps 10 / 8-12 as creatures, heatscar
  * spiders 10 / 4 (only with the config option), nitro creepers 8 / 4-6.
  */
 public final class NaturaEntities {
@@ -52,7 +52,7 @@ public final class NaturaEntities {
 
     public static void init() {}
 
-    /** The 1.12 attributes (NeoForge EntityAttributeCreationEvent, Fabric FabricDefaultAttributeRegistry). */
+    /** The 1.12 attributes (Forge EntityAttributeCreationEvent, Fabric FabricDefaultAttributeRegistry). */
     public static void attributes(BiConsumer<EntityType<? extends LivingEntity>, AttributeSupplier> event) {
         event.accept(IMP.get(), ImpEntity.createAttributes().build());
         event.accept(HEATSCAR_SPIDER.get(), HeatscarSpiderEntity.createAttributes().build());
@@ -60,7 +60,7 @@ public final class NaturaEntities {
         event.accept(NITRO_CREEPER.get(), net.minecraft.world.entity.monster.Creeper.createAttributes().build());
     }
 
-    /** Where they may spawn (NeoForge RegisterSpawnPlacementsEvent, Fabric SpawnPlacements.register). */
+    /** Where they may spawn (Forge SpawnPlacementRegisterEvent, Fabric SpawnPlacements.register). */
     public static void placements(PlacementRegistrar event) {
         event.register(IMP.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ImpEntity::checkImpSpawnRules);
         event.register(HEATSCAR_SPIDER.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,

@@ -1,0 +1,15 @@
+{
+  "values": [
+    {
+      "id": "minecraft:soul_sand",
+      "required": false
+    },
+    {
+      "id": "minecraft:netherrack",
+      "required": false
+    },
+    "natura:tainted_soil",
+    "natura:tainted_farmland_dry",
+    "natura:tainted_farmland_heated"
+  ]
+}

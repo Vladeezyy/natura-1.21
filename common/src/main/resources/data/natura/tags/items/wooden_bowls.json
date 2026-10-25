@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "minecraft:bowl",
+      "required": false
+    },
+    "natura:ghostwood_bowl",
+    "natura:bloodwood_bowl",
+    "natura:darkwood_bowl",
+    "natura:fusewood_bowl"
+  ]
+}

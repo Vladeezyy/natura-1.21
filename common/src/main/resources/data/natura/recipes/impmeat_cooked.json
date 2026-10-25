@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "natura:impmeat_raw"
+  },
+  "result": "natura:impmeat_cooked",
+  "experience": 0.2,
+  "cookingtime": 200
+}

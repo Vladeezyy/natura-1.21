@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A  ",
+    "AA ",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:tiger_planks"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "natura:tiger_stairs"
+  },
+  "group": "natura:overworld_stairs"
+}

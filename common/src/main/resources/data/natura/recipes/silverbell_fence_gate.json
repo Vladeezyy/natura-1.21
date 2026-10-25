@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ABA",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:silverbell_stick"
+    },
+    "B": {
+      "item": "natura:silverbell_planks"
+    }
+  },
+  "result": {
+    "item": "natura:silverbell_fence_gate"
+  },
+  "group": "natura:overworld_fence_gates"
+}

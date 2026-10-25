@@ -17,8 +17,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * The blaze rails on Fabric (NeoForge: its rail API): a 0.65 top speed, the golden one boosts like the powered rail and
- * then runs its own push (NeoForge calls onMinecartPass just before the boost), the activator one activates carts.
+ * The blaze rails on Fabric (Forge: its rail API): a 0.65 top speed, the golden one boosts like the powered rail and
+ * then runs its own push (Forge calls onMinecartPass just before the boost), the activator one activates carts.
  */
 @Mixin(AbstractMinecart.class)
 public abstract class AbstractMinecartMixin {

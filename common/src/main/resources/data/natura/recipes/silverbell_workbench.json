@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA",
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:silverbell_planks"
+    }
+  },
+  "result": {
+    "item": "natura:silverbell_workbench"
+  },
+  "group": "natura:overworld_workbenches"
+}

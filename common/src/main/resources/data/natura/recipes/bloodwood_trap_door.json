@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:bloodwood_planks"
+    }
+  },
+  "result": {
+    "count": 2,
+    "item": "natura:bloodwood_trapdoor"
+  },
+  "group": "natura:nether_trap_doors"
+}

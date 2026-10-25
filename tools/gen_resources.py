@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generates the 1.21.1 resources of the Natura port from the 1.12 Natura resources.
+"""Generates the 1.21.1 resources of the Natura port from the 1.12 Natura resources (1.20.1: tools/gen_resources_1_20_1.sh).
 
     python3 -I tools/gen_resources.py <1.12 src/main/resources/assets/natura> common/src/main/resources
 
@@ -24,8 +24,11 @@ NS = "natura"
 ASSETS = os.path.join(OUT, "assets", NS)
 DATA = os.path.join(OUT, "data")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# the 1.21.1 vanilla assets (blockstates / models of the templates), unpacked by ModDevGradle for the common project
-VANILLA_JAR = os.path.join(ROOT, "common", "build", "moddev", "artifacts", "vanilla-1.21.1-20240808.144430-client-extra-aka-minecraft-resources.jar")
+# the vanilla assets (blockstates / models of the templates) of this branch's Minecraft, unpacked by ModDevGradle for
+# the common project (1.21.1: vanilla-*-client-extra-aka-minecraft-resources.jar; 1.20.1 legacyforge: client-extra-*.jar)
+_ARTIFACTS = os.path.join(ROOT, "common", "build", "moddev", "artifacts")
+VANILLA_JAR = next(os.path.join(_ARTIFACTS, f) for f in sorted(os.listdir(_ARTIFACTS))
+                   if f.endswith(".jar") and "client-extra" in f)
 
 
 def w(path, obj):

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:hopseed_planks"
+    }
+  },
+  "result": {
+    "item": "natura:hopseed_button"
+  },
+  "group": "natura:overworld_buttons"
+}

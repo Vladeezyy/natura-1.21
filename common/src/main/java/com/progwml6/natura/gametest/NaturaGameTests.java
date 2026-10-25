@@ -707,7 +707,7 @@ public final class NaturaGameTests {
         spider.kill();
         // the babies come when the body goes, after the 20 tick death animation (1.12 setDead)
         helper.runAfterDelay(25, () -> {
-            var found = helper.getLevel().getEntities(com.progwml6.natura.entities.NaturaEntities.BABY_HEATSCAR_SPIDER.get(), new net.minecraft.world.phys.AABB(helper.absolutePos(BlockPos.ZERO)).inflate(10), e -> true);
+            var found = helper.getLevel().getEntities(com.progwml6.natura.entities.NaturaEntities.BABY_HEATSCAR_SPIDER.get(), helper.getBounds().inflate(2), e -> true);
             int babies = found.size();
             helper.assertTrue(babies >= 2 && babies <= 4, "a dead heatscar spider leaves 2-4 babies: " + babies);
             found.forEach(net.minecraft.world.entity.Entity::discard);
@@ -768,7 +768,7 @@ public final class NaturaGameTests {
         helper.succeed();
     }
 
-    /** The nine 1.12 world generators are features added to every biome (NeoForge biome modifiers, Fabric BiomeModifications). */
+    /** The nine 1.12 world generators are features added to every biome (Forge biome modifiers, Fabric BiomeModifications). */
     private static void worldgenFeatures(GameTestHelper helper) {
         var access = helper.getLevel().registryAccess();
         var biomes = access.registryOrThrow(Registries.BIOME);

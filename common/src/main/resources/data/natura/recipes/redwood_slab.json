@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:redwood_planks"
+    }
+  },
+  "result": {
+    "count": 6,
+    "item": "natura:redwood_slab"
+  },
+  "group": "natura:overworld_slabs"
+}

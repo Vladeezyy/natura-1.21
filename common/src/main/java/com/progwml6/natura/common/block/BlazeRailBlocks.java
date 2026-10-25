@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * 1.12 blaze rails: rails with a 0.65 top speed (vanilla 0.4); the golden one also pushes and brakes in its own way.
- * The rail methods have the NeoForge IBaseRailBlockExtension signatures (no NeoForge types), so NeoForge calls them;
+ * The rail methods have the Forge IForgeBaseRailBlock signatures (no Forge types), so Forge calls them;
  * on Fabric mixins into the minecart do.
  */
 public final class BlazeRailBlocks {
@@ -53,7 +53,7 @@ public final class BlazeRailBlocks {
             this.activator = activator;
         }
 
-        /** NeoForge PoweredRailBlock.isActivatorRail; Fabric: the minecart mixin. */
+        /** Forge PoweredRailBlock.isActivatorRail; Fabric: the minecart mixin. */
         public boolean isActivatorRail() {
             return this.activator;
         }

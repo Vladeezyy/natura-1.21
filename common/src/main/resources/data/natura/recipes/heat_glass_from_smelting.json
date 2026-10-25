@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "natura:heat_sand"
+  },
+  "result": "natura:heat_glass",
+  "experience": 0.3,
+  "cookingtime": 200
+}

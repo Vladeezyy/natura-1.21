@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:amaranth_log"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "natura:amaranth_planks"
+  },
+  "group": "natura:overworld_planks"
+}

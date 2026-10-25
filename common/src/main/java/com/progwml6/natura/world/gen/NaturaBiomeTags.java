@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
-/** The conventional (c:) biome tags the 1.12 BiomeDictionary checks became; NeoForge and Fabric both fill them. */
+/** The conventional (c:) biome tags the 1.12 BiomeDictionary checks became; Forge and Fabric both fill them. */
 public final class NaturaBiomeTags {
     public static final TagKey<Biome> IS_BEACH = tag("is_beach");
     public static final TagKey<Biome> IS_END = tag("is_end");

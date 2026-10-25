@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:tiger_planks"
+    }
+  },
+  "result": {
+    "item": "natura:tiger_button"
+  },
+  "group": "natura:overworld_buttons"
+}

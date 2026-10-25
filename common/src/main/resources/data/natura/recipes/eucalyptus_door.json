@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA",
+    "AA",
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:eucalyptus_planks"
+    }
+  },
+  "result": {
+    "count": 3,
+    "item": "natura:eucalyptus_door"
+  },
+  "group": "natura:overworld_doors"
+}

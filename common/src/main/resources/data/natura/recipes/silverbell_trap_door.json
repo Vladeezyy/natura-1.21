@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:silverbell_planks"
+    }
+  },
+  "result": {
+    "count": 2,
+    "item": "natura:silverbell_trapdoor"
+  },
+  "group": "natura:overworld_trap_doors"
+}

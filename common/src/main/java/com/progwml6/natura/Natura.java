@@ -10,7 +10,7 @@ import com.progwml6.natura.entities.NaturaEntities;
 import com.progwml6.natura.tools.NaturaTools;
 import com.progwml6.natura.world.gen.NaturaFeatures;
 
-/** Natura: the common part, started by the NeoForge and the Fabric entry points. */
+/** Natura: the common part, started by the Forge and the Fabric entry points. */
 public final class Natura {
     public static final String MODID = "natura";
     public static final Logger LOG = LogUtils.getLogger();

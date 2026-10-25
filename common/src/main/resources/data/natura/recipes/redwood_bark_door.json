@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA",
+    "AA",
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:redwood_bark"
+    }
+  },
+  "result": {
+    "count": 3,
+    "item": "natura:redwood_bark_door"
+  },
+  "group": "natura:overworld_doors"
+}

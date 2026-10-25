@@ -16,7 +16,7 @@ import com.progwml6.natura.platform.ConfigSpec;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**
- * config/natura-common.toml on Fabric, the same file and layout NeoForge writes: read once at start (what is missing or
+ * config/natura-common.toml on Fabric, the same file and layout Forge writes: read once at start (what is missing or
  * out of range gets its default), then written back with every option.
  */
 final class FabricConfig {

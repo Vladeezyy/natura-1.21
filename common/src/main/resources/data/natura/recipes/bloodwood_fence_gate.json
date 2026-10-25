@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ABA",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:bloodwood_stick"
+    },
+    "B": {
+      "item": "natura:bloodwood_planks"
+    }
+  },
+  "result": {
+    "item": "natura:bloodwood_fence_gate"
+  },
+  "group": "natura:nether_fence_gates"
+}

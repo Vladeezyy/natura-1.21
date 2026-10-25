@@ -22,10 +22,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** What the common code needs from the mod loader (NeoForge or Fabric); found with {@link Services}. */
+/** What the common code needs from the mod loader (Forge or Fabric); found with {@link Services}. */
 public interface Platform {
 
-    /** "neoforge" or "fabric". */
+    /** "forge" or "fabric". */
     String name();
 
     // Registration
@@ -38,10 +38,10 @@ public interface Platform {
     /** A spawn egg for an entity type that may not exist yet when the item is made. */
     Item spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties);
 
-    /** The 1.12 kama: a sword that is also shears (NeoForge: the shears item abilities). */
+    /** The 1.12 kama: a sword that is also shears (Forge: the shears tool actions). */
     Item kama(Tier tier, Item.Properties properties);
 
-    /** The 1.12 tainted soil (NeoForge: nether plants are sustained by it). */
+    /** The 1.12 tainted soil (Forge: nether plants are sustained by it). */
     Block taintedSoil(BlockBehaviour.Properties properties);
 
     /** BlockEntityType.Builder.of (its factory interface is not public in vanilla). */
@@ -52,21 +52,21 @@ public interface Platform {
 
     // Hooks
 
-    /** NeoForge CommonHooks.canCropGrow: other mods may allow or deny a growth step. */
+    /** Forge ForgeHooks.onCropsGrowPre: other mods may allow or deny a growth step. */
     boolean canCropGrow(Level level, BlockPos pos, BlockState state, boolean grow);
 
-    /** NeoForge CommonHooks.fireCropGrowPost. */
+    /** Forge ForgeHooks.onCropsGrowPost. */
     void cropGrown(Level level, BlockPos pos, BlockState state);
 
     boolean isFakePlayer(Player player);
 
-    /** Bone meal on a block (NeoForge: BoneMealItem.applyBonemeal with its event, Fabric: BoneMealItem.growCrop). */
+    /** Bone meal on a block (Forge: BoneMealItem.applyBonemeal with its event, Fabric: BoneMealItem.growCrop). */
     boolean applyBonemeal(ItemStack stack, Level level, BlockPos pos, Player player);
 
-    /** A biome's downfall (NeoForge: after the biome modifiers' climate changes). */
+    /** A biome's downfall (Forge: after the biome modifiers' climate changes). */
     float downfall(Biome biome);
 
-    /** Whether a tool shears (NeoForge: the shears_dig ability, Fabric: shears and the c:tools/shears tag). */
+    /** Whether a tool shears (Forge: the SHEARS_DIG tool action, Fabric: shears and the c:tools/shears tag). */
     boolean isShears(ItemStack stack);
 
     // GameTests

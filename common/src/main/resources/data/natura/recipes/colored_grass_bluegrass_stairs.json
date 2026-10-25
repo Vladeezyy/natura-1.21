@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A  ",
+    "AA ",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:bluegrass"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "natura:bluegrass_stairs"
+  },
+  "group": "natura:overworld_stairs"
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA",
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:eucalyptus_planks"
+    }
+  },
+  "result": {
+    "item": "natura:eucalyptus_workbench"
+  },
+  "group": "natura:overworld_workbenches"
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:ghostwood_planks"
+    }
+  },
+  "result": {
+    "item": "natura:ghostwood_pressure_plate"
+  },
+  "group": "natura:nether_pressure_plates"
+}

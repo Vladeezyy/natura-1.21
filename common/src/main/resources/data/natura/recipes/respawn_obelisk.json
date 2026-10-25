@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "A A",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:ghostwood_log"
+    }
+  },
+  "result": {
+    "item": "natura:respawn_obelisk"
+  }
+}

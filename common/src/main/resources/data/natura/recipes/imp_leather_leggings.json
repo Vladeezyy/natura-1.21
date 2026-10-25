@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "A A",
+    "A A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:imp_leather"
+    }
+  },
+  "result": {
+    "item": "natura:imp_armor_leggings"
+  }
+}

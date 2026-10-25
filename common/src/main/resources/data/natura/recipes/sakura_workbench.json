@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA",
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:hopseed_planks"
+    }
+  },
+  "result": {
+    "item": "natura:hopseed_workbench"
+  },
+  "group": "natura:overworld_workbenches"
+}

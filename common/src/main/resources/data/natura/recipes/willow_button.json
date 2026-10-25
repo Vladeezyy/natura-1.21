@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:willow_planks"
+    }
+  },
+  "result": {
+    "item": "natura:willow_button"
+  },
+  "group": "natura:overworld_buttons"
+}

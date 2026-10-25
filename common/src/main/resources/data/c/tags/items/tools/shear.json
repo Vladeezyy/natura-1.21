@@ -1,0 +1,26 @@
+{
+  "replace": false,
+  "values": [
+    "natura:ghostwood_kama",
+    "natura:bloodwood_kama",
+    "natura:darkwood_kama",
+    "natura:fusewood_kama",
+    "natura:netherquartz_kama",
+    {
+      "id": "minecraft:shears",
+      "required": false
+    },
+    {
+      "id": "#forge:shears",
+      "required": false
+    },
+    {
+      "id": "#forge:tools/shears",
+      "required": false
+    },
+    {
+      "id": "#c:tools/shears",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:redwood_heart"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "natura:redwood_planks"
+  },
+  "group": "natura:overworld_planks"
+}

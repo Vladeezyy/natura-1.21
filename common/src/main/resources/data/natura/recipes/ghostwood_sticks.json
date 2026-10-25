@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A",
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:ghostwood_planks"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "natura:ghostwood_stick"
+  },
+  "group": "natura:nether_sticks"
+}

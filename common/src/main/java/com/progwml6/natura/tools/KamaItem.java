@@ -22,7 +22,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 
 /**
  * 1.12 ItemNaturaKama: a sword that is also shears. Cobweb and leaves break fast (15), wool at 5; it shears sheep (and
- * other shearable mobs) and gets the sheared drops of leaves, grass and vines (NeoForge: the shears item abilities, in
+ * other shearable mobs) and gets the sheared drops of leaves, grass and vines (Forge: the shears tool actions, in
  * its subclass; both: the c:tools/shears tag).
  */
 public class KamaItem extends SwordItem {
@@ -45,7 +45,7 @@ public class KamaItem extends SwordItem {
 
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
-        // vanilla shearable mobs (NeoForge: its IShearable ones, in its subclass)
+        // vanilla shearable mobs (Forge: its IForgeShearable ones, in its subclass)
         if (entity instanceof Shearable target && target.readyForShearing()) {
             if (!entity.level().isClientSide) {
                 target.shear(SoundSource.PLAYERS);

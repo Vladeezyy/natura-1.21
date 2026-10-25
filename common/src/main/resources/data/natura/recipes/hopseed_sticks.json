@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A ",
+    " A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:hopseed_planks"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "natura:hopseed_stick"
+  },
+  "group": "natura:overworld_sticks"
+}

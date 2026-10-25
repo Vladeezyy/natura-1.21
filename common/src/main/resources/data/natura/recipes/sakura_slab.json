@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:sakura_planks"
+    }
+  },
+  "result": {
+    "count": 6,
+    "item": "natura:hopseed_slab"
+  },
+  "group": "natura:overworld_slabs"
+}

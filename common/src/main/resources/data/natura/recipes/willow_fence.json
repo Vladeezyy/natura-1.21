@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BAB",
+    "BAB"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:willow_stick"
+    },
+    "B": {
+      "item": "natura:willow_planks"
+    }
+  },
+  "result": {
+    "count": 2,
+    "item": "natura:willow_fence"
+  },
+  "group": "natura:overworld_fences"
+}

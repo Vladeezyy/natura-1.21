@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:tiger_log"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "natura:tiger_planks"
+  },
+  "group": "natura:overworld_planks"
+}

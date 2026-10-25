@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.NetherWartBlock;
 import net.minecraft.world.level.block.RootsBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Nether wart, fungi and roots grow on tainted soil (NeoForge: TaintedSoilBlock canSustainPlant). */
+/** Nether wart, fungi and roots grow on tainted soil (Forge: ForgeTaintedSoilBlock canSustainPlant). */
 @Mixin({NetherWartBlock.class, FungusBlock.class, RootsBlock.class})
 public abstract class TaintedSoilPlantMixin {
     @Inject(method = "mayPlaceOn", at = @At("HEAD"), cancellable = true)

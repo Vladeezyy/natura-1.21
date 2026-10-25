@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:autumnal_grass"
+    }
+  },
+  "result": {
+    "count": 6,
+    "item": "natura:autumnal_grass_slab"
+  },
+  "group": "natura:overworld_slabs"
+}

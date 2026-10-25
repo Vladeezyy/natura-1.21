@@ -35,7 +35,7 @@ public class NaturaFabric implements ModInitializer {
         ResourceConditions.register(new ResourceLocation(Natura.MODID, ConfigOptionEnabledCondition.ID),
                 json -> ConfigOptionEnabledCondition.test(GsonHelper.getAsString(json, ConfigOptionEnabledCondition.FIELD)));
         NaturaBlocks.registerFlammability();
-        // the blaze hopper uses the vanilla hopper block entity (NeoForge: BlockEntityTypeAddBlocksEvent)
+        // the blaze hopper uses the vanilla hopper block entity (Forge 1.20.1: the same, through its access transformer)
         BlockEntityType.HOPPER.validBlocks = ImmutableSet.<Block>builder().addAll(BlockEntityType.HOPPER.validBlocks)
                 .add(NaturaBlocks.BLAZE_HOPPER.get()).build();
         NaturaEntities.attributes(FabricDefaultAttributeRegistry::register);

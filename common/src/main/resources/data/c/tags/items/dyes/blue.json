@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "natura:blue_dye",
+    {
+      "id": "minecraft:blue_dye",
+      "required": false
+    },
+    {
+      "id": "#forge:dyes/blue",
+      "required": false
+    }
+  ]
+}

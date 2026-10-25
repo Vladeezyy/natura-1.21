@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA",
+    " B",
+    " B"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:bloodwood_planks"
+    },
+    "B": {
+      "item": "natura:bloodwood_stick"
+    }
+  },
+  "result": {
+    "item": "natura:bloodwood_kama"
+  }
+}

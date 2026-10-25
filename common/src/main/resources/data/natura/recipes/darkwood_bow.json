@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AB ",
+    "A B",
+    "AB "
+  ],
+  "key": {
+    "A": {
+      "item": "natura:flame_string"
+    },
+    "B": {
+      "item": "natura:darkwood_stick"
+    }
+  },
+  "result": {
+    "item": "natura:darkwood_bow"
+  }
+}

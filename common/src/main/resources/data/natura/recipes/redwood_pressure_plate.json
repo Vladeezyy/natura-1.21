@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AA"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:redwood_planks"
+    }
+  },
+  "result": {
+    "item": "natura:redwood_pressure_plate"
+  },
+  "group": "natura:overworld_pressure_plates"
+}

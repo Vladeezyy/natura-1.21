@@ -30,7 +30,7 @@ public final class Registration {
         return new ItemEntry<>(id(name), Services.PLATFORM.register(Registries.ITEM, name, factory));
     }
 
-    /** NeoForge DeferredRegister.Blocks-like: {@code BLOCKS.register(id, factory)}. */
+    /** DeferredRegister.Blocks-like (as in NeoForge 1.21): {@code BLOCKS.register(id, factory)}. */
     public static final class Blocks {
         private final List<BlockEntry<?>> entries = new ArrayList<>();
 
@@ -45,7 +45,7 @@ public final class Registration {
         }
     }
 
-    /** NeoForge DeferredRegister.Items-like: {@code ITEMS.register(id, factory)}. */
+    /** DeferredRegister.Items-like (as in NeoForge 1.21): {@code ITEMS.register(id, factory)}. */
     public static final class Items {
         public <I extends Item> ItemEntry<I> register(String name, Supplier<I> factory) {
             return item(name, factory);

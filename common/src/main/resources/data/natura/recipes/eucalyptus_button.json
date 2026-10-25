@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:eucalyptus_planks"
+    }
+  },
+  "result": {
+    "item": "natura:eucalyptus_button"
+  },
+  "group": "natura:overworld_buttons"
+}

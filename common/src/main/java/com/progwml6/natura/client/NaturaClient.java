@@ -55,7 +55,7 @@ public final class NaturaClient {
      * 1.12 ItemNaturaBow: "pulling" like the vanilla bow; its "pull" compared the drawn item with a field that was still
      * null when the bow was made, so it was always 0 and the bows only ever show their first pulling frame.
      */
-    /** On the main thread after the registries (NeoForge FMLClientSetupEvent work, Fabric client init). */
+    /** On the main thread after the registries (Forge FMLClientSetupEvent work, Fabric client init). */
     public static void setup() {
         for (String wood : new String[] {"ghostwood", "bloodwood", "darkwood", "fusewood"}) {
             var bow = com.progwml6.natura.tools.NaturaTools.TOOLS.get(wood + "_bow").get();

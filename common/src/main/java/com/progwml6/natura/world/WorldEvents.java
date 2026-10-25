@@ -25,7 +25,7 @@ public final class WorldEvents {
 
     private WorldEvents() {}
 
-    /** An entity joined a server level (NeoForge EntityJoinLevelEvent, Fabric ServerEntityEvents.ENTITY_LOAD). */
+    /** An entity joined a server level (Forge EntityJoinLevelEvent, Fabric ServerEntityEvents.ENTITY_LOAD). */
     public static void onJoin(Entity entity) {
         if (entity instanceof Cow || entity instanceof Sheep) {
             var animal = (net.minecraft.world.entity.animal.Animal) entity;

@@ -11,14 +11,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * 1.12 BlockTaintedSoil (soil, dry and heated farmland): nether plants grow on it and it burns forever like netherrack
- * (also in the infiniburn tags). NeoForge: canSustainPlant in its subclass; Fabric: mixins into the nether plants.
+ * (also in the infiniburn tags). Forge: canSustainPlant in its subclass; Fabric: mixins into the nether plants.
  */
 public class TaintedSoilBlock extends Block {
     public TaintedSoilBlock(Properties properties) {
         super(properties);
     }
 
-    /** NeoForge IBlockExtension.isFireSource (same signature, no NeoForge types). */
+    /** Forge IForgeBlock.isFireSource (same signature, no Forge types). */
     public boolean isFireSource(BlockState state, LevelReader level, BlockPos pos, Direction direction) {
         return true;
     }

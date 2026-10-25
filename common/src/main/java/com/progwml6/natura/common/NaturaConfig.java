@@ -6,7 +6,7 @@ import com.progwml6.natura.platform.ConfigSpec;
 
 /**
  * The 1.12 Natura config (natura.cfg), with the same options, sections and defaults. A common config,
- * config/natura-common.toml on both loaders (NeoForge: a ModConfigSpec built from {@link #SPEC}, Fabric: the same file
+ * config/natura-common.toml on both loaders (Forge: a ForgeConfigSpec built from {@link #SPEC}, Fabric: the same file
  * read and written by the Fabric project).
  */
 public final class NaturaConfig {

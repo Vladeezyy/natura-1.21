@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "natura:darkwood_log"
+    }
+  },
+  "result": {
+    "count": 4,
+    "item": "natura:darkwood_planks"
+  },
+  "group": "natura:nether_planks"
+}
