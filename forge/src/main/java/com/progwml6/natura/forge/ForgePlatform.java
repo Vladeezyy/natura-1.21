@@ -1,15 +1,16 @@
-package com.progwml6.natura.neoforge;
+package com.progwml6.natura.forge;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableSet;
 import com.progwml6.natura.Natura;
+import com.progwml6.natura.common.NaturaBlocks;
 import com.progwml6.natura.platform.Platform;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceKey;
@@ -30,16 +31,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
-import net.neoforged.neoforge.common.ItemAbilities;
-import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.network.registration.NetworkRegistry;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.common.ToolActions;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
 
-/** The NeoForge side of {@link Platform}: deferred registers on the mod bus and the NeoForge hooks. */
-public class NeoForgePlatform implements Platform {
+/** The Forge side of {@link Platform}: deferred registers on the mod bus and the Forge hooks. */
+public class ForgePlatform implements Platform {
     /** Set by {@link #init} from the mod constructor, before the common registrations. */
     private static IEventBus modBus;
     private static final Map<ResourceKey<?>, DeferredRegister<?>> REGISTERS = new HashMap<>();
@@ -57,14 +57,21 @@ public class NeoForgePlatform implements Platform {
         });
     }
 
-    @Override
-    public String name() {
-        return "neoforge";
+    /** The blaze hopper is a hopper block entity (Forge 1.20.1 has no event for it: the AT opens validBlocks). */
+    static void addHopperBlock() {
+        BlockEntityType.HOPPER.validBlocks = ImmutableSet.<Block>builder().addAll(BlockEntityType.HOPPER.validBlocks)
+                .add(NaturaBlocks.BLAZE_HOPPER.get()).build();
     }
 
     @Override
-    public <R, T extends R> Holder<R> register(ResourceKey<? extends Registry<R>> registry, String name, Supplier<T> factory) {
-        return deferred(registry).register(name, factory);
+    public String name() {
+        return "forge";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <R, T extends R> Supplier<R> register(ResourceKey<? extends Registry<R>> registry, String name, Supplier<T> factory) {
+        return (Supplier<R>) deferred(registry).register(name, factory);
     }
 
     @Override
@@ -75,17 +82,17 @@ public class NeoForgePlatform implements Platform {
     @Override
     @SuppressWarnings("unchecked")
     public Item spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties) {
-        return new DeferredSpawnEggItem((Supplier<? extends EntityType<? extends Mob>>) type, background, highlight, properties);
+        return new ForgeSpawnEggItem((Supplier<? extends EntityType<? extends Mob>>) type, background, highlight, properties);
     }
 
     @Override
     public Item kama(Tier tier, Item.Properties properties) {
-        return new NeoForgeKamaItem(tier, properties);
+        return new ForgeKamaItem(tier, properties);
     }
 
     @Override
     public Block taintedSoil(BlockBehaviour.Properties properties) {
-        return new NeoForgeTaintedSoilBlock(properties);
+        return new ForgeTaintedSoilBlock(properties);
     }
 
     @Override
@@ -100,12 +107,12 @@ public class NeoForgePlatform implements Platform {
 
     @Override
     public boolean canCropGrow(Level level, BlockPos pos, BlockState state, boolean grow) {
-        return CommonHooks.canCropGrow(level, pos, state, grow);
+        return ForgeHooks.onCropsGrowPre(level, pos, state, grow);
     }
 
     @Override
     public void cropGrown(Level level, BlockPos pos, BlockState state) {
-        CommonHooks.fireCropGrowPost(level, pos, state);
+        ForgeHooks.onCropsGrowPost(level, pos, state);
     }
 
     @Override
@@ -115,7 +122,7 @@ public class NeoForgePlatform implements Platform {
 
     @Override
     public boolean isShears(ItemStack stack) {
-        return stack.canPerformAction(ItemAbilities.SHEARS_DIG);
+        return stack.canPerformAction(ToolActions.SHEARS_DIG);
     }
 
     @Override
@@ -130,6 +137,6 @@ public class NeoForgePlatform implements Platform {
 
     @Override
     public void configureMockConnection(Connection connection) {
-        NetworkRegistry.configureMockConnection(connection);
+        // Forge 1.20.1 sends to any connection
     }
 }

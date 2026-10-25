@@ -1,7 +1,5 @@
 package com.progwml6.natura.common.block;
 
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
@@ -10,12 +8,12 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SaplingBlock;
-import net.minecraft.world.level.block.grower.TreeGrower;
+import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Natura saplings (1.12 BlockSapling subclasses): vanilla ticking (light 9, 1 in 7, two stages) and bone meal (45%),
- * the tree comes from the Natura generator instead of a TreeGrower. Overworld saplings use the vanilla soil rules,
+ * the tree comes from the Natura generator instead of a tree grower. Overworld saplings use the vanilla soil rules,
  * nether ones grow on {@link #soil} (soul sand, netherrack, tainted soil), and the bloodwood sapling hangs from it.
  */
 public class NaturaSaplingBlock extends SaplingBlock {
@@ -30,7 +28,14 @@ public class NaturaSaplingBlock extends SaplingBlock {
     private final boolean hanging;
 
     public NaturaSaplingBlock(String name, Tree tree, TagKey<Block> soil, boolean hanging, Properties properties) {
-        super(new TreeGrower("natura_" + name, Optional.empty(), Optional.empty(), Optional.empty()), properties);
+        // the tree comes from advanceTree; the vanilla grower has no feature
+        super(new AbstractTreeGrower() {
+            @Override
+            protected net.minecraft.resources.ResourceKey<net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?>> getConfiguredFeature(
+                    RandomSource random, boolean flowers) {
+                return null;
+            }
+        }, properties);
         this.tree = tree;
         this.soil = soil;
         this.hanging = hanging;
@@ -42,7 +47,7 @@ public class NaturaSaplingBlock extends SaplingBlock {
     }
 
     @Override
-    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         if (this.soil == null) {
             return super.canSurvive(state, level, pos);
         }

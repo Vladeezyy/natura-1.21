@@ -78,7 +78,7 @@ public class HeatscarSpiderEntity extends Spider {
                     default -> 0;
                 };
                 if (time > 0) {
-                    target.igniteForSeconds(time);
+                    target.setSecondsOnFire(time);
                 }
             }
             return true;

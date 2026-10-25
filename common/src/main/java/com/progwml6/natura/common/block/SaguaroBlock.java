@@ -2,7 +2,6 @@ package com.progwml6.natura.common.block;
 
 import java.util.Map;
 
-import com.mojang.serialization.MapCodec;
 import com.progwml6.natura.common.NaturaBlocks;
 
 import net.minecraft.core.BlockPos;
@@ -47,11 +46,6 @@ public class SaguaroBlock extends Block {
     }
 
     @Override
-    protected MapCodec<? extends Block> codec() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(PROPERTIES.values().toArray(new BooleanProperty[0]));
     }
@@ -86,40 +80,40 @@ public class SaguaroBlock extends Block {
     }
 
     @Override
-    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState below = level.getBlockState(pos.below());
         return below.getBlock() instanceof SaguaroBlock || below.is(Blocks.SAND) || below.is(Blocks.RED_SAND);
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbor, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighbor, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         return state.setValue(PROPERTIES.get(direction), connects(level, neighborPos));
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(PipeBlock.UP) ? UP : NORMAL;
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return NORMAL;
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (!(entity instanceof ItemEntity)) {
             entity.hurt(level.damageSources().cactus(), 1.0F);
         }
     }
 
     @Override
-    protected boolean isRandomlyTicking(BlockState state) {
+    public boolean isRandomlyTicking(BlockState state) {
         return true;
     }
 
     @Override
-    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (level.getLevelData().isRaining() && level.isEmptyBlock(pos.above())) {
             boolean canGrow = random.nextInt(20) == 0;
             if (com.progwml6.natura.platform.Services.PLATFORM.canCropGrow(level, pos, state, canGrow)) {
@@ -139,7 +133,7 @@ public class SaguaroBlock extends Block {
     }
 
     @Override
-    protected BlockState rotate(BlockState state, Rotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         BlockState out = state;
         for (Direction dir : Direction.Plane.HORIZONTAL) {
             out = out.setValue(PROPERTIES.get(rotation.rotate(dir)), state.getValue(PROPERTIES.get(dir)));
@@ -148,7 +142,7 @@ public class SaguaroBlock extends Block {
     }
 
     @Override
-    protected BlockState mirror(BlockState state, Mirror mirror) {
+    public BlockState mirror(BlockState state, Mirror mirror) {
         BlockState out = state;
         for (Direction dir : Direction.Plane.HORIZONTAL) {
             out = out.setValue(PROPERTIES.get(mirror.mirror(dir)), state.getValue(PROPERTIES.get(dir)));

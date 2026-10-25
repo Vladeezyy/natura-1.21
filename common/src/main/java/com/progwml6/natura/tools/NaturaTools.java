@@ -8,17 +8,12 @@ import java.util.Map;
 import com.progwml6.natura.Natura;
 import com.progwml6.natura.common.NaturaBlocks;
 
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.ShovelItem;
@@ -28,12 +23,8 @@ import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
-import com.progwml6.natura.platform.Entry;
 import com.progwml6.natura.platform.ItemEntry;
-import com.progwml6.natura.platform.Registration;
 import com.progwml6.natura.platform.Services;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.block.Block;
 
 /**
  * 1.12 NaturaTools: ghostwood (wood), bloodwood (its own: mines like iron, 350 uses, speed 7, damage +3, enchantability
@@ -57,9 +48,10 @@ public final class NaturaTools {
             return 3.0F;
         }
 
+        /** Mines like iron. */
         @Override
-        public TagKey<Block> getIncorrectBlocksForDrops() {
-            return BlockTags.INCORRECT_FOR_IRON_TOOL;
+        public int getLevel() {
+            return 2;
         }
 
         @Override
@@ -74,27 +66,65 @@ public final class NaturaTools {
     };
 
     /** 1.12 "Imp": durability factor 33, 1 / 3 / 2 / 1 (boots, leggings, chestplate, helmet), enchantability 15, no repair item. */
-    public static final Entry<ArmorMaterial, ArmorMaterial> IMP = Registration.register(Registries.ARMOR_MATERIAL, "imp", () -> {
-        Map<ArmorItem.Type, Integer> defense = new EnumMap<>(ArmorItem.Type.class);
-        defense.put(ArmorItem.Type.BOOTS, 1);
-        defense.put(ArmorItem.Type.LEGGINGS, 3);
-        defense.put(ArmorItem.Type.CHESTPLATE, 2);
-        defense.put(ArmorItem.Type.HELMET, 1);
-        defense.put(ArmorItem.Type.BODY, 2);
-        return new ArmorMaterial(defense, 15, SoundEvents.ARMOR_EQUIP_GENERIC, () -> Ingredient.EMPTY,
-                List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(Natura.MODID, "imp"))), 0.0F, 0.0F);
-    });
+    public static final ArmorMaterial IMP = new ArmorMaterial() {
+        /** vanilla ArmorMaterials health per slot (boots 13, leggings 15, chestplate 16, helmet 11) times the factor */
+        private static final Map<ArmorItem.Type, Integer> HEALTH = new EnumMap<>(Map.of(ArmorItem.Type.BOOTS, 13,
+                ArmorItem.Type.LEGGINGS, 15, ArmorItem.Type.CHESTPLATE, 16, ArmorItem.Type.HELMET, 11));
+        private static final Map<ArmorItem.Type, Integer> DEFENSE = new EnumMap<>(Map.of(ArmorItem.Type.BOOTS, 1,
+                ArmorItem.Type.LEGGINGS, 3, ArmorItem.Type.CHESTPLATE, 2, ArmorItem.Type.HELMET, 1));
+
+        @Override
+        public int getDurabilityForType(ArmorItem.Type type) {
+            return HEALTH.get(type) * 33;
+        }
+
+        @Override
+        public int getDefenseForType(ArmorItem.Type type) {
+            return DEFENSE.get(type);
+        }
+
+        @Override
+        public int getEnchantmentValue() {
+            return 15;
+        }
+
+        @Override
+        public SoundEvent getEquipSound() {
+            return SoundEvents.ARMOR_EQUIP_GENERIC;
+        }
+
+        @Override
+        public Ingredient getRepairIngredient() {
+            return Ingredient.EMPTY;
+        }
+
+        /** natura:textures/models/armor/imp_layer_1.png (Forge reads the namespace; Fabric: ArmorTextureMixin) */
+        @Override
+        public String getName() {
+            return Natura.MODID + ":imp";
+        }
+
+        @Override
+        public float getToughness() {
+            return 0.0F;
+        }
+
+        @Override
+        public float getKnockbackResistance() {
+            return 0.0F;
+        }
+    };
 
     public static final Map<String, ItemEntry<Item>> TOOLS = new LinkedHashMap<>();
     /** The imp armor with the enchantments its 1.12 creative tab stacks had. */
-    public static final Map<ItemEntry<Item>, List<ResourceKey<Enchantment>>> ENCHANTED = new LinkedHashMap<>();
+    public static final Map<ItemEntry<Item>, List<Enchantment>> ENCHANTED = new LinkedHashMap<>();
 
     static {
         // 1.12 order: imp armor (NaturaEntities loaded), then the nether tools
-        armor("imp_armor_helmet", ArmorItem.Type.HELMET, Enchantments.PROTECTION);
+        armor("imp_armor_helmet", ArmorItem.Type.HELMET, Enchantments.ALL_DAMAGE_PROTECTION);
         armor("imp_armor_chestplate", ArmorItem.Type.CHESTPLATE, Enchantments.BLAST_PROTECTION);
         armor("imp_armor_leggings", ArmorItem.Type.LEGGINGS, Enchantments.PROJECTILE_PROTECTION);
-        armor("imp_armor_boots", ArmorItem.Type.BOOTS, Enchantments.FEATHER_FALLING);
+        armor("imp_armor_boots", ArmorItem.Type.BOOTS, Enchantments.FALL_PROTECTION);
         woodTools("ghostwood", Tiers.WOOD, 384);
         woodTools("bloodwood", BLOODWOOD, 1501);
         woodTools("darkwood", Tiers.STONE, 162);
@@ -114,19 +144,19 @@ public final class NaturaTools {
         return holder;
     }
 
-    private static void armor(String id, ArmorItem.Type type, ResourceKey<Enchantment> enchantment) {
-        ItemEntry<Item> holder = register(id, new Item.Properties().durability(type.getDurability(33)), p -> new ArmorItem(IMP.holder(), type, p));
+    private static void armor(String id, ArmorItem.Type type, Enchantment enchantment) {
+        ItemEntry<Item> holder = register(id, new Item.Properties(), p -> new ArmorItem(IMP, type, p));
         ENCHANTED.put(holder, List.of(enchantment, Enchantments.FIRE_PROTECTION));
     }
 
     private static void tools(String wood, Tier tier) {
-        register(wood + "_sword", new Item.Properties(), p -> new SwordItem(tier, p.attributes(SwordItem.createAttributes(tier, 3, -2.4F))));
-        register(wood + "_pickaxe", new Item.Properties(), p -> new PickaxeItem(tier, p.attributes(DiggerItem.createAttributes(tier, 1.0F, -2.8F))));
-        register(wood + "_shovel", new Item.Properties(), p -> new ShovelItem(tier, p.attributes(DiggerItem.createAttributes(tier, 1.5F, -3.0F))));
+        register(wood + "_sword", new Item.Properties(), p -> new SwordItem(tier, 3, -2.4F, p));
+        register(wood + "_pickaxe", new Item.Properties(), p -> new PickaxeItem(tier, 1, -2.8F, p));
+        register(wood + "_shovel", new Item.Properties(), p -> new ShovelItem(tier, 1.5F, -3.0F, p));
         // 1.12 ItemAxe damage / speed per vanilla material, bloodwood its own 3 / -3.0
         float damage = tier == Tiers.WOOD ? 6.0F : tier == BLOODWOOD ? 3.0F : tier == Tiers.STONE ? 7.0F : 6.0F;
         float speed = tier == Tiers.WOOD ? -3.2F : tier == BLOODWOOD ? -3.0F : tier == Tiers.STONE ? -3.2F : -3.1F;
-        register(wood + "_axe", new Item.Properties(), p -> new AxeItem(tier, p.attributes(DiggerItem.createAttributes(tier, damage, speed))));
+        register(wood + "_axe", new Item.Properties(), p -> new AxeItem(tier, damage, speed, p));
         register(wood + "_kama", new Item.Properties(), p -> Services.PLATFORM.kama(tier, p));
     }
 

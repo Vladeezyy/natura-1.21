@@ -22,10 +22,10 @@ import net.minecraft.world.entity.EntityType;
 
 /** The 1.12 renderers: the imp model, the vanilla spider (x2, baby x0.85) and creeper with the Natura textures. */
 public final class NaturaEntityRenderers {
-    public static final ModelLayerLocation IMP = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Natura.MODID, "imp"), "main");
-    private static final ResourceLocation IMP_TEXTURE = ResourceLocation.fromNamespaceAndPath(Natura.MODID, "textures/entity/imp.png");
-    private static final ResourceLocation SPIDER_TEXTURE = ResourceLocation.fromNamespaceAndPath(Natura.MODID, "textures/entity/heatscarspider.png");
-    private static final ResourceLocation CREEPER_TEXTURE = ResourceLocation.fromNamespaceAndPath(Natura.MODID, "textures/entity/nitrocreeper.png");
+    public static final ModelLayerLocation IMP = new ModelLayerLocation(new ResourceLocation(Natura.MODID, "imp"), "main");
+    private static final ResourceLocation IMP_TEXTURE = new ResourceLocation(Natura.MODID, "textures/entity/imp.png");
+    private static final ResourceLocation SPIDER_TEXTURE = new ResourceLocation(Natura.MODID, "textures/entity/heatscarspider.png");
+    private static final ResourceLocation CREEPER_TEXTURE = new ResourceLocation(Natura.MODID, "textures/entity/nitrocreeper.png");
 
     private NaturaEntityRenderers() {}
 

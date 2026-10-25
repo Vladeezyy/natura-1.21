@@ -11,7 +11,7 @@ import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaPlugin;
-import snownee.jade.api.JadeIds;
+import snownee.jade.api.Identifiers;
 import snownee.jade.api.WailaPlugin;
 import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.theme.IThemeHelper;
@@ -30,7 +30,7 @@ public class NaturaJadePlugin implements IWailaPlugin {
     public enum Crop implements IBlockComponentProvider {
         INSTANCE;
 
-        private static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(Natura.MODID, "crop");
+        private static final ResourceLocation UID = new ResourceLocation(Natura.MODID, "crop");
 
         @Override
         public IElement getIcon(BlockAccessor accessor, IPluginConfig config, IElement currentIcon) {
@@ -45,7 +45,9 @@ public class NaturaJadePlugin implements IWailaPlugin {
             if (!(accessor.getBlock() instanceof NaturaCropBlock crop)) {
                 return;
             }
-            tooltip.replace(JadeIds.CORE_OBJECT_NAME, IThemeHelper.get().title(new ItemStack(crop.crop()).getHoverName()));
+            // Jade 11 has no replace(): the name line goes and comes back first, with the same tag
+            tooltip.remove(Identifiers.CORE_OBJECT_NAME);
+            tooltip.add(0, IThemeHelper.get().title(new ItemStack(crop.crop()).getHoverName()), Identifiers.CORE_OBJECT_NAME);
             float growth = crop.getAge(accessor.getBlockState()) / (float) crop.getMaxAge() * 100.0F;
             if (growth < 100.0F) {
                 tooltip.add(Component.translatable("tooltip.jade.crop_growth", IThemeHelper.get().info(String.format("%.0f%%", growth))));

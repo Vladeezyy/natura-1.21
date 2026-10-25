@@ -14,18 +14,27 @@ import net.minecraft.world.item.TooltipFlag;
  * for the others (1.12 displayCustomEffectsTooltip).
  */
 public class NaturaFoodItem extends NaturaItem {
-    public NaturaFoodItem(Properties properties) {
+    /** 1.12 itemUseDuration (1.21: FoodProperties eatSeconds; 1.20.1 has only normal or fast food). */
+    private final int eatTicks;
+
+    public NaturaFoodItem(Properties properties, int eatTicks) {
         super(properties);
+        this.eatTicks = eatTicks;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public int getUseDuration(ItemStack stack) {
+        return this.eatTicks;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
-        FoodProperties food = stack.get(net.minecraft.core.component.DataComponents.FOOD);
+        FoodProperties food = this.getFoodProperties();
         if (food != null) {
-            for (FoodProperties.PossibleEffect effect : food.effects()) {
-                var instance = effect.effect();
-                boolean bad = instance.getEffect().value().getCategory() == MobEffectCategory.HARMFUL;
+            for (var effect : food.getEffects()) {
+                var instance = effect.getFirst();
+                boolean bad = instance.getEffect().getCategory() == MobEffectCategory.HARMFUL;
                 tooltip.add(Component.translatable(instance.getDescriptionId()).withStyle(bad ? ChatFormatting.RED : ChatFormatting.BLUE));
             }
         }

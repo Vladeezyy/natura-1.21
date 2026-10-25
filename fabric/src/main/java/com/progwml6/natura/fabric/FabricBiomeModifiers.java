@@ -57,7 +57,7 @@ final class FabricBiomeModifiers {
                 throw new IllegalStateException("Could not read " + file, e);
             }
             String name = file.getFileName().toString().replace(".json", "");
-            apply(ResourceLocation.fromNamespaceAndPath(Natura.MODID, name), json);
+            apply(new ResourceLocation(Natura.MODID, name), json);
         }
     }
 
@@ -78,7 +78,7 @@ final class FabricBiomeModifiers {
             case "neoforge:add_features" -> {
                 GenerationStep.Decoration step = GenerationStep.Decoration.valueOf(json.get("step").getAsString().toUpperCase(java.util.Locale.ROOT));
                 List<ResourceKey<net.minecraft.world.level.levelgen.placement.PlacedFeature>> features = strings(json.get("features")).stream()
-                        .map(f -> ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.parse(f))).toList();
+                        .map(f -> ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(f))).toList();
                 BiomeModifications.create(id).add(ModificationPhase.ADDITIONS, biomes, context -> {
                     if (enabled(conditions)) {
                         features.forEach(feature -> context.getGenerationSettings().addFeature(step, feature));
@@ -104,7 +104,7 @@ final class FabricBiomeModifiers {
     }
 
     private static void addSpawn(BiomeModificationContext context, JsonObject spawner) {
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(spawner.get("type").getAsString()));
+        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(spawner.get("type").getAsString()));
         context.getSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type, spawner.get("weight").getAsInt(),
                 spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()));
     }
@@ -118,7 +118,7 @@ final class FabricBiomeModifiers {
             return BiomeSelectors.all();
         }
         if (biomes.isJsonPrimitive() && biomes.getAsString().startsWith("#")) {
-            return BiomeSelectors.tag(TagKey.create(Registries.BIOME, ResourceLocation.parse(biomes.getAsString().substring(1))));
+            return BiomeSelectors.tag(TagKey.create(Registries.BIOME, new ResourceLocation(biomes.getAsString().substring(1))));
         }
         throw new IllegalStateException("Unsupported biomes: " + biomes);
     }

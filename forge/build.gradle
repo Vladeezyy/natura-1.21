@@ -1,10 +1,10 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.neoforged.moddev'
+    id 'net.neoforged.moddev.legacyforge'
 }
 
-neoForge {
-    version = neo_version
+legacyForge {
+    version = forge_version
     parchment {
         minecraftVersion = parchment_minecraft
         mappingsVersion = parchment_version
@@ -12,9 +12,8 @@ neoForge {
     runs {
         configureEach {
             gameDirectory = project.file('run')
-            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
-            systemProperty 'forge.logging.markers', 'REGISTRIES'
-            logLevel = org.slf4j.event.Level.DEBUG
+            systemProperty 'forge.enabledGameTestNamespaces', mod_id
+            logLevel = org.slf4j.event.Level.INFO
         }
         client {
             client()
@@ -23,8 +22,10 @@ neoForge {
             server()
             programArgument '--nogui'
         }
+        // Forge 1.20.1 runs the tests in an ordinary server world (vanilla: a flat one): its own folder, flat
         gameTestServer {
             type = 'gameTestServer'
+            gameDirectory = project.file('run-gametest')
         }
         // Scripted test scene (com.progwml6.natura.client.DevScene): joins run/saves/natura_scene, screenshots the
         // blocks, items and machines to run/screenshots/scene_*.png and quits.
@@ -51,17 +52,17 @@ configurations {
 }
 
 dependencies {
-    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
-    compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
-    localRuntime "maven.modrinth:jade:${jade_version}+neoforge"
+    modRuntimeOnly "mezz.jei:jei-${minecraft_version}-forge:${jei_version}"
+    modCompileOnly "maven.modrinth:jade:${jade_version}+forge"
+    modRuntimeOnly "maven.modrinth:jade:${jade_version}+forge"
 }
 
-// neoforge.mods.toml comes from src/main/templates with the gradle properties
+// mods.toml comes from src/main/templates with the gradle properties
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     var replaceProperties = [
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
-            neo_version_range      : neo_version_range,
+            forge_version_range    : forge_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : license,
@@ -73,10 +74,15 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
     into 'build/generated/sources/modMetadata'
 }
 sourceSets.main.resources.srcDir generateModMetadata
-neoForge.ideSyncTask generateModMetadata
+legacyForge.ideSyncTask generateModMetadata
 
-// The 1.21.1 game test server reuses run/world: each run starts from a fresh world.
-def gameTestWorld = file('run/world')
+// Forge 1.20.1's game test server is a dedicated server on server.properties: each run starts from a fresh flat world
+def gameTestDir = file('run-gametest')
 tasks.matching { it.name == 'runGameTestServer' }.configureEach {
-    doFirst { gameTestWorld.deleteDir() }
+    doFirst {
+        new File(gameTestDir, 'world').deleteDir()
+        gameTestDir.mkdirs()
+        new File(gameTestDir, 'server.properties').text = 'level-type=minecraft\\:flat\ngenerate-structures=false\nspawn-monsters=false\nonline-mode=false\n'
+        new File(gameTestDir, 'eula.txt').text = 'eula=true\n'
+    }
 }

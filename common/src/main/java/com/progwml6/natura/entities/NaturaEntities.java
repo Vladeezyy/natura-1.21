@@ -6,7 +6,6 @@ import com.progwml6.natura.common.NaturaBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -17,7 +16,7 @@ import com.progwml6.natura.platform.Registration;
 import com.progwml6.natura.platform.Services;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.SpawnPlacementType;
+import net.minecraft.world.entity.SpawnPlacements.Type;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import com.progwml6.natura.platform.Entry;
@@ -63,12 +62,12 @@ public final class NaturaEntities {
 
     /** Where they may spawn (NeoForge RegisterSpawnPlacementsEvent, Fabric SpawnPlacements.register). */
     public static void placements(PlacementRegistrar event) {
-        event.register(IMP.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ImpEntity::checkImpSpawnRules);
-        event.register(HEATSCAR_SPIDER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+        event.register(IMP.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ImpEntity::checkImpSpawnRules);
+        event.register(HEATSCAR_SPIDER.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 HeatscarSpiderEntity::checkHeatscarSpawnRules);
-        event.register(BABY_HEATSCAR_SPIDER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+        event.register(BABY_HEATSCAR_SPIDER.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 HeatscarSpiderEntity::checkHeatscarSpawnRules);
-        event.register(NITRO_CREEPER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules);
+        event.register(NITRO_CREEPER.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules);
     }
 
     /** 1.12 spawn eggs were in the vanilla eggs tab. */
@@ -77,6 +76,6 @@ public final class NaturaEntities {
     }
 
     public interface PlacementRegistrar {
-        <T extends Mob> void register(EntityType<T> type, SpawnPlacementType placement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> predicate);
+        <T extends Mob> void register(EntityType<T> type, SpawnPlacements.Type placement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> predicate);
     }
 }

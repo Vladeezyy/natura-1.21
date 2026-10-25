@@ -140,7 +140,7 @@ final class FabricConfig {
                 lines.add("\t#Range: " + (integer.min() == Integer.MIN_VALUE ? "< " + integer.max()
                         : integer.max() == Integer.MAX_VALUE ? "> " + integer.min() : integer.min() + " ~ " + integer.max()));
             }
-            lines.add("\t" + quote(path.getLast()) + " = " + value.get());
+            lines.add("\t" + quote(path.get(path.size() - 1)) + " = " + value.get());
         }
         return lines;
     }

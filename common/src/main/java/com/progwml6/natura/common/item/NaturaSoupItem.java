@@ -13,7 +13,7 @@ public class NaturaSoupItem extends NaturaFoodItem {
     private final Supplier<? extends ItemLike> bowl;
 
     public NaturaSoupItem(Supplier<? extends ItemLike> bowl, Properties properties) {
-        super(properties.stacksTo(1));
+        super(properties.stacksTo(1), 32);
         this.bowl = bowl;
     }
 

@@ -20,7 +20,7 @@ public class NaturaWorkbenchBlock extends CraftingTableBlock {
     }
 
     @Override
-    protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         ContainerLevelAccess access = ContainerLevelAccess.create(level, pos);
         return new SimpleMenuProvider((id, inventory, player) -> new CraftingMenu(id, inventory, access) {
             @Override

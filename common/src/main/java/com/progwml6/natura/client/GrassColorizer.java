@@ -22,8 +22,8 @@ import net.minecraft.world.level.biome.Biome;
 public final class GrassColorizer implements ResourceManagerReloadListener {
     private static int[] blue = new int[65536];
     private static int[] orange = new int[65536];
-    private static final ResourceLocation BLUE = ResourceLocation.fromNamespaceAndPath(Natura.MODID, "textures/colormap/bluegrasscolor.png");
-    private static final ResourceLocation ORANGE = ResourceLocation.fromNamespaceAndPath(Natura.MODID, "textures/colormap/orangegrasscolor.png");
+    private static final ResourceLocation BLUE = new ResourceLocation(Natura.MODID, "textures/colormap/bluegrasscolor.png");
+    private static final ResourceLocation ORANGE = new ResourceLocation(Natura.MODID, "textures/colormap/orangegrasscolor.png");
 
     @Override
     public void onResourceManagerReload(ResourceManager manager) {

@@ -101,12 +101,11 @@ public final class WorldgenScene {
         if (!opened && mc.screen instanceof TitleScreen) {
             opened = true;
             if (mc.getLevelSource().levelExists(WORLD)) {
-                mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.setScreen(new TitleScreen()));
+                mc.createWorldOpenFlows().loadLevel(new TitleScreen(), WORLD);
             } else {
                 LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, false, Difficulty.PEACEFUL, true, new GameRules(),
                         WorldDataConfiguration.DEFAULT);
-                mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(1234L, true, false), WorldPresets::createNormalWorldDimensions,
-                        new TitleScreen());
+                mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(1234L, true, false), WorldPresets::createNormalWorldDimensions);
             }
             return;
         }
@@ -132,7 +131,7 @@ public final class WorldgenScene {
     /** Goes to the closest biome of the shot (the chunks around generate while the next steps wait). */
     private static void go(ServerPlayer player, Shot shot) {
         ServerLevel level = player.getServer().getLevel(shot.dimension());
-        ResourceKey<Biome> biome = ResourceKey.create(Registries.BIOME, ResourceLocation.parse(shot.biome()));
+        ResourceKey<Biome> biome = ResourceKey.create(Registries.BIOME, new ResourceLocation(shot.biome()));
         BlockPos from = player.level() == level ? player.blockPosition() : new BlockPos(0, 64, 0);
         Pair<BlockPos, Holder<Biome>> found = level.findClosestBiome3d(h -> h.is(biome), from.offset(600, 0, 0), 6400, 32, 64);
         target = found == null ? from : found.getFirst();

@@ -15,5 +15,5 @@ plugins {
 
 rootProject.name = 'natura-1.21'
 include('common')
-include('neoforge')
+include('forge')
 include('fabric')

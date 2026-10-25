@@ -4,7 +4,6 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceKey;
@@ -31,8 +30,8 @@ public interface Platform {
 
     // Registration
 
-    /** Registers an entry (NeoForge: through a deferred register, Fabric: right away). */
-    <R, T extends R> Holder<R> register(ResourceKey<? extends Registry<R>> registry, String name, Supplier<T> factory);
+    /** Registers an entry (Forge: through a deferred register, Fabric: right away). */
+    <R, T extends R> Supplier<R> register(ResourceKey<? extends Registry<R>> registry, String name, Supplier<T> factory);
 
     CreativeModeTab.Builder creativeTabBuilder();
 

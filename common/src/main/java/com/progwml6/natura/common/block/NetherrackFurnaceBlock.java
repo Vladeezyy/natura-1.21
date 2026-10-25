@@ -1,6 +1,5 @@
 package com.progwml6.natura.common.block;
 
-import com.mojang.serialization.MapCodec;
 import com.progwml6.natura.common.NaturaBlocks;
 
 import net.minecraft.core.BlockPos;
@@ -22,11 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public class NetherrackFurnaceBlock extends AbstractFurnaceBlock {
     public NetherrackFurnaceBlock(Properties properties) {
         super(properties);
-    }
-
-    @Override
-    protected MapCodec<? extends AbstractFurnaceBlock> codec() {
-        throw new UnsupportedOperationException();
     }
 
     @Override

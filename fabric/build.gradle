@@ -72,7 +72,7 @@ configurations {
 dependencies {
     productionMods "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     // not part of the Fabric API bundle; without it the server ignores -Dfabric-api.gametest and just keeps running
-    productionMods "net.fabricmc.fabric-api:fabric-gametest-api-v1:2.0.5+6fc22b9919"
+    productionMods "net.fabricmc.fabric-api:fabric-gametest-api-v1:${fabric_gametest_version}"
 }
 def prodDir = file('run-prod')
 tasks.register('prodGametest', net.fabricmc.loom.task.prod.ServerProductionRunTask) {

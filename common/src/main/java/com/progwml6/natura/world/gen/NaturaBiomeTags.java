@@ -22,6 +22,6 @@ public final class NaturaBiomeTags {
     private NaturaBiomeTags() {}
 
     private static TagKey<Biome> tag(String name) {
-        return TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("c", name));
+        return TagKey.create(Registries.BIOME, new ResourceLocation("c", name));
     }
 }

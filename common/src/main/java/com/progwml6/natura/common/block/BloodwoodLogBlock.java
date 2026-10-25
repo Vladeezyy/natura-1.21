@@ -57,7 +57,7 @@ public class BloodwoodLogBlock extends Block {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock())) {
             RedwoodLeavesBlock.beginLeavesDecay(level, pos, 4);
         }

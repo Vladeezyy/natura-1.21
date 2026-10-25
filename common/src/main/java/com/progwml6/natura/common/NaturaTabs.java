@@ -38,8 +38,7 @@ public final class NaturaTabs {
                         return;
                     }
                     ItemStack stack = new ItemStack(item.get());
-                    var lookup = params.holders().lookupOrThrow(Registries.ENCHANTMENT);
-                    enchantments.forEach(key -> stack.enchant(lookup.getOrThrow(key), 1));
+                    enchantments.forEach(enchantment -> stack.enchant(enchantment, 1));
                     output.accept(stack);
                 })).build());
     }

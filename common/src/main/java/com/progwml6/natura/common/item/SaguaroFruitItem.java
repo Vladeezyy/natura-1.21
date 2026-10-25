@@ -17,7 +17,7 @@ public class SaguaroFruitItem extends NaturaFoodItem {
     private final Supplier<? extends Block> baby;
 
     public SaguaroFruitItem(Supplier<? extends Block> baby, Properties properties) {
-        super(properties);
+        super(properties, 32);
         this.baby = baby;
     }
 
@@ -37,7 +37,9 @@ public class SaguaroFruitItem extends NaturaFoodItem {
             if (!level.isClientSide) {
                 level.setBlock(pos.above(), this.baby.get().defaultBlockState(), Block.UPDATE_ALL);
             }
-            context.getItemInHand().consume(1, player);
+            if (!((Object) player instanceof net.minecraft.world.entity.player.Player consumer && consumer.getAbilities().instabuild)) {
+                context.getItemInHand().shrink(1);
+            }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
         return InteractionResult.FAIL;

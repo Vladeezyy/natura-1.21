@@ -13,7 +13,6 @@ import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -42,7 +41,7 @@ import net.minecraft.world.level.block.state.BlockState;
 /** The Fabric side of {@link Platform}: entries registered right away, Fabric API registries, vanilla behaviour for the NeoForge hooks. */
 public class FabricPlatform implements Platform {
     /** c:tools/shear: shears and the kamas (NeoForge: the shears_dig item ability). */
-    private static final TagKey<Item> SHEARS = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "tools/shear"));
+    private static final TagKey<Item> SHEARS = TagKey.create(Registries.ITEM, new ResourceLocation("c", "tools/shear"));
 
     @Override
     public String name() {
@@ -51,9 +50,10 @@ public class FabricPlatform implements Platform {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <R, T extends R> Holder<R> register(ResourceKey<? extends Registry<R>> registry, String name, Supplier<T> factory) {
+    public <R, T extends R> Supplier<R> register(ResourceKey<? extends Registry<R>> registry, String name, Supplier<T> factory) {
         Registry<R> target = (Registry<R>) BuiltInRegistries.REGISTRY.get(registry.location());
-        return Registry.registerForHolder(target, ResourceLocation.fromNamespaceAndPath(Natura.MODID, name), factory.get());
+        R value = Registry.register(target, new ResourceLocation(Natura.MODID, name), factory.get());
+        return () -> value;
     }
 
     @Override

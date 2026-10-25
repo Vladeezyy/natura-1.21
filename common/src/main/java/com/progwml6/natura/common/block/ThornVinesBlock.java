@@ -32,7 +32,7 @@ public class ThornVinesBlock extends VineBlock {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (PRICKS && !(entity instanceof ItemEntity) && !(entity instanceof Ghast)) {
             DamageSource source = CACTUS ? level.damageSources().cactus() : level.damageSources().lava();
             entity.hurt(source, 1);

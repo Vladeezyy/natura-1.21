@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -30,16 +29,15 @@ public class NaturaLeavesBlock extends LeavesBlock {
     }
 
     @Override
-    protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         List<ItemStack> drops = super.getDrops(state, params);
         if (this.dropsRedstone) {
             ItemStack tool = params.getOptionalParameter(LootContextParams.TOOL);
             ServerLevel level = params.getLevel();
-            var enchantments = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
-            boolean silk = tool != null && EnchantmentHelper.getItemEnchantmentLevel(enchantments.getOrThrow(Enchantments.SILK_TOUCH), tool) > 0;
+            boolean silk = tool != null && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0;
             boolean sheared = tool != null && com.progwml6.natura.platform.Services.PLATFORM.isShears(tool);
             if (!silk && !sheared) {
-                int fortune = tool == null ? 0 : EnchantmentHelper.getItemEnchantmentLevel(enchantments.getOrThrow(Enchantments.FORTUNE), tool);
+                int fortune = tool == null ? 0 : EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);
                 Random rand = new Random();
                 rand.setSeed(2 ^ 16 + 2 ^ 8 + (4 * 3 * 271));
                 if (fortune > 3 || rand.nextInt(40 - fortune * 10) == 0) {
@@ -51,7 +49,7 @@ public class NaturaLeavesBlock extends LeavesBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock())) {
             RedwoodLeavesBlock.beginLeavesDecay(level, pos, 2);
         }

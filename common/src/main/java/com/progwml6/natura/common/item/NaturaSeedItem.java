@@ -40,7 +40,9 @@ public class NaturaSeedItem extends NaturaItem {
             if (!level.isClientSide) {
                 level.setBlock(pos.above(), this.crop.get().defaultBlockState(), Block.UPDATE_ALL);
             }
-            context.getItemInHand().consume(1, player);
+            if (!((Object) player instanceof net.minecraft.world.entity.player.Player consumer && consumer.getAbilities().instabuild)) {
+                context.getItemInHand().shrink(1);
+            }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
         return InteractionResult.FAIL;

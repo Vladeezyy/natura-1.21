@@ -2,15 +2,14 @@ package com.progwml6.natura.platform;
 
 import java.util.function.Supplier;
 
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 
-/** A registered entry (NeoForge: a deferred holder, Fabric: the holder of an entry registered right away). */
+/** A registered entry (Forge: a registry object, Fabric: the entry registered right away). */
 public class Entry<R, T extends R> implements Supplier<T> {
     private final ResourceLocation id;
-    private final Holder<R> holder;
+    private final Supplier<R> holder;
 
-    public Entry(ResourceLocation id, Holder<R> holder) {
+    public Entry(ResourceLocation id, Supplier<R> holder) {
         this.id = id;
         this.holder = holder;
     }
@@ -18,14 +17,11 @@ public class Entry<R, T extends R> implements Supplier<T> {
     @Override
     @SuppressWarnings("unchecked")
     public T get() {
-        return (T) this.holder.value();
+        return (T) this.holder.get();
     }
 
     public ResourceLocation getId() {
         return this.id;
     }
 
-    public Holder<R> holder() {
-        return this.holder;
-    }
 }

@@ -81,7 +81,7 @@ public class NaturaFabricClient implements ClientModInitializer {
             List<String> models = new ArrayList<>();
             collectModels(states.get(), models);
             for (String model : models) {
-                String type = renderType(mod, ResourceLocation.parse(model), 0);
+                String type = renderType(mod, new ResourceLocation(model), 0);
                 if (type != null) {
                     RenderType layer = switch (type) {
                         case "minecraft:cutout", "cutout" -> RenderType.cutout();
@@ -122,7 +122,7 @@ public class NaturaFabricClient implements ClientModInitializer {
         if (json.get().has("render_type")) {
             return json.get().get("render_type").getAsString();
         }
-        return json.get().has("parent") ? renderType(mod, ResourceLocation.parse(json.get().get("parent").getAsString()), depth + 1) : null;
+        return json.get().has("parent") ? renderType(mod, new ResourceLocation(json.get().get("parent").getAsString()), depth + 1) : null;
     }
 
     private static Optional<JsonObject> read(Optional<Path> path) {
@@ -143,7 +143,7 @@ public class NaturaFabricClient implements ClientModInitializer {
 
         @Override
         public ResourceLocation getFabricId() {
-            return ResourceLocation.fromNamespaceAndPath(Natura.MODID, "grass_colorizer");
+            return new ResourceLocation(Natura.MODID, "grass_colorizer");
         }
 
         @Override

@@ -31,7 +31,7 @@ public class FlintAndBlazeItem extends Item {
             level.setBlock(pos, BaseFireBlock.getState(level, pos), Block.UPDATE_ALL_IMMEDIATE);
         }
         if (player != null) {
-            context.getItemInHand().hurtAndBreak(1, player, LivingEntity.getSlotForHand(context.getHand()));
+            context.getItemInHand().hurtAndBreak(1, player, e -> e.broadcastBreakEvent(context.getHand()));
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

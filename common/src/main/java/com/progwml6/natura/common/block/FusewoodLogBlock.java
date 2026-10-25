@@ -17,7 +17,7 @@ public class FusewoodLogBlock extends NaturaLogBlock {
     }
 
     @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide) {
             Difficulty difficulty = level.getDifficulty();
             if (difficulty == Difficulty.HARD) {
@@ -26,6 +26,6 @@ public class FusewoodLogBlock extends NaturaLogBlock {
                 level.explode(null, pos.getX(), pos.getY(), pos.getZ(), 1.75F, Level.ExplosionInteraction.NONE);
             }
         }
-        return super.playerWillDestroy(level, pos, state, player);
+        super.playerWillDestroy(level, pos, state, player);
     }
 }

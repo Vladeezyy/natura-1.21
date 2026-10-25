@@ -27,7 +27,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
  */
 public class KamaItem extends SwordItem {
     public KamaItem(Tier tier, Properties properties) {
-        super(tier, properties.attributes(SwordItem.createAttributes(tier, 3, -2.4F)));
+        super(tier, 3, -2.4F, properties);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class KamaItem extends SwordItem {
     }
 
     @Override
-    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
+    public boolean isCorrectToolForDrops(BlockState state) {
         return state.is(Blocks.COBWEB) || state.is(Blocks.REDSTONE_WIRE) || state.is(Blocks.TRIPWIRE);
     }
 
@@ -50,7 +50,7 @@ public class KamaItem extends SwordItem {
             if (!entity.level().isClientSide) {
                 target.shear(SoundSource.PLAYERS);
                 entity.gameEvent(GameEvent.SHEAR, player);
-                stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+                stack.hurtAndBreak(1, player, e -> e.broadcastBreakEvent(hand));
             }
             return InteractionResult.sidedSuccess(entity.level().isClientSide);
         }
@@ -58,7 +58,7 @@ public class KamaItem extends SwordItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         NaturaItem.addTooltip(this.getDescriptionId(), tooltip);
     }
 }

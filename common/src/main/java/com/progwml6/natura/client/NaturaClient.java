@@ -59,9 +59,9 @@ public final class NaturaClient {
     public static void setup() {
         for (String wood : new String[] {"ghostwood", "bloodwood", "darkwood", "fusewood"}) {
             var bow = com.progwml6.natura.tools.NaturaTools.TOOLS.get(wood + "_bow").get();
-            net.minecraft.client.renderer.item.ItemProperties.register(bow, net.minecraft.resources.ResourceLocation.withDefaultNamespace("pulling"),
+            net.minecraft.client.renderer.item.ItemProperties.register(bow, new net.minecraft.resources.ResourceLocation("pulling"),
                     (stack, level, entity, seed) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
-            net.minecraft.client.renderer.item.ItemProperties.register(bow, net.minecraft.resources.ResourceLocation.withDefaultNamespace("pull"),
+            net.minecraft.client.renderer.item.ItemProperties.register(bow, new net.minecraft.resources.ResourceLocation("pull"),
                     (stack, level, entity, seed) -> 0.0F);
         }
     }

@@ -86,7 +86,7 @@ public final class NaturaBlocks {
     /** Fire spread (1.12 setFireInfo: encouragement, flammability), applied in common setup. */
     private static final Map<BlockEntry<? extends Block>, int[]> FLAMMABLE = new LinkedHashMap<>();
 
-    public static final TagKey<Block> NETHER_SAPLING_SOIL = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(Natura.MODID, "nether_sapling_soil"));
+    public static final TagKey<Block> NETHER_SAPLING_SOIL = TagKey.create(Registries.BLOCK, new ResourceLocation(Natura.MODID, "nether_sapling_soil"));
 
     public record WoodSet(BlockEntry<Block> planks, BlockEntry<SlabBlock> slab, BlockEntry<StairBlock> stairs,
                           BlockEntry<FenceBlock> fence, BlockEntry<FenceGateBlock> fenceGate, BlockEntry<TrapDoorBlock> trapdoor,
@@ -110,7 +110,7 @@ public final class NaturaBlocks {
     public static BlockEntry<HopperBlock> BLAZE_HOPPER;
     public static Supplier<BlockEntityType<NetherrackFurnaceBlockEntity>> NETHERRACK_FURNACE_BE;
     /** 1.12 netherrack button: a stone button (20 ticks, no arrows) with the wooden click sounds. */
-    private static final BlockSetType NETHERRACK = new BlockSetType("natura_netherrack", true, true, false, BlockSetType.PressurePlateSensitivity.MOBS,
+    private static final BlockSetType NETHERRACK = new BlockSetType("natura_netherrack", true,
             SoundType.WOOD, net.minecraft.sounds.SoundEvents.IRON_DOOR_CLOSE, net.minecraft.sounds.SoundEvents.IRON_DOOR_OPEN,
             net.minecraft.sounds.SoundEvents.IRON_TRAPDOOR_CLOSE, net.minecraft.sounds.SoundEvents.IRON_TRAPDOOR_OPEN,
             net.minecraft.sounds.SoundEvents.STONE_PRESSURE_PLATE_CLICK_OFF, net.minecraft.sounds.SoundEvents.STONE_PRESSURE_PLATE_CLICK_ON,
@@ -185,7 +185,7 @@ public final class NaturaBlocks {
         for (String door : new String[] {"eucalyptus", "hopseed", "sakura", "redwood", "redwood_bark", "tiger", "maple", "silverbell",
                 "ghostwood", "bloodwood", "darkwood", "fusewood"}) {
             String id = door + "_door";
-            BlockEntry<DoorBlock> block = BLOCKS.register(id, () -> new DoorBlock(BlockSetType.OAK, wood(3.0F, 3.0F).noOcclusion().pushReaction(PushReaction.DESTROY)));
+            BlockEntry<DoorBlock> block = BLOCKS.register(id, () -> new DoorBlock(wood(3.0F, 3.0F).noOcclusion().pushReaction(PushReaction.DESTROY), BlockSetType.OAK));
             TAB_DECORATIVE.add(ITEMS.register(id, () -> new NaturaDoorItem(block.get(), new Item.Properties())));
             DOORS.put(id, block);
         }
@@ -231,10 +231,11 @@ public final class NaturaBlocks {
                 .strength(3.0F, 8.0F).sound(SoundType.METAL).noOcclusion()), TAB_WORLD);
         NETHER.put("nether_lever", block("nether_lever", () -> new LeverBlock(BlockBehaviour.Properties.of().noCollission().strength(0.5F)
                 .sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY)), TAB_WORLD));
-        NETHER.put("nether_button", block("nether_button", () -> new ButtonBlock(NETHERRACK, 20, BlockBehaviour.Properties.of().noCollission()
-                .strength(0.5F).pushReaction(PushReaction.DESTROY)), TAB_WORLD));
-        NETHER.put("nether_pressure_plate", block("nether_pressure_plate", () -> new PressurePlateBlock(BlockSetType.STONE, BlockBehaviour.Properties.of()
-                .mapColor(MapColor.NETHER).forceSolidOn().requiresCorrectToolForDrops().noCollission().strength(0.5F).pushReaction(PushReaction.DESTROY)),
+        NETHER.put("nether_button", block("nether_button", () -> new ButtonBlock(BlockBehaviour.Properties.of().noCollission()
+                .strength(0.5F).pushReaction(PushReaction.DESTROY), NETHERRACK, 20, false), TAB_WORLD));
+        NETHER.put("nether_pressure_plate", block("nether_pressure_plate", () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.MOBS, BlockBehaviour.Properties.of()
+                .mapColor(MapColor.NETHER).forceSolidOn().requiresCorrectToolForDrops().noCollission().strength(0.5F).pushReaction(PushReaction.DESTROY),
+                BlockSetType.STONE),
                 TAB_WORLD));
         NETHER.put("blaze_rail", block("blaze_rail", () -> new BlazeRailBlocks.Normal(rail()), TAB_WORLD));
         NETHER.put("blaze_powered_rail", block("blaze_powered_rail", () -> new BlazeRailBlocks.Powered(rail(), false), TAB_WORLD));
@@ -364,14 +365,14 @@ public final class NaturaBlocks {
         BlockEntry<SlabBlock> slab = block(name + "_slab", () -> new SlabBlock(wood(2.0F, 2.0F)), TAB_DECORATIVE);
         FLAMMABLE.put(slab, new int[] {5, 20});
         BlockEntry<StairBlock> stairs = block(name + "_stairs", () -> new StairBlock(planks.get().defaultBlockState(), wood(2.0F, 2.0F)), TAB_DECORATIVE);
-        BlockEntry<ButtonBlock> button = block(name + "_button", () -> new ButtonBlock(BlockSetType.OAK, 30,
-                BlockBehaviour.Properties.of().noCollission().strength(0.5F).pushReaction(PushReaction.DESTROY)), TAB_DECORATIVE);
-        BlockEntry<PressurePlateBlock> plate = block(name + "_pressure_plate", () -> new PressurePlateBlock(BlockSetType.OAK,
-                wood(0.5F, 0.5F).forceSolidOn().noCollission().pushReaction(PushReaction.DESTROY)), TAB_DECORATIVE);
-        BlockEntry<TrapDoorBlock> trapdoor = block(name + "_trapdoor", () -> new TrapDoorBlock(BlockSetType.OAK,
-                wood(3.0F, 3.0F).noOcclusion().isValidSpawn((s, l, p, type) -> false)), TAB_DECORATIVE);
+        BlockEntry<ButtonBlock> button = block(name + "_button", () -> new ButtonBlock(
+                BlockBehaviour.Properties.of().noCollission().strength(0.5F).pushReaction(PushReaction.DESTROY), BlockSetType.OAK, 30, true), TAB_DECORATIVE);
+        BlockEntry<PressurePlateBlock> plate = block(name + "_pressure_plate", () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING,
+                wood(0.5F, 0.5F).forceSolidOn().noCollission().pushReaction(PushReaction.DESTROY), BlockSetType.OAK), TAB_DECORATIVE);
+        BlockEntry<TrapDoorBlock> trapdoor = block(name + "_trapdoor", () -> new TrapDoorBlock(
+                wood(3.0F, 3.0F).noOcclusion().isValidSpawn((s, l, p, type) -> false), BlockSetType.OAK), TAB_DECORATIVE);
         BlockEntry<FenceBlock> fence = block(name + "_fence", () -> new FenceBlock(wood(2.0F, 3.0F).forceSolidOn()), TAB_DECORATIVE);
-        BlockEntry<FenceGateBlock> gate = block(name + "_fence_gate", () -> new FenceGateBlock(WoodType.OAK, wood(2.0F, 3.0F).forceSolidOn()), TAB_DECORATIVE);
+        BlockEntry<FenceGateBlock> gate = block(name + "_fence_gate", () -> new FenceGateBlock(wood(2.0F, 3.0F).forceSolidOn(), WoodType.OAK), TAB_DECORATIVE);
         return new WoodSet(planks, slab, stairs, fence, gate, trapdoor, button, plate, null, null, null);
     }
 

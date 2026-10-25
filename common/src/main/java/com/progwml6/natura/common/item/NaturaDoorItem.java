@@ -15,7 +15,7 @@ public class NaturaDoorItem extends DoubleHighBlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level context, List<Component> tooltip, TooltipFlag flag) {
         NaturaItem.addTooltip(this.getDescriptionId(), tooltip);
     }
 }

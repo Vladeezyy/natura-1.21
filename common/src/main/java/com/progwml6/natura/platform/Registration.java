@@ -53,6 +53,6 @@ public final class Registration {
     }
 
     private static ResourceLocation id(String name) {
-        return ResourceLocation.fromNamespaceAndPath(Natura.MODID, name);
+        return new ResourceLocation(Natura.MODID, name);
     }
 }

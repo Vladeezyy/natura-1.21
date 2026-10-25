@@ -1,9 +1,9 @@
 package com.progwml6.natura.common.block;
 
+import net.minecraft.world.InteractionResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -40,17 +40,17 @@ public class CloudBlock extends Block {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return level.getBlockState(pos.below()).getBlock() instanceof CloudBlock ? Shapes.empty() : BOTTOM;
     }
 
     @Override
-    protected boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
+    public boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
         return adjacent.getBlock() instanceof CloudBlock || super.skipRendering(state, adjacent, direction);
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (this.sulfur && entity instanceof AbstractArrow arrow && !level.isClientSide && arrow.isOnFire()) {
             explode(level, pos, arrow.getOwner() instanceof LivingEntity living ? living : null);
             level.removeBlock(pos, false);
@@ -64,13 +64,14 @@ public class CloudBlock extends Block {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        ItemStack stack = player.getItemInHand(hand);
         if (this.sulfur && stack.is(Items.FLINT_AND_STEEL)) {
             level.removeBlock(pos, false);
             explode(level, pos, player);
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
-        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+        return super.use(state, level, pos, player, hand, hit);
     }
 
     /** 1.12 createExplosion(entity, corner, size, smoking = true): breaks blocks, no fire. */

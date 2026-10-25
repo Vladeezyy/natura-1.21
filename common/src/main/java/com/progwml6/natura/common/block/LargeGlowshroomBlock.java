@@ -74,19 +74,19 @@ public class LargeGlowshroomBlock extends Block {
     }
 
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return level.getBlockState(pos.above()).getBlock() instanceof LargeGlowshroomBlock ? Shapes.empty() : TOP;
     }
 
     @Override
-    protected boolean skipRendering(BlockState state, BlockState adjacent, net.minecraft.core.Direction direction) {
+    public boolean skipRendering(BlockState state, BlockState adjacent, net.minecraft.core.Direction direction) {
         // 1.12: blue and purple pieces hide the faces next to them
         String id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(adjacent.getBlock()).getPath();
         return id.equals("blue_large_glowshroom") || id.equals("purple_large_glowshroom") || super.skipRendering(state, adjacent, direction);
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         Vec3 motion = entity.getDeltaMovement();
         if (motion.y < 0) {
             motion = new Vec3(motion.x, motion.y * 0.25F, motion.z);
@@ -102,7 +102,7 @@ public class LargeGlowshroomBlock extends Block {
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
         return new ItemStack(this.small.get());
     }
 }

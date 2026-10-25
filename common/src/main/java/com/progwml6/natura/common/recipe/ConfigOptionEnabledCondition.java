@@ -8,7 +8,7 @@ import com.progwml6.natura.common.NaturaConfig;
 /**
  * 1.12 ConfigOptionEnabledConditionFactory: a recipe (or another data entry, like the heatscar spider spawns) only there
  * when a config option is on (natura:config_option_enabled, field "config_setting"). The loaders wrap it in their own
- * condition types (NeoForge: neoforge:conditions, Fabric: fabric:load_conditions).
+ * condition types (Forge: conditions / forge:conditions, Fabric: fabric:load_conditions).
  */
 public final class ConfigOptionEnabledCondition {
     public static final String ID = "config_option_enabled";

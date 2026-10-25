@@ -44,7 +44,7 @@ public class RedwoodLeavesBlock extends NaturaLeavesBlock {
     }
 
     @Override
-    protected boolean isRandomlyTicking(BlockState state) {
+    public boolean isRandomlyTicking(BlockState state) {
         return state.getValue(CHECK_DECAY) && !state.getValue(BlockStateProperties.PERSISTENT);
     }
 
@@ -54,7 +54,7 @@ public class RedwoodLeavesBlock extends NaturaLeavesBlock {
     }
 
     @Override
-    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!state.getValue(CHECK_DECAY) || state.getValue(BlockStateProperties.PERSISTENT)) {
             return;
         }

@@ -101,7 +101,7 @@ public final class DevScene {
         at(745, mc -> mc.options.hideGui = false);
         at(750, mc -> mc.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true)));
         at(754, mc -> selectTab(mc, NaturaTabs.GENERAL.get()));
-        at(758, mc -> mc.screen.mouseScrolled(mc.getWindow().getGuiScaledWidth() / 2.0, mc.getWindow().getGuiScaledHeight() / 2.0, 0, -10));
+        at(758, mc -> mc.screen.mouseScrolled(mc.getWindow().getGuiScaledWidth() / 2.0, mc.getWindow().getGuiScaledHeight() / 2.0, -10));
         at(768, mc -> shot(mc, "tab_general_tools"));
         at(770, mc -> mc.setScreen(null));
         at(775, mc -> mc.options.hideGui = true);

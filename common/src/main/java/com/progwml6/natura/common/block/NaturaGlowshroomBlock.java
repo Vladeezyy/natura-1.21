@@ -1,7 +1,6 @@
 package com.progwml6.natura.common.block;
 
 
-import com.mojang.serialization.MapCodec;
 import com.progwml6.natura.common.NaturaBlocks;
 import com.progwml6.natura.world.tree.GlowshroomGenerator;
 import com.progwml6.natura.world.tree.TreeWorld;
@@ -36,12 +35,7 @@ public class NaturaGlowshroomBlock extends BushBlock implements BonemealableBloc
     }
 
     @Override
-    protected MapCodec<? extends BushBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
@@ -51,7 +45,7 @@ public class NaturaGlowshroomBlock extends BushBlock implements BonemealableBloc
     }
 
     @Override
-    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         if (pos.getY() < level.getMinBuildHeight() || pos.getY() >= level.getMaxBuildHeight()) {
             return false;
         }
@@ -63,12 +57,12 @@ public class NaturaGlowshroomBlock extends BushBlock implements BonemealableBloc
     }
 
     @Override
-    protected boolean isRandomlyTicking(BlockState state) {
+    public boolean isRandomlyTicking(BlockState state) {
         return true;
     }
 
     @Override
-    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
         if (rand.nextInt(25) == 0) {
             int i = 5;
             for (BlockPos p : BlockPos.betweenClosed(pos.offset(-4, -1, -4), pos.offset(4, 1, 4))) {
@@ -95,7 +89,7 @@ public class NaturaGlowshroomBlock extends BushBlock implements BonemealableBloc
     }
 
     @Override
-    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClient) {
         return true;
     }
 

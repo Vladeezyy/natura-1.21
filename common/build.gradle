@@ -1,21 +1,27 @@
 plugins {
     id 'multiloader-common'
-    id 'net.neoforged.moddev'
+    id 'net.neoforged.moddev.legacyforge'
 }
 
-neoForge {
-    neoFormVersion = neo_form_version
-    // what NeoForge opens and the common code uses (compile only; Fabric: the access widener)
-    accessTransformers.from(file('accesstransformer.cfg'))
+legacyForge {
+    // 1.20.1: the MCP (vanilla) setup does not apply access transformers, so common compiles on Forge userdev; Fabric
+    // compiles the same sources on vanilla + the access widener, which catches any Forge-only call
+    version = forge_version
+    // what the common code needs opened (Forge: the same file in the jar, SRG names; Fabric: natura.accesswidener)
+    accessTransformers.from(rootProject.file('forge/src/main/resources/META-INF/accesstransformer.cfg'))
     parchment {
         minecraftVersion = parchment_minecraft
         mappingsVersion = parchment_version
     }
 }
 
+repositories {
+    maven { url = 'https://maven.fabricmc.net' }
+}
+
 dependencies {
-    // Jade (the 1.12 Waila plugin): the API is the same in the NeoForge and the Fabric jar
-    compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
+    // Jade (the 1.12 Waila plugin): the API is the same in the Forge and the Fabric jar
+    modCompileOnly "maven.modrinth:jade:${jade_version}+forge"
 }
 
 configurations {

@@ -2,6 +2,7 @@ package com.progwml6.natura.common.block;
 
 import java.util.function.Supplier;
 
+import net.minecraft.world.InteractionHand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -25,7 +26,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import com.mojang.serialization.MapCodec;
 
 /**
  * 1.12 BlockOverworldCrops (barley 0-3, cotton 0-4): grows like a vanilla crop, bone meal adds 2-5 stages, and a ripe
@@ -68,11 +68,6 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
     public static final IntegerProperty AGE_3 = IntegerProperty.create("age", 0, 3);
     public static final IntegerProperty AGE_4 = IntegerProperty.create("age", 0, 4);
 
-    @Override
-    protected MapCodec<? extends BushBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
-
     /** Barley: stages 0-3, picked back to 1. */
     public static class Barley extends NaturaCropBlock {
         public Barley(Supplier<? extends ItemLike> crop, Supplier<? extends ItemLike> seed, Properties properties) {
@@ -106,7 +101,7 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
@@ -116,20 +111,20 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
     }
 
     @Override
-    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState soil = level.getBlockState(pos.below());
         return (level.getRawBrightness(pos, 0) >= 8 || level.canSeeSky(pos)) && (soil.is(Blocks.FARMLAND) || soil.is(Blocks.DIRT)
                 || soil.is(Blocks.GRASS_BLOCK) || soil.is(Blocks.COARSE_DIRT) || soil.is(Blocks.PODZOL));
     }
 
     @Override
-    protected boolean isRandomlyTicking(BlockState state) {
+    public boolean isRandomlyTicking(BlockState state) {
         // a grown crop has nothing to do (as vanilla crops): no random ticks for whole fields of ripe barley and cotton
         return state.getValue(this.age) < this.maxAge;
     }
 
     @Override
-    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (level.getMaxLocalRawBrightness(pos.above()) >= 9) {
             int i = state.getValue(this.age);
             if (i < this.maxAge) {
@@ -174,7 +169,7 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
     }
 
     @Override
-    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClient) {
         return state.getValue(this.age) < this.maxAge;
     }
 
@@ -202,17 +197,20 @@ public abstract class NaturaCropBlock extends BushBlock implements BonemealableB
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (hand != InteractionHand.MAIN_HAND) {
+            return InteractionResult.PASS; // 1.21 useWithoutItem: main hand only
+        }
         return this.pick(state, level, pos, player) ? InteractionResult.sidedSuccess(level.isClientSide) : InteractionResult.PASS;
     }
 
     @Override
-    protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
+    public void attack(BlockState state, Level level, BlockPos pos, Player player) {
         this.pick(state, level, pos, player);
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
         return new ItemStack(this.seed.get());
     }
 

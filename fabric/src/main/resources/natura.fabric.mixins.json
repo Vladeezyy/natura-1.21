@@ -2,8 +2,8 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.progwml6.natura.fabric.mixin",
-  "compatibilityLevel": "JAVA_21",
-  "mixins": ["AbstractMinecartMixin", "ServerPlayerMixin", "SpawnPlacementsInvoker", "TaintedSoilPlantMixin"],
+  "compatibilityLevel": "JAVA_17",
+  "mixins": ["AbstractMinecartMixin", "PlayerRespawnMixin", "SpawnPlacementsInvoker", "TaintedSoilPlantMixin"],
   "injectors": {
     "defaultRequire": 1
   }

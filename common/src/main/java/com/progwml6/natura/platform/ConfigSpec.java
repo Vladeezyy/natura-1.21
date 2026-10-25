@@ -93,7 +93,7 @@ public final class ConfigSpec {
         }
 
         public Builder pop() {
-            this.sections.removeLast();
+            this.sections.remove(this.sections.size() - 1);
             return this;
         }
 

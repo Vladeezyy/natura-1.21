@@ -1,6 +1,5 @@
 package com.progwml6.natura.common.block;
 
-import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,22 +28,17 @@ public class NetherGlassBlock extends HalfTransparentBlock {
     }
 
     @Override
-    protected MapCodec<? extends HalfTransparentBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return this.soul ? Shapes.empty() : HeatSandBlock.SHAPE;
     }
 
     @Override
-    protected boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
+    public boolean skipRendering(BlockState state, BlockState adjacent, Direction direction) {
         return adjacent.is(this) || super.skipRendering(state, adjacent, direction);
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (entity instanceof LivingEntity living) {
             if (this.soul) {
                 living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 1));

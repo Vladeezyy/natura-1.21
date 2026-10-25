@@ -102,7 +102,7 @@ public final class NaturaItems {
     public static final ItemEntry<Item> BARLEY_SEED_BAG = bag("barley_seed_bag", () -> NaturaBlocks.BARLEY_CROP.get());
     public static final ItemEntry<Item> COTTON_SEED_BAG = bag("cotton_seed_bag", () -> NaturaBlocks.COTTON_CROP.get());
     public static final ItemEntry<Item> SAGUARO_FRUIT_ITEM = register("saguaro_fruit_item", p -> new SaguaroFruitItem(() -> NaturaBlocks.SAGUARO_BABY.get(),
-            p.food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.3F).build())));
+            p.food(new FoodProperties.Builder().nutrition(3).saturationMod(0.3F).build())));
 
     private NaturaItems() {}
 
@@ -122,9 +122,9 @@ public final class NaturaItems {
         return register(id, p -> new NaturaSeedBagItem(crop, p));
     }
 
-    private record Effect(Holder<MobEffect> effect, int duration) {}
+    private record Effect(MobEffect effect, int duration) {}
 
-    private static Effect effect(Holder<MobEffect> effect, int duration) {
+    private static Effect effect(MobEffect effect, int duration) {
         return new Effect(effect, duration);
     }
 
@@ -132,20 +132,19 @@ public final class NaturaItems {
         return new Effect[] {effect(MobEffects.NIGHT_VISION, 45 * 25), effect(MobEffects.POISON, 16 * 25), effect(MobEffects.DIG_SLOWDOWN, 8 * 25)};
     }
 
-    private static FoodProperties foodProperties(int nutrition, float saturation, int ticks, Effect... effects) {
-        FoodProperties.Builder builder = new FoodProperties.Builder().nutrition(nutrition).saturationModifier(saturation);
+    private static FoodProperties foodProperties(int nutrition, float saturation, Effect... effects) {
+        FoodProperties.Builder builder = new FoodProperties.Builder().nutrition(nutrition).saturationMod(saturation);
         for (Effect e : effects) {
             builder.effect(new MobEffectInstance(e.effect(), e.duration(), 0), 1.0F);
         }
-        FoodProperties food = builder.build();
-        return new FoodProperties(food.nutrition(), food.saturation(), false, ticks / 20.0F, food.usingConvertsTo(), food.effects());
+        return builder.build();
     }
 
     private static ItemEntry<Item> food(String id, int nutrition, float saturation, int ticks, Effect... effects) {
-        return register(id, p -> new NaturaFoodItem(p.food(foodProperties(nutrition, saturation, ticks, effects))));
+        return register(id, p -> new NaturaFoodItem(p.food(foodProperties(nutrition, saturation, effects)), ticks));
     }
 
     private static ItemEntry<Item> soup(String id, int nutrition, float saturation, Supplier<? extends ItemLike> bowl, Effect... effects) {
-        return register(id, p -> new NaturaSoupItem(bowl, p.food(foodProperties(nutrition, saturation, 32, effects))));
+        return register(id, p -> new NaturaSoupItem(bowl, p.food(foodProperties(nutrition, saturation, effects))));
     }
 }

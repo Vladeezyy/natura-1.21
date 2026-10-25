@@ -1,6 +1,5 @@
 package com.progwml6.natura.common.block;
 
-import com.mojang.serialization.MapCodec;
 
 import net.minecraft.world.level.block.BushBlock;
 
@@ -10,8 +9,4 @@ public class NaturaPlantBlock extends BushBlock {
         super(properties);
     }
 
-    @Override
-    protected MapCodec<? extends BushBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
 }
