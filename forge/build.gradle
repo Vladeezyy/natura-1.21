@@ -31,7 +31,10 @@ legacyForge {
         // blocks, items and machines to run/screenshots/scene_*.png and quits.
         scene {
             client()
-            programArguments.addAll '--quickPlaySingleplayer', 'natura_scene'
+            // a missing world is made by the scene itself (from the title screen)
+            if (file('run/saves/natura_scene').exists()) {
+                programArguments.addAll '--quickPlaySingleplayer', 'natura_scene'
+            }
             systemProperty 'natura.scene', 'true'
         }
         // Screenshots of generated terrain (com.progwml6.natura.client.WorldgenScene): opens or creates run/saves/natura_gen.

@@ -37,6 +37,8 @@ import net.minecraft.world.level.levelgen.Heightmap;
  */
 public final class DevScene {
     private static final boolean ENABLED = System.getProperty("natura.scene") != null;
+    private static final String WORLD = "natura_scene";
+    private static boolean created;
     private static final List<Step> STEPS = new ArrayList<>();
     private static int tick;
     private static BlockPos origin;
@@ -121,6 +123,21 @@ public final class DevScene {
     public static void onTick() {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        // no scene world yet (a new checkout or another Minecraft version): a creative superflat one, as the scene needs.
+        // The quick play of a missing world ends on its "Failed to quick play" screen (DisconnectedScreen); a new run
+        // folder starts on the accessibility onboarding screen instead of the title screen.
+        if (!created && mc.level == null && (mc.screen instanceof net.minecraft.client.gui.screens.TitleScreen
+                || mc.screen instanceof net.minecraft.client.gui.screens.DisconnectedScreen
+                || mc.screen instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) && !mc.getLevelSource().levelExists(WORLD)) {
+            mc.options.onboardAccessibility = false;
+            created = true;
+            var settings = new net.minecraft.world.level.LevelSettings(WORLD, GameType.CREATIVE, false, net.minecraft.world.Difficulty.PEACEFUL,
+                    true, new net.minecraft.world.level.GameRules(), net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
+            mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new net.minecraft.world.level.levelgen.WorldOptions(1234L, false, false),
+                    access -> access.registryOrThrow(net.minecraft.core.registries.Registries.WORLD_PRESET)
+                            .getHolderOrThrow(net.minecraft.world.level.levelgen.presets.WorldPresets.FLAT).value().createWorldDimensions());
+            return;
+        }
         if (mc.player == null || mc.getSingleplayerServer() == null) return;
         // The window is usually unfocused while this runs: never pause, or the integrated server stops.
         mc.options.pauseOnLostFocus = false;
@@ -458,6 +475,7 @@ public final class DevScene {
     private static void selectTab(Minecraft mc, CreativeModeTab tab) {
         if (!(mc.screen instanceof CreativeModeInventoryScreen screen)) return;
         try {
+            fabricPageOf(screen, tab);
             var method = CreativeModeInventoryScreen.class.getDeclaredMethod("selectTab", CreativeModeTab.class);
             method.setAccessible(true);
             method.invoke(screen, tab);
@@ -465,6 +483,26 @@ public final class DevScene {
             Natura.LOG.warn("[scene] could not select the creative tab", e);
         }
     }
+
+    /**
+     * Fabric API pages the creative tabs and ignores a tab of another page: turn to its page first (Fabric API 0.92:
+     * fabric_currentPage / fabric_nextPage on the screen, getPage on the tab). Nothing on Forge.
+     */
+    private static void fabricPageOf(CreativeModeInventoryScreen screen, CreativeModeTab tab) throws ReflectiveOperationException {
+        java.lang.reflect.Method current, next, page;
+        try {
+            current = screen.getClass().getMethod("fabric_currentPage");
+            next = screen.getClass().getMethod("fabric_nextPage");
+            page = tab.getClass().getMethod("getPage");
+        } catch (NoSuchMethodException notFabric) {
+            return;
+        }
+        int target = (int) page.invoke(tab);
+        for (int i = 0; i < 16 && (int) current.invoke(screen) != target; i++) {
+            next.invoke(screen);
+        }
+    }
+
 
     private static void shot(Minecraft mc, String name) {
         Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), msg -> Natura.LOG.info("[scene] {}", msg.getString()));

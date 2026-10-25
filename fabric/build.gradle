@@ -46,7 +46,10 @@ loom {
         scene {
             client()
             name 'Scene'
-            programArgs '--quickPlaySingleplayer', 'natura_scene'
+            // a missing world is made by the scene itself (from the title screen)
+            if (file('run/saves/natura_scene').exists()) {
+                programArgs '--quickPlaySingleplayer', 'natura_scene'
+            }
             vmArg '-Dnatura.scene=true'
             runDir('run')
         }
