@@ -5,6 +5,8 @@ resources_1_20_1.py: turns a mod's 1.21.1 resources into the Minecraft 1.20.1 fo
   python3 -I scripts/resources_1_20_1.py <resources dir> --mod <mod id> [--neoforge-jar <neoforge-21.1.x-universal.jar>]
                                           [--materials tritanium,dilithium]
 
+--code-tags: c: tags only the code checks, e.g. "worldgen/biome:is_forest,is_nether" (1.21 names; neither 1.20.1 loader has
+them: Forge says forge:is_forest, Fabric API 0.92 c:forest): shipped from NeoForge 21.1 plus the loaders' own tags.
 --neoforge-jar: for the contents of the 1.21 c: tags the data refers to (~/.gradle/caches/modules-2/files-2.1/
 net.neoforged/neoforge/21.1.*/*/neoforge-21.1.*-universal.jar); without it those tags are left to the loaders (and are
 then empty on both: Forge has forge:, Fabric the old c: names). --materials: the mod's own materials, also put into the
@@ -33,7 +35,14 @@ from pathlib import Path
 DATA_VERSION_1_20_1 = 3465
 PLURAL = {"recipe": "recipes", "loot_table": "loot_tables", "structure": "structures", "advancement": "advancements",
           "predicate": "predicates", "item_modifier": "item_modifiers", "function": "functions"}
-TAG_PLURAL = {"item": "items", "block": "blocks", "entity_type": "entity_types", "fluid": "fluids", "game_event": "game_events"}
+TAG_PLURAL = {"item": "items", "block": "blocks", "entity_type": "entity_types", "fluid": "fluids", "game_event": "game_events",
+              "worldgen/biome": "worldgen/biome"}
+# the 1.21 c: biome tags -> what Fabric API 0.92 calls them (Forge 1.20.1: forge:<the same name>, added as well)
+FABRIC_0_92_BIOME = {"is_beach": "beach", "is_end": "in_the_end", "is_forest": "forest", "is_hill": "extreme_hills",
+                     "is_jungle": "jungle", "is_mountain": "mountain", "is_nether": "in_nether", "is_overworld": "in_overworld",
+                     "is_plains": "plains", "is_river": "river", "is_swamp": "swamp", "is_desert": "desert", "is_ocean": "ocean",
+                     "is_savanna": "savanna", "is_taiga": "taiga", "is_badlands": "badlands", "is_snowy": "snowy",
+                     "is_mushroom": "mushroom", "is_sandy": "desert"}
 # referenced c: tags that NeoForge 21.1 does not have
 VANILLA_ONLY = {"flowers/small": "#minecraft:small_flowers", "flowers/tall": "#minecraft:tall_flowers"}
 
@@ -42,6 +51,9 @@ ap.add_argument("root")
 ap.add_argument("--mod", required=True)
 ap.add_argument("--neoforge-jar")
 ap.add_argument("--materials", default="")
+# c: tags only the code checks (TagKey.create), so the data does not show them: kind:name,name;kind:name...
+# e.g. --code-tags "worldgen/biome:is_forest,is_nether" (biome tags also get the forge: and Fabric 0.92 names)
+ap.add_argument("--code-tags", default="")
 args = ap.parse_args()
 MOD = args.mod
 MATERIALS = [m for m in args.materials.split(",") if m]
@@ -209,6 +221,18 @@ def copy_c_tag(kind, path, done):
 done = set()
 for path in sorted(referenced_c_tags()):
     copy_c_tag("item", path, done)
+for group in [g for g in args.code_tags.split(";") if g]:
+    kind, names = group.split(":", 1)
+    for name in names.split(","):
+        copy_c_tag(kind, name, done)
+        target = data / "c" / "tags" / TAG_PLURAL[kind] / (name + ".json")
+        tag = load(target) if target.exists() else {"replace": False, "values": []}
+        # the 1.20.1 loaders' own tags of the same kind (other mods' biomes are in those)
+        extra = [f"#forge:{name}"] + ([f"#c:{FABRIC_0_92_BIOME[name]}"] if kind == "worldgen/biome" and name in FABRIC_0_92_BIOME else [])
+        for e in extra:
+            if optional(e) not in tag["values"]:
+                tag["values"].append(optional(e))
+        save(target, tag)
 
 # the mod's materials in the 1.20.1 forge: tags (same paths) and Fabric's old c: names
 for kind in ("items", "blocks"):

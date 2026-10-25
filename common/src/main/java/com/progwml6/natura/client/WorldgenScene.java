@@ -98,8 +98,10 @@ public final class WorldgenScene {
     public static void onTick() {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
-        if (!opened && mc.screen instanceof TitleScreen) {
+        // a new run folder starts on the accessibility onboarding screen instead of the title screen
+        if (!opened && (mc.screen instanceof TitleScreen || mc.screen instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen)) {
             opened = true;
+            mc.options.onboardAccessibility = false;
             if (mc.getLevelSource().levelExists(WORLD)) {
                 mc.createWorldOpenFlows().loadLevel(new TitleScreen(), WORLD);
             } else {
@@ -137,6 +139,7 @@ public final class WorldgenScene {
         target = found == null ? from : found.getFirst();
         int y = shot.dimension() == Level.NETHER ? 70 : 200;
         player.teleportTo(level, target.getX() + 0.5, y, target.getZ() + 0.5, 0.0F, 30.0F);
+        fly(player);
         Natura.LOG.info("[worldgen scene] {}: {} at {}", shot.name(), shot.biome(), target);
     }
 
@@ -171,6 +174,7 @@ public final class WorldgenScene {
             Natura.LOG.info("[worldgen scene] {}: nothing found around {}", shot.name(), target);
             player.teleportTo(level, target.getX() + 0.5, nether ? 70 : level.getHeight(Heightmap.Types.MOTION_BLOCKING, target.getX(), target.getZ()) + 20,
                     target.getZ() + 0.5, 0.0F, 40.0F);
+            fly(player);
             return;
         }
         Natura.LOG.info("[worldgen scene] {}: {} at {}", shot.name(), BuiltInRegistries.BLOCK.getKey(level.getBlockState(best).getBlock()), best);
@@ -198,6 +202,14 @@ public final class WorldgenScene {
         float yaw = (float) (Mth.atan2(-dir.x, dir.z) * Mth.RAD_TO_DEG);
         float pitch = (float) (-Mth.atan2(dir.y, Math.sqrt(dir.x * dir.x + dir.z * dir.z)) * Mth.RAD_TO_DEG);
         player.teleportTo(level, eye.x, eye.y - player.getEyeHeight(), eye.z, yaw, pitch);
+        fly(player);
+    }
+
+    /** Keeps the camera where it was put: 1.20.1 drops the flying of a teleported player (into the leaves or the lava). */
+    private static void fly(ServerPlayer player) {
+        player.getAbilities().mayfly = true;
+        player.getAbilities().flying = true;
+        player.onUpdateAbilities();
     }
 
     /** Air all around the camera, so no leaves or rock fill the view. */

@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#minecraft:is_hill",
+      "required": false
+    },
+    {
+      "id": "#forge:is_hill",
+      "required": false
+    },
+    {
+      "id": "#c:extreme_hills",
+      "required": false
+    }
+  ]
+}
