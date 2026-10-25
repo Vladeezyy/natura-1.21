@@ -1,0 +1,162 @@
+
+[ENABLE-DISABLE]
+	"Obelisks let players respawn in the Nether" = true
+	"Generate Redwood Trees" = false
+	"Generate Maple Trees" = true
+	"Generate Silverbell Trees" = true
+	"Generate Amaranth Trees" = true
+	"Generate Tigerwood Trees" = true
+	"Generate Willow Trees" = true
+	"Generate Small Eucalyptus Trees" = true
+	"Generate Hopseed Trees" = true
+	"Generate Sakura Trees" = true
+	"Generate Saguaro Cactus" = true
+	"Generate Bloodwood Trees" = true
+	"Generate Darkwood Trees" = true
+	"Generate Fusewood Trees" = true
+	"Generate Ghostwood Trees" = true
+	"Generate Raspberry Bushes" = true
+	"Generate Blueberry Bushes" = true
+	"Generate Blackberry Bushes" = true
+	"Generate Maloberry Bushes" = true
+	"Generate Blightberry Bushes" = true
+	"Generate Duskberry Bushes" = true
+	"Generate Skyberry Bushes" = true
+	"Generate Stingberry Bushes" = true
+	"Generate Thornvines" = true
+	"Generate Overworld Clouds" = true
+	"Generate Sulfur Clouds" = true
+	"Generate Ash Clouds" = true
+	"Generate Dark Clouds" = true
+	"Enable Clouds" = false
+	"Generate Barley Crops" = true
+	"Generate Cotton Crops" = true
+	"Generate Bluebell Flowers" = true
+	"Generate Green Glowshroom" = true
+	"Generate Purple Glowshroom" = true
+	"Generate Blue Glowshroom" = true
+	"Generate Glowshroom Trees" = true
+	"Drop cotton seeds from grass" = true
+	"Drop barley seeds from grass" = true
+	"Enable wheat to flour recipe" = true
+	"Generate Tained Soil" = true
+	"Generate Heat Sand" = true
+
+[Entities]
+	"Enable Heatscar Spiders" = false
+
+[Mob-Changes]
+	#Range: > 0
+	"Minimum Baby Heatscar Spiders on Spider Death" = 2
+	#Range: > 0
+	"Maximum Baby Heatscar Spiders on Spider Death" = 4
+
+[Worldgen]
+	#Controls what the lowest Y level trees can grow at, make lower if the tree will not grow
+	#Range: -2048 ~ 2048
+	"Sea level" = 64
+	#Controls what the lowest Y level trees can grow at in a flat world, make value lower if the tree will not grow
+	#Counted from the bottom of the world (1.12 worlds started at y 0)
+	#Range: -2048 ~ 2048
+	"Flat Sea level" = 1
+	#Range: > 0
+	"Redwood Tree Spawn Rarity" = 150
+	#Range: > 0
+	"Maple Tree Spawn Rarity" = 10
+	#Range: > 0
+	"Silverbell Tree Spawn Rarity" = 70
+	#Range: > 0
+	"Amaranth Tree Spawn Rarity" = 1
+	#Range: > 0
+	"Tigerwood Tree Spawn Rarity" = 30
+	#Range: > 0
+	"Willow Tree Spawn Rarity" = 10
+	#Range: > 0
+	"Eucalyptus Tree Spawn Rarity" = 25
+	#Range: > 0
+	"Eucalyptus Tree Spawn Range" = 32
+	#Range: > 0
+	"Hopseed Tree Spawn Rarity" = 10
+	#Range: > 0
+	"Hopseed Tree Spawn Range" = 20
+	#Range: > 0
+	"Sakura Tree Spawn Rarity" = 10
+	#Range: > 0
+	"Sakura Tree Spawn Range" = 32
+	#Range: > 0
+	"Bloodwood Tree Spawn Rarity" = 14
+	#Range: > 0
+	"Darkwood Tree Spawn Rarity" = 10
+	#Range: > 0
+	"Fusewood Tree Spawn Rarity" = 50
+	#Range: > 0
+	"Ghostwood Tree Spawn Rarity" = 10
+	#Range: > 0
+	"Saguaro Cactus Spawn Rarity" = 5
+	#Range: > 0
+	"Raspberry Spawn Rarity" = 30
+	#Range: > 0
+	"Raspberry Spawn Range" = 64
+	#Range: > 0
+	"Blueberry Spawn Rarity" = 34
+	#Range: > 0
+	"Blueberry Spawn Range" = 64
+	#Range: > 0
+	"Blackberry Spawn Rarity" = 48
+	#Range: > 0
+	"Blackberry Spawn Range" = 64
+	#Range: > 0
+	"Maloberry Spawn Rarity" = 40
+	#Range: > 0
+	"Maloberry Spawn Range" = 64
+	#Range: > 0
+	"Blightberry Spawn Rarity" = 18
+	#Range: > 0
+	"Blightberry Spawn Range" = 100
+	#Range: > 0
+	"Duskberry Spawn Rarity" = 18
+	#Range: > 0
+	"Duskberry Spawn Range" = 100
+	#Range: > 0
+	"Skyberry Spawn Rarity" = 18
+	#Range: > 0
+	"Skyberry Spawn Range" = 100
+	#Range: > 0
+	"Stingberry Spawn Rarity" = 18
+	#Range: > 0
+	"Stingberry Spawn Range" = 100
+	#Range: > 0
+	"Cloud Spawn Rarity" = 10
+	#Range: -2048 ~ 2048
+	"Cloud Spawn Height" = 192
+	#Range: > 0
+	"Cloud Spawn Range" = 48
+	#Range: > 0
+	"Dark Cloud Spawn Density" = 10
+	#Range: -2048 ~ 2048
+	"Dark Cloud Spawn Height" = 64
+	#Range: > 0
+	"Dark Cloud Spawn Range" = 256
+	#Range: > 0
+	"Sulfur Cloud Spawn Rarity" = 8
+	#Range: -2048 ~ 2048
+	"Sulfur Cloud Spawn Height" = 40
+	#Range: > 0
+	"Sulfur Cloud Spawn Range" = 78
+	#Range: > 0
+	"Ash Cloud Spawn Rarity" = 8
+	#Range: -2048 ~ 2048
+	"Ash Cloud Spawn Height" = 40
+	#Range: > 0
+	"Ash Cloud Spawn Range" = 78
+	#Range: > 0
+	"Tainted Soil Cluster Count" = 4
+	#Range: > 0
+	"Heat Sand Cluster Count" = 4
+	#Range: > 0
+	"Tainted Soil Cluster Size" = 33
+	#Range: > 0
+	"Heat Sand Cluster Size" = 33
+	#Range: > 0
+	"Thornvines Spawn Rarity" = 40
+

@@ -1,0 +1,36 @@
+== forge gen-natura (39 s)
+[bench] gen overworld 24x24 chunks in 8.81 s: 65.4 chunks/s
+[bench] gen nether 24x24 chunks in 6.99 s: 82.4 chunks/s
+== forge gen-off (37 s)
+[bench] gen overworld 24x24 chunks in 9.40 s: 61.3 chunks/s
+[bench] gen nether 24x24 chunks in 6.80 s: 84.7 chunks/s
+== forge crops-natura (75 s)
+[bench] item entities: {}
+[bench] crops natura 16384 plants: 0.516 ms per tick (average of 1200 ticks, random tick speed 300)
+== forge crops-wheat (74 s)
+[bench] item entities: {}
+[bench] crops wheat 16384 plants: 0.460 ms per tick (average of 1200 ticks, random tick speed 300)
+== forge carts-blaze (74 s)
+[bench] item entities: {}
+[bench] carts blaze 1024 carts: 2.621 ms per tick (average of 1200 ticks)
+== forge carts-vanilla (73 s)
+[bench] item entities: {}
+[bench] carts vanilla 1024 carts: 2.998 ms per tick (average of 1200 ticks)
+== fabric gen-natura (32 s)
+[bench] gen overworld 24x24 chunks in 8.37 s: 68.9 chunks/s
+[bench] gen nether 24x24 chunks in 6.27 s: 91.9 chunks/s
+== fabric gen-off (35 s)
+[bench] gen overworld 24x24 chunks in 8.88 s: 64.9 chunks/s
+[bench] gen nether 24x24 chunks in 6.26 s: 92.0 chunks/s
+== fabric crops-natura (73 s)
+[bench] item entities: {}
+[bench] crops natura 16384 plants: 0.450 ms per tick (average of 1200 ticks, random tick speed 300)
+== fabric crops-wheat (72 s)
+[bench] item entities: {}
+[bench] crops wheat 16384 plants: 0.425 ms per tick (average of 1200 ticks, random tick speed 300)
+== fabric carts-blaze (72 s)
+[bench] item entities: {}
+[bench] carts blaze 1024 carts: 2.458 ms per tick (average of 1200 ticks)
+== fabric carts-vanilla (73 s)
+[bench] item entities: {}
+[bench] carts vanilla 1024 carts: 2.071 ms per tick (average of 1200 ticks)

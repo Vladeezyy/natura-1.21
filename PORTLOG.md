@@ -377,3 +377,37 @@ are noise. Server tick in ms, generation in chunks per second (24x24 chunks).
   thorn vines, soil veins); 0.2-0.3 s more for 576 chunks on 26.3.
 - 26.3 random ticks cost ten times more on a flat world for both crops (vanilla wheat too): not Natura.
 - The client draws nothing per frame (tints are computed when a chunk section is built); not measured.
+
+## Forge 1.20.1 + Fabric (branch mc/1.20.1, 2026-10-26)
+
+A backport of the 1.21.1 version: Forge 47.4.28 (ModDevGradle legacyforge; `common` compiles on Forge userdev, the
+access transformer in SRG names) and Fabric 0.16.14 / Fabric API 0.92.12, Java 17. The mechanical part of the Java
+changes was done by modding-kb `scripts/backport_1_20_1.py`, the resources by `tools/resources_1_20_1.py` after the
+1.21.1 generator (`tools/gen_resources_1_20_1.sh`). Same behaviour as 1.21.1; what is done differently:
+
+- Blocks: `use()` (1.21 `useItemOn` / `useWithoutItem`; the without-item part only for the main hand, as in 1.21).
+- Food: the 1.12 eating times are the items' `getUseDuration` (1.20.1 food has no eating time of its own).
+- Tools and imp armor: `Tier.getLevel()` (bloodwood mines like iron, 2), the imp `ArmorMaterial` is a plain object named
+  `natura:imp`; on Fabric a client mixin (`ArmorTextureMixin`) finds its layer textures, which Forge does itself.
+- Forge hooks: the kama has the shears tool actions and shears every `IForgeShearable` mob; tainted soil sustains the
+  nether plants through `canSustainPlant(..., IPlantable)`; the obelisk respawn through `IForgeBlock.getRespawnPosition`
+  (Fabric: a mixin into `Player.findRespawnPositionAndUseSpawnBlock`); the blaze hopper is added to the hopper block
+  entity type at common setup on both loaders (Forge 1.20.1 has no event for it).
+- Conditions: the wheat flour recipe has Forge `conditions` and `fabric:load_conditions`, the heatscar spider spawns
+  `forge:conditions`; Fabric reads the Forge biome modifiers from the jar (`data/natura/forge/biome_modifier`).
+- Biome types: the generation checks the 1.21 conventional biome tags (`c:is_forest`, ...), which no 1.20.1 loader has;
+  the jar ships them (vanilla entries as in NeoForge 21.1, plus `forge:is_*` and the Fabric API 0.92 `c:forest`, ...).
+- The `c:tools/shear` tag of 1.21 is in the jar (shears and the kamas).
+- Game tests: the same 49, `:forge:runGameTestServer` (a flat world), `:fabric:runGametest`, `:fabric:prodGametest` on the
+  release jar; the Forge release jar starts on a real Forge server without errors (`sh tools/prodserver.sh`).
+
+Performance (`tools/bench.sh`, the same cases as 1.21.1, one run each, Apple laptop):
+
+| | 1.20.1 Forge | 1.20.1 Fabric |
+|---|---|---|
+| overworld generation, Natura on / off (chunks/s) | 65.4 / 61.3 | 68.9 / 64.9 |
+| nether generation, Natura on / off (chunks/s) | 82.4 / 84.7 | 91.9 / 92.0 |
+| 16384 grown barley / wheat, random tick speed 300 (ms per tick) | 0.52 / 0.46 | 0.45 / 0.43 |
+| 1024 minecarts on blaze / vanilla rails (ms per tick) | 2.62 / 3.00 | 2.06, 2.46, 2.54 / 2.07, 2.34, 2.48 |
+
+All on par with vanilla (differences inside the run-to-run noise).

@@ -1,7 +1,8 @@
-# Natura for Minecraft 1.21.1 (unofficial port)
+# Natura for Minecraft 1.20.1 (unofficial port)
 
 An unofficial port of [Natura](https://github.com/progwml6/Natura) 4.3.2 (Minecraft 1.12.2) by mDiyo, progwml6 and
-the Slime Knights to Minecraft 1.21.1 for **NeoForge** 21.1 and **Fabric** (Fabric API required).
+the Slime Knights to Minecraft 1.20.1 for **Forge** 47 and **Fabric** (Fabric API required). Branch `mc/1.20.1`, a
+backport of the 1.21.1 version (branch `main`).
 
 > Heyo, Redwood trees! Chop them all day long!
 
@@ -37,16 +38,17 @@ recipe and the sea level the trees grow from.
 
 ## Building
 
-JDK 21, then:
+JDK 17 (Gradle itself runs on JDK 21), then:
 
 ```
 ./gradlew build
 ```
 
-The jars are in `neoforge/build/libs` and `fabric/build/libs`. The game code and resources are in `common`; the
-`neoforge` and `fabric` projects hold what differs per loader. Resources are generated from the 1.12 resources by
-`tools/gen_resources.py` (see the script header). Game tests: `./gradlew :neoforge:runGameTestServer` and
-`./gradlew :fabric:runGametest`.
+The jars are in `forge/build/libs` and `fabric/build/libs`. The game code and resources are in `common`; the
+`forge` and `fabric` projects hold what differs per loader. Resources are generated from the 1.12 resources by
+`tools/gen_resources_1_20_1.sh` (the 1.21.1 generator `tools/gen_resources.py`, then the 1.20.1 formats). Game tests:
+`./gradlew :forge:runGameTestServer`, `./gradlew :fabric:runGametest` and `./gradlew :fabric:prodGametest` (the
+release jar); the Forge release jar on a real server: `sh tools/prodserver.sh`.
 
 ## License
 

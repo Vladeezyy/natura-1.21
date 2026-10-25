@@ -2,10 +2,10 @@
 # Dev measurements (common/.../dev/DevBench.java) on a fresh dev server world, each case in its own world:
 #   gen with Natura world generation and without it (all Natura features off), crops (Natura barley vs vanilla wheat),
 #   carts (1024 minecarts on blaze rails vs vanilla rails: the cost of the rail code).
-# LOADER=neoforge|fabric (default neoforge). ONLY=gen|crops|carts runs one group. Each run is stopped after LIMIT
+# LOADER=forge|fabric (default forge). ONLY=gen|crops|carts runs one group. Each run is stopped after LIMIT
 # seconds (default 180). Prints the "[bench]" lines. JFR=1 also records a flight recording of each case.
 cd "$(dirname "$0")/.."
-LOADER=${LOADER:-neoforge}
+LOADER=${LOADER:-forge}
 SIZE=${SIZE:-24}
 LIMIT=${LIMIT:-180}
 RUN=$LOADER/run
@@ -27,7 +27,7 @@ bench() { # case name, -D properties, natura world generation on/off
 	stop
 	rm -rf $RUN/world build-bench.log
 	mkdir -p $RUN/config && echo "eula=true" > $RUN/eula.txt
-	# 1.21.2+: an empty server stops ticking after 60 s; the crops and carts cases tick longer than that
+	# 1.21.2+: an empty server stops ticking after 60 s (1.20.1 ignores the key); the crops and carts cases tick longer
 	touch $RUN/server.properties
 	prop pause-when-empty-seconds 0
 	# the same world in every case: a fixed seed; crops and carts on a flat world (no terrain vegetation dropping items)
