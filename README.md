@@ -36,20 +36,6 @@ the barley and cotton crops show their crop item.
 heatscar spiders, the baby spider count, the obelisk respawn in the nether, the seeds from grass, the wheat flour
 recipe and the sea level the trees grow from.
 
-## Building
-
-JDK 17 (Gradle itself runs on JDK 21), then:
-
-```
-./gradlew build
-```
-
-The jars are in `forge/build/libs` and `fabric/build/libs`. The game code and resources are in `common`; the
-`forge` and `fabric` projects hold what differs per loader. Resources are generated from the 1.12 resources by
-`tools/gen_resources_1_20_1.sh` (the 1.21.1 generator `tools/gen_resources.py`, then the 1.20.1 formats). Game tests:
-`./gradlew :forge:runGameTestServer`, `./gradlew :fabric:runGametest` and `./gradlew :fabric:prodGametest` (the
-release jar); the Forge release jar on a real server: `sh tools/prodserver.sh`.
-
 ## License
 
 The code of this port: **LGPL-3.0-only** ([LICENSE](LICENSE), GPL-3.0 text in [COPYING](licenses/COPYING)), Copyright (c) 2026 Vladeezyy (the original code was public domain under [CC0](http://creativecommons.org/publicdomain/zero/1.0/)).
