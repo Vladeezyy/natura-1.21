@@ -4,6 +4,7 @@
   "package": "com.progwml6.natura.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": ["FireBlockInvoker", "OldMinecartBehaviorMixin"],
+  "client": ["BerryBushOpaqueMixin"],
   "injectors": {
     "defaultRequire": 1
   }

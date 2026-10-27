@@ -389,3 +389,13 @@ obfuscation (no Parchment, no remapping). Resources: `tools/convert_26.py` turns
   as on 1.21.1). Fabric: an annotated class (`FabricGameTests`, 100 ticks like the 1.21.1 tests) and the tree
   environments as data. 50 tests pass on NeoForge, Fabric and the Fabric release jar.
 - Scenes: the scene makes a new flat world itself (time and weather by command).
+
+## Fast leaves (2026-10-27)
+
+Reported on CurseForge: leaves and berry bushes stayed see-through with fast leaves. 1.12 drew both opaque with fast
+graphics (vanilla leaves, `BlockEnumBerryBush.getBlockLayer` SOLID).
+
+- 26.x already draws every LeavesBlock opaque when "Cutout Leaves" is off (`ModelBlockRenderer.forceOpaque`, the
+  "Fast" preset), whatever the model asks, so the leaves were right. Berry bushes are not leaves: a client mixin on
+  `forceOpaque` (common, both loaders) treats them the same way.
+- DevScene: `plants_fast` and `logs_leaves_fast` shots with cutout leaves off.
