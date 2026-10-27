@@ -396,3 +396,13 @@ NeoForge 26.2.0.93, Fabric API 0.161.0. Only renames: the entity type and block 
 `EntityTypes` / `BlockEntityTypes`; the sapling tag is gone (the redwood check asks for a sapling block); the screen,
 overlay and HUD toggle are in `Minecraft.gui`, the main render target in the game renderer (scenes); no
 `BlockPos.getBottomCenter`. NeoForge: `bannerFile` instead of the deprecated `logoFile`. Resources as on 26.1.2.
+
+## Fast leaves (2026-10-27)
+
+Reported on CurseForge: leaves and berry bushes stayed see-through with fast leaves. 1.12 drew both opaque with fast
+graphics (vanilla leaves, `BlockEnumBerryBush.getBlockLayer` SOLID).
+
+- 26.x already draws every LeavesBlock opaque when "Cutout Leaves" is off (`ModelBlockRenderer.forceOpaque`, the
+  "Fast" preset), whatever the model asks, so the leaves were right. Berry bushes are not leaves: a client mixin on
+  `forceOpaque` (common, both loaders) treats them the same way.
+- DevScene: `plants_fast` and `logs_leaves_fast` shots with cutout leaves off.
