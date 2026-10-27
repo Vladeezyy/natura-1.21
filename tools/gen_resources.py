@@ -238,7 +238,8 @@ def door(name, bottom, top, item_tex):
 
 
 def leaves(name, texture):
-    m = model(name, "minecraft:block/leaves", {"all": texture}, "minecraft:cutout_mipped")
+    # no render_type: vanilla picks cutout_mipped (fancy) or solid (fast) for every LeavesBlock, as 1.12 did
+    m = model(name, "minecraft:block/leaves", {"all": texture})
     blockstate(name, {"": {"model": m}})
     item_model(name, m)
 
@@ -560,7 +561,8 @@ def plants():
     cross_block("bluebells", tex("bluebells_flower", "cross"), None)
     old("bluebells_flower", 0, "bluebells", "bluebells_flower")
     self_drop("bluebells")
-    # berry bushes: 1.12 natura_bush_small / medium / large, ripe texture at stage 3
+    # berry bushes: 1.12 natura_bush_small / medium / large, ripe texture at stage 3; cutout_mipped is for the items,
+    # in the world the bushes follow the graphics mode like the leaves (NeoForge and Fabric client code)
     for world, berries in (("overworld", ["raspberry", "blueberry", "blackberry", "maloberry"]), ("nether", ["blightberry", "duskberry", "skyberry", "stingberry"])):
         for berry in berries:
             old_id = f"{world}_berrybush_{berry}"

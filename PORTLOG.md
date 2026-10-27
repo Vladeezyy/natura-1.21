@@ -377,3 +377,19 @@ are noise. Server tick in ms, generation in chunks per second (24x24 chunks).
   thorn vines, soil veins); 0.2-0.3 s more for 576 chunks on 26.3.
 - 26.3 random ticks cost ten times more on a flat world for both crops (vanilla wheat too): not Natura.
 - The client draws nothing per frame (tints are computed when a chunk section is built); not measured.
+
+## Fast leaves (2026-10-27)
+
+Reported on CurseForge: leaves and berry bushes stayed see-through with fast leaves. 1.12 drew both opaque with fast
+graphics (vanilla leaves, `BlockEnumBerryBush.getBlockLayer` SOLID).
+
+- Leaves: the `render_type` in the leaves models fixed cutout_mipped on NeoForge, past the vanilla choice for a
+  LeavesBlock (cutout_mipped with fancy graphics, solid with fast); the models no longer set it. Fabric always took the
+  vanilla choice for leaves.
+- Berry bushes (not a LeavesBlock) take the oak leaves' layer: NeoForge wraps their block models
+  (`ModelEvent.ModifyBakingResult`), Fabric has a client mixin on `ItemBlockRenderTypes.getChunkRenderType`. Sodium's
+  "Leaves Quality" changes the same vanilla answer, so it now applies to the Natura leaves and bushes too. The items
+  keep cutout_mipped.
+- DevScene: `plants_fast` and `logs_leaves_fast` shots with fast graphics.
+- DevScene makes its world when it is missing (as on mc/1.20.1) and opens it past the accessibility onboarding screen
+  of a new run folder, which stopped `--quickPlaySingleplayer`.

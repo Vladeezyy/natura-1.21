@@ -37,6 +37,8 @@ import net.minecraft.world.level.levelgen.Heightmap;
  */
 public final class DevScene {
     private static final boolean ENABLED = System.getProperty("natura.scene") != null;
+    private static final String WORLD = "natura_scene";
+    private static boolean created;
     private static final List<Step> STEPS = new ArrayList<>();
     private static int tick;
     private static BlockPos origin;
@@ -110,7 +112,21 @@ public final class DevScene {
         at(825, mc -> server(mc, DevScene::jadeCrop));
         at(828, mc -> mc.options.hideGui = false);
         at(860, mc -> shot(mc, "jade_crop"));
-        at(870, Minecraft::stop);
+        // fast graphics: leaves and berry bushes opaque, as in 1.12
+        at(862, mc -> {
+            mc.options.hideGui = true;
+            mc.options.graphicsMode().set(net.minecraft.client.GraphicsStatus.FAST);
+            mc.levelRenderer.allChanged();
+        });
+        at(865, mc -> server(mc, DevScene::plants));
+        at(905, mc -> shot(mc, "plants_fast"));
+        at(910, mc -> server(mc, DevScene::logsAndLeaves));
+        at(950, mc -> shot(mc, "logs_leaves_fast"));
+        at(952, mc -> {
+            mc.options.graphicsMode().set(net.minecraft.client.GraphicsStatus.FANCY);
+            mc.levelRenderer.allChanged();
+        });
+        at(960, Minecraft::stop);
     }
 
     private static void at(int t, Consumer<Minecraft> action) {
@@ -121,6 +137,32 @@ public final class DevScene {
     public static void onTick() {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        // no scene world yet (a new checkout or another Minecraft version): a creative superflat one, as the scene needs.
+        // The quick play of a missing world ends on its "Failed to quick play" screen (DisconnectedScreen); a new run
+        // folder starts on the accessibility onboarding screen instead of the title screen, and that screen also stops
+        // the quick play of an existing world: open it from here.
+        if (!created && mc.level == null && mc.screen instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen
+                && mc.getLevelSource().levelExists(WORLD)) {
+            mc.options.onboardAccessibility = false;
+            mc.options.save();
+            created = true;
+            mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.setScreen(new net.minecraft.client.gui.screens.TitleScreen()));
+            return;
+        }
+        if (!created && mc.level == null && (mc.screen instanceof net.minecraft.client.gui.screens.TitleScreen
+                || mc.screen instanceof net.minecraft.client.gui.screens.DisconnectedScreen
+                || mc.screen instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) && !mc.getLevelSource().levelExists(WORLD)) {
+            mc.options.onboardAccessibility = false;
+            mc.options.save();
+            created = true;
+            var settings = new net.minecraft.world.level.LevelSettings(WORLD, GameType.CREATIVE, false, net.minecraft.world.Difficulty.PEACEFUL,
+                    true, new net.minecraft.world.level.GameRules(), net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
+            mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new net.minecraft.world.level.levelgen.WorldOptions(1234L, false, false),
+                    access -> access.registryOrThrow(net.minecraft.core.registries.Registries.WORLD_PRESET)
+                            .getHolderOrThrow(net.minecraft.world.level.levelgen.presets.WorldPresets.FLAT).value().createWorldDimensions(),
+                    new net.minecraft.client.gui.screens.TitleScreen());
+            return;
+        }
         if (mc.player == null || mc.getSingleplayerServer() == null) return;
         // The window is usually unfocused while this runs: never pause, or the integrated server stops.
         mc.options.pauseOnLostFocus = false;
