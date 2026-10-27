@@ -411,3 +411,16 @@ Performance (`tools/bench.sh`, the same cases as 1.21.1, one run each, Apple lap
 | 1024 minecarts on blaze / vanilla rails (ms per tick) | 2.62 / 3.00 | 2.06, 2.46, 2.54 / 2.07, 2.34, 2.48 |
 
 All on par with vanilla (differences inside the run-to-run noise).
+
+## Fast leaves (2026-10-27)
+
+Reported on CurseForge: leaves and berry bushes stayed see-through with fast leaves. 1.12 drew both opaque with fast
+graphics (vanilla leaves, `BlockEnumBerryBush.getBlockLayer` SOLID).
+
+- Leaves: the `render_type` in the leaves models fixed cutout_mipped on Forge, past the vanilla choice for a
+  LeavesBlock (cutout_mipped with fancy graphics, solid with fast); the models no longer set it. Fabric always took the
+  vanilla choice for leaves.
+- Berry bushes (not a LeavesBlock) take the oak leaves' layer: Forge wraps their block models
+  (`ModelEvent.ModifyBakingResult`), Fabric has a client mixin on `ItemBlockRenderTypes.getChunkRenderType`. The items keep
+  cutout_mipped.
+- DevScene: `plants_fast` and `logs_leaves_fast` shots with fast graphics.
