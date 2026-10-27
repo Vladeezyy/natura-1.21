@@ -110,7 +110,17 @@ public final class DevScene {
         at(825, mc -> server(mc, DevScene::jadeCrop));
         at(828, mc -> hideGui(mc, false));
         at(860, mc -> shot(mc, "jade_crop"));
-        at(870, Minecraft::stop);
+        // cutout leaves off (the "Fast" graphics preset): leaves and berry bushes opaque, as in 1.12
+        at(862, mc -> {
+            hideGui(mc, true);
+            mc.options.cutoutLeaves().set(false);
+        });
+        at(865, mc -> server(mc, DevScene::plants));
+        at(905, mc -> shot(mc, "plants_fast"));
+        at(910, mc -> server(mc, DevScene::logsAndLeaves));
+        at(950, mc -> shot(mc, "logs_leaves_fast"));
+        at(952, mc -> mc.options.cutoutLeaves().set(true));
+        at(960, Minecraft::stop);
     }
 
     private static boolean worldCreated;

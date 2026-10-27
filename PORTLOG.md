@@ -431,3 +431,13 @@ are noise. Server tick in ms, generation in chunks per second (24x24 chunks).
   thorn vines, soil veins); 0.2-0.3 s more for 576 chunks on 26.3.
 - 26.3 random ticks cost ten times more on a flat world for both crops (vanilla wheat too): not Natura.
 - The client draws nothing per frame (tints are computed when a chunk section is built); not measured.
+
+## Fast leaves (2026-10-27)
+
+Reported on CurseForge: leaves and berry bushes stayed see-through with fast leaves. 1.12 drew both opaque with fast
+graphics (vanilla leaves, `BlockEnumBerryBush.getBlockLayer` SOLID).
+
+- 26.x already draws every LeavesBlock opaque when "Cutout Leaves" is off (`ModelBlockRenderer.forceOpaque`, the
+  "Fast" preset), whatever the model asks, so the leaves were right. Berry bushes are not leaves: a client mixin on
+  `forceOpaque` (common, both loaders) treats them the same way.
+- DevScene: `plants_fast` and `logs_leaves_fast` shots with cutout leaves off.
