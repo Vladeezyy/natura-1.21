@@ -30,19 +30,26 @@ jobs:
             case "$(sed -n 's/^minecraft_version=//p' gradle.properties)" in 26*) v=25 ;; *) v=21 ;; esac
           fi
           echo "java=$v" >> "$GITHUB_OUTPUT"
+          # Loom 1.13 needs Gradle on Java 21+: an older java_version (17 for 1.20.1) is only the toolchain
+          if [ "$v" -lt 21 ]; then
+            { echo "jdks<<EOF"; echo "$v"; echo 21; echo EOF; } >> "$GITHUB_OUTPUT"
+          else
+            echo "jdks=$v" >> "$GITHUB_OUTPUT"
+          fi
 
+      # the last JDK listed runs Gradle; the toolchain finds the other one
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: ${{ steps.props.outputs.java }}
+          java-version: ${{ steps.props.outputs.jdks }}
 
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build
         run: chmod +x gradlew && ./gradlew build --console=plain
 
-      - name: GameTests (NeoForge)
-        run: ./gradlew :neoforge:runGameTestServer --console=plain
+      - name: GameTests (Forge)
+        run: ./gradlew :forge:runGameTestServer --console=plain
 
       - name: GameTests (Fabric)
         if: ${{ !cancelled() }}
